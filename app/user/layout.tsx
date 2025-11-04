@@ -1,5 +1,4 @@
 import { FaUser } from "react-icons/fa6";
-import Sidebar from "./components/Sidebar";
 
 export default function RootLayout({
   children,
@@ -8,14 +7,13 @@ export default function RootLayout({
 }>) {
   return (
     <div className="flex flex-row w-full h-screen bg-gray-50">
-      <Sidebar />
       <div className="flex-1 overflow-auto">
         <div className="h-[4%] bg-[#16292f] flex justify-end p-4 items-center text-white gap-4">
           <h1 className="italic">Hola User 01</h1>
-          <FaUser className="bg-white rounded-full p-4" color="blue"/>
+          <FaUser className="bg-white rounded-full p-4" color="blue" />
         </div>
         <div className="h-[96%] p-4">
-        {children}
+          {children}
         </div>
       </div>
     </div>

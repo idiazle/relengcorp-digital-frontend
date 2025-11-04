@@ -1,11 +1,11 @@
-import Image from "next/image";
 import MonitoreoCondiciones from "./admin/moncon/page";
+import Menu from "./menu/page";
 
 export default function Home() {
   return (
     <div >
       <main >
-        <MonitoreoCondiciones />
+        <Menu />
       </main>
     </div>
   );
