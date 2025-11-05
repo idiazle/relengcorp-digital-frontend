@@ -9,29 +9,44 @@ const Sidebar = () => {
   const routes = [
     {
       id: 1,
+      name: 'Gestión de Usuarios',
+      icon: <FaRegFileLines />,
+      path: '/admin/users',
+      role: ['1', '2'],
+      enabled: true
+    },
+    {
+      id: 2,
+      name: 'Gestión de Entidades',
+      icon: <FaRegFileLines />,
+      path: '/admin/entities',
+      role: ['1', '2'],
+      enabled: true
+    },
+    {
+      id: 3,
       name: 'Monitoreo de Condicion',
       icon: <FaRegFileLines />,
       path: '/admin/moncon',
       role: ['1', '2', '3'],
       enabled: true
     },
-    {
-      id: 2,
-      name: 'Gestión de Documentos',
-      icon: <FaRegFileLines />,
-      path: '/admin/documents',
-      role: ['1', '2', '3'],
-      enabled: true
-    },
-    {
-      id: 3,
-      name: 'Gestión de TAGS',
-      icon: <FaRegFileLines />,
-      path: '/admin/equipments',
-      role: ['1', '2', '3'],
-      enabled: true
-    },
-
+    // {
+    //   id: 4,
+    //   name: 'Gestión de Documentos',
+    //   icon: <FaRegFileLines />,
+    //   path: '/admin/documents',
+    //   role: ['1', '2', '3'],
+    //   enabled: true
+    // },
+    // {
+    //   id: 5,
+    //   name: 'Gestión de TAGS',
+    //   icon: <FaRegFileLines />,
+    //   path: '/admin/equipments',
+    //   role: ['1', '2', '3'],
+    //   enabled: true
+    // },
   ]
 
   return (
