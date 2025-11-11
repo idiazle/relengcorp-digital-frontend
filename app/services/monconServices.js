@@ -1,9 +1,5 @@
 import axios from 'axios';
 
-// Moncon Services - Notices CRUD Operations
-// Base URL is set using environment variable NEXT_PUBLIC_API_URL
-
-// Fetch all notices
 export const getNotices = async () => {
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/notices`);
@@ -14,7 +10,6 @@ export const getNotices = async () => {
   }
 };
 
-// Fetch a single notice by ID
 export const getNoticeById = async (id) => {
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/notices/${id}`);
@@ -25,7 +20,6 @@ export const getNoticeById = async (id) => {
   }
 }
 
-// Create a new notice
 export const createNotice = async (data) => {
   try {
     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/notices`, data);
@@ -36,7 +30,6 @@ export const createNotice = async (data) => {
   }
 }
 
-// Update an existing notice
 export const updateNotice = async (id, data) => {
   try {
     const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/notices/${id}`, data);
@@ -47,18 +40,6 @@ export const updateNotice = async (id, data) => {
   }
 }
 
-// // Partially update an existing notice
-// export const patchNotice = async (id, data) => {
-//   try {
-//     const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/notices/${id}`, data);
-//     return response;
-//   } catch (error) {
-//     console.error('Error patching Moncon notice:', error);
-//     throw error;
-//   }
-// }
-
-// Delete a notice
 export const deleteNotice = async (id) => {
   try {
     const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/notices/${id}`);
@@ -92,6 +73,16 @@ export const createMonconReport = async (data) => {
   }
 }
 
+export const updateReport = async (reportId, data) => {
+  try {
+    const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/reports/${reportId}`, data);
+    return response;
+  } catch (error) {
+    console.error('Error update Moncon report:', error);
+    throw error;
+  }
+}
+
 export const deleteMonconReport = async (id) => {
   try {
     const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`);
@@ -113,12 +104,3 @@ export const getNoticesByReportId = async (reportId) => {
   }
 }
 
-export const updateReport = async (reportId, data ) =>{
-  try {
-    const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/reports/${reportId}`, data);
-    return response;
-  } catch (error) {
-    console.error('Error update Moncon report:', error);
-    throw error;
-  }
-}

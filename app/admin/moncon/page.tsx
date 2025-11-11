@@ -17,6 +17,7 @@ import { FaBell, FaCircle, FaEye, FaFilePdf, FaPencil, FaPlus, FaTrash, FaUpload
 import { createMonconReport, deleteMonconReport, getMonconReports, getNoticesByReportId, updateReport } from '../../services/monconServices'
 import { getEntities } from '@/app/services/entitiesServices'
 import { Entity, ReportType } from '@/lib/types'
+import PDFViewer from '../components/PDFViewer'
 
 const MonitoreoCondiciones = () => {
   const [openNewRegister, setOpenNewRegister] = useState<boolean>(false);
@@ -292,7 +293,7 @@ const MonitoreoCondiciones = () => {
                 <TableCell>{getConditionName(data.condition)}</TableCell>
                 <TableCell className="flex flex-row gap-2">
                   <Button size="sm"
-                    disabled={!data.attachments || data.attachments.length === 0}
+                    // disabled={!data.attachments || data.attachments.length === 0}
                     onClick={() => setOpenPDF(true)}>
                     <FaFilePdf />
                   </Button>
@@ -329,18 +330,7 @@ const MonitoreoCondiciones = () => {
         </Table>
       </div>
 
-      {/* Visualizar archivos PDF */}
-      <Dialog open={openPDF} onOpenChange={setOpenPDF}>
-        <DialogContent className='min-w-3xl bg-slate-200'>
-          <DialogHeader>
-            <DialogTitle>Archivos PDF</DialogTitle>
-          </DialogHeader>
-          <div className='w-full p-2 rounded-md gap-4 flex flex-col mt-4'>
-            <embed src="/sample.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="600px" />
-          </div>
-        </DialogContent>
-      </Dialog>
-
+      -
       {/* Nuevo registro individual */}
       <Dialog open={openNewRegister} onOpenChange={setOpenNewRegister}>
         <DialogContent className='min-w-5xl bg-slate-200'>
@@ -848,7 +838,7 @@ const MonitoreoCondiciones = () => {
       {/* Ver registro individual */}
       {
         openViewRegister && (
-          <Dialog open={openViewRegister} onOpenChange={setOpenViewRegister}>
+          <Dialog open={openViewRegister} onOpenChange={() => { setOpenViewRegister(false); setRegisterSelected(null); }}>
             <DialogContent className='min-w-5xl bg-slate-200'>
               <DialogHeader>
                 <DialogTitle className='font-bold'>DETALLE DE REGISTRO</DialogTitle>
@@ -1073,7 +1063,7 @@ const MonitoreoCondiciones = () => {
                   <div className='flex flex-col gap-2 w-2/3'>
                     {/* Subir PDF con información detallada, lo que están realizando en estos momentos */}
                     <Label className='font-semibold'>Archivo:</Label>
-                    <Input className='bg-white' type='file' accept='.pdf'></Input>
+
                   </div>
                 </div>
 
@@ -1081,11 +1071,11 @@ const MonitoreoCondiciones = () => {
                 <div className='w-full flex flex-row gap-2 mt-5'>
                   <div className='flex flex-col gap-2 w-2/3'>
                     <Label className='font-semibold'>N° de avisos:</Label>
-                    <Input className='bg-white' value={noticesData[0]?.name} />
+                    <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.name ? noticesData[0]?.name : "---"}</h1>
                   </div>
                   <div className='flex flex-col gap-2 w-2/3'>
                     <Label className='font-semibold'>Fecha de aviso:</Label>
-                    <Input className='bg-white' value={noticesData[0]?.date} />
+                    <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.date ? noticesData[0]?.date : "---"}</h1>
                   </div>
                   <div className='flex flex-col gap-2 w-2/3'>
                     <Label className='font-semibold'>Status de aviso:</Label>
@@ -1103,11 +1093,11 @@ const MonitoreoCondiciones = () => {
                 <div className='w-full flex flex-row gap-2'>
                   <div className='flex flex-col gap-2 w-2/3'>
                     <Label className='font-semibold'>N° de OT:</Label>
-                    <Input disabled className='bg-white' value={noticesData[0]?.ot_number} />
+                    <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.ot_number ? noticesData[0]?.ot_number : "---"}</h1>
                   </div>
                   <div className='flex flex-col gap-2 w-2/3'>
                     <Label className='font-semibold'>Fecha de OT:</Label>
-                    <Input disabled className='bg-white' value={noticesData[0]?.ot_date} />
+                    <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.ot_date ? noticesData[0]?.ot_date : "---"}</h1>
                   </div>
                   <div className='flex flex-col gap-2 w-2/3'>
                     <Label className='font-semibold'>Status de OT:</Label>
@@ -1137,7 +1127,7 @@ const MonitoreoCondiciones = () => {
                   </div>
                   <div className='flex flex-col gap-2 w-2/3'>
                     <Label className='font-semibold'>Comentario:</Label>
-                    <Input className='bg-white' value={noticesData[0]?.comment} />
+                    <Input className='bg-white p-1.5 rounded-md'>{noticesData[0]?.comments}</Input>
                   </div>
                 </div>
               </div>
@@ -1250,51 +1240,9 @@ const MonitoreoCondiciones = () => {
         </DialogContent>
       </Dialog>
 
-      {/* <Dialog open={openNoticesDialog} onOpenChange={() => { setOpenNoticesDialog(false); setNoticesData([]); }}>
-        <DialogContent className='min-w-1/2 max-h-[600px] bg-slate-200'>
-          <DialogHeader>
-            <DialogTitle>Avisos para </DialogTitle>
-          </DialogHeader>
-          <div>
-            <Table className='bg-white'>
-              <TableHeader className="bg-gray-300 sticky top-0 z-10">
-                <TableRow>
-                  <TableHead>N° AVISO</TableHead>
-                  <TableHead>STATUS AVISO</TableHead>
-                  <TableHead>FECHA AVISO</TableHead>
-                  <TableHead>N° OT</TableHead>
-                  <TableHead>STATUS OT</TableHead>
-                  <TableHead>FECHA OT</TableHead>
-                  <TableHead>STATUS REAL</TableHead>
-                  <TableHead>COMENTARIO</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {noticesData.length > 0 ? (
-                  noticesData.map((data, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{data.name}</TableCell>
-                      <TableCell>{data.status === 1 ? 'Abierto' : 'Cerrado'}</TableCell>
-                      <TableCell>{data.date ? data.date : 'N/A'}</TableCell>
-                      <TableCell>{data.ot_number ? data.ot_number : 'N/A'}</TableCell>
-                      <TableCell>{data.ot_status === 1 ? 'Abierto' : 'Cerrado'}</TableCell>
-                      <TableCell>{data.ot_date ? data.ot_date : 'N/A'}</TableCell>
-                      <TableCell>{data.status_real === 1 ? 'Atendido' : 'No atendido'}</TableCell>
-                      <TableCell>{data.comment ? data.comment : 'N/A'}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center">
-                      No hay avisos disponibles
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </DialogContent>
-      </Dialog> */}
+      {
+        openPDF && <PDFViewer urlPDF={''} openDialog={openPDF} setOpenDialog={setOpenPDF} />
+      }
     </div >
 
   )
