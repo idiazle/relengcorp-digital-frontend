@@ -11,9 +11,12 @@ export type ReportType = {
   observations?: string;
   condition: number;
   diagnostic?: string;
-  recommendations?: string;
+  recomendations?: string;
   created_by?: number;
   deleted?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
 }
 
 export type Entity = {

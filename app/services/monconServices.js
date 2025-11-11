@@ -112,3 +112,13 @@ export const getNoticesByReportId = async (reportId) => {
     throw error;
   }
 }
+
+export const updateReport = async (reportId, data ) =>{
+  try {
+    const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/reports/${reportId}`, data);
+    return response;
+  } catch (error) {
+    console.error('Error update Moncon report:', error);
+    throw error;
+  }
+}
