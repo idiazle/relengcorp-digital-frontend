@@ -4,10 +4,9 @@ export type ReportType = {
   name: string;
   attachment?: File[];
   program: number;
-  program_date: string;
   task_type: number;
   execution_status: number;
-  execution_date: string;
+  execution_date?: string;
   observations?: string;
   condition: number;
   diagnostic?: string;
@@ -28,4 +27,18 @@ export type Entity = {
   children?: Entity[]
   extra_info?: string
   deleted?: boolean
+}
+
+export type NoticesType = {
+  id?: number;
+  name : string; //numero de aviso
+  date: string; //fecha de aviso
+  status: number; //estado del aviso
+  ot_status?: number; //estado de la ot relacionada
+  ot_number?: string; //numero de la ot relacionada
+  ot_date?: string; //fecha de la ot relacionada
+  status_real?: number; //estado real del aviso despues de inspeccion en terreno
+  comment?: string; //comentario adicional del estado real
+  report: number; //id de reporte asociado
+  created_by?: string; //usuario que creo el aviso
 }
