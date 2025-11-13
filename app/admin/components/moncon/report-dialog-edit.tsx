@@ -9,8 +9,10 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { NoticesType, ReportType } from '@/lib/types'
-import { useState } from 'react'
-import { updateReport } from '@/app/services/monconServices'
+import { useEffect, useState } from 'react'
+import { createNotice, deleteNotice, getNoticesByReportId, updateReport } from '@/app/services/monconServices'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { FaTrash } from 'react-icons/fa6'
 
 
 type ReportDialogEditProps = {
@@ -26,6 +28,8 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
   const [loading, setLoading] = useState(false);
   const [noticesData, setNoticesData] = useState<NoticesType[]>([]);
   const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date_status, setDateStatus] = useState<Date | undefined>(new Date())
+  const [date_ot, setDateOt] = useState<Date | undefined>(new Date())
   const [file, setFile] = useState<File | null>(null);
 
   const editReport = (reportId: number, updatedData: ReportType) => {
@@ -60,6 +64,67 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
       console.error("Error updating report:", error);
     });
   };
+
+  const handleAddNotice = () => {
+    // Lógica para añadir un nuevo aviso
+    const newNotice: NoticesType = {
+      name: '',
+      date: '',
+      status: 1,
+      ot_number: '',
+      ot_date: '',
+      ot_status: 1,
+      status_real: 1,
+      comment: ''
+    };
+    setNoticesData([...noticesData, newNotice]);
+  }
+
+  const noticesByReport = (idReport: number) => {
+    getNoticesByReportId(idReport).then((response) => {
+      console.log("Notices fetched successfully:", response);
+      setNoticesData(response.data);
+    }).catch((error) => {
+      console.error("Error fetching notices:", error);
+    });
+    // Lógica para obtener los avisos relacionados con un reporte
+  }
+  useEffect(() => {
+    if (registerSelected) {
+      noticesByReport(registerSelected.id);
+    }
+  }, [registerSelected]);
+
+  const handleSubmitNotices = () => {
+    const idReport = registerSelected?.id;
+    noticesData.forEach((notice, index) => {
+      const temp = { ...notice, report: idReport, date: date_status?.toISOString().slice(0, 10), ot_date: date_ot?.toISOString().slice(0, 10) }
+      console.log(`Submitting notice ${index + 1}:`, temp);
+      createNotice(temp).then((response) => {
+        console.log(`Notice ${index + 1} created successfully:`, response);
+      }).catch((error) => {
+        console.error(`Error creating notice ${index + 1}:`, error);
+      });
+    });
+  }
+
+  const handleDeleteNotice = (index: number) => {
+    if (confirm("¿Estás seguro de que deseas eliminar este aviso?")) {
+      const noticeToDelete = noticesData[index];
+      if (noticeToDelete.id) {
+        deleteNotice(noticeToDelete.id).then((response) => {
+          console.log("Notice deleted successfully:", response);
+          const updatedNotices = noticesData.filter((_, i) => i !== index);
+          setNoticesData(updatedNotices);
+        }).catch((error) => {
+          console.error("Error deleting notice:", error);
+        });
+      } else {
+        const updatedNotices = noticesData.filter((_, i) => i !== index);
+        setNoticesData(updatedNotices);
+      }
+    }
+  }
 
   return (
     <Dialog open={openEditRegister} onOpenChange={() => { setOpenEditRegister(false); setRegisterSelected(null) }}>
@@ -299,80 +364,167 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
           </div>
 
           {/* Status de aviso */}
-          <div className='w-full flex flex-row gap-2 mt-5'>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>N° de avisos:</Label>
-              <Input className='bg-white' />
+          <div className='w-full flex flex-col gap-2'>
+            <div className='w-full flex flex-row justify-between items-center'>
+              <Label className='font-semibold'>Status de avisos relacionados:</Label>
+              <div className='flex flex-row gap-1'>
+                <Button asChild onClick={() => handleSubmitNotices()}>
+                  <div className='bg-blue-600'>
+                    Guardar aviso
+                  </div>
+                </Button>
+                <Button asChild onClick={() => handleAddNotice()}>
+                  <div className='bg-blue-600'>
+                    Añadir aviso
+                  </div>
+                </Button>
+              </div>
             </div>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>Fecha de aviso:</Label>
-              <Input className='bg-white' />
-            </div>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>Status de aviso:</Label>
-              <Select>
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Abierto</SelectItem>
-                  <SelectItem value="2">Cerrado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className='w-full flex flex-row gap-2'>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>N° de OT:</Label>
-              <Input className='bg-white' />
-            </div>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>Fecha de OT:</Label>
-              <Input className='bg-white' />
-            </div>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>Status de OT:</Label>
-              <Select>
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Abierto</SelectItem>
-                  <SelectItem value="2">Cerrado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className='w-full flex flex-row gap-2'>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>Status Real:</Label>
-              <Select>
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Abierto</SelectItem>
-                  <SelectItem value="2">Cerrado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className='flex flex-col gap-2 w-2/3'>
-              <Label className='font-semibold'>Comentario:</Label>
-              <Input className='bg-white' />
+            <Table className=" bg-white">
+              <TableHeader className="bg-gray-300">
+                <TableRow>
+                  <TableHead >N° aviso</TableHead>
+                  <TableHead >Fecha</TableHead>
+                  <TableHead >Status</TableHead>
+                  <TableHead >N° OT</TableHead>
+                  <TableHead >Fecha OT</TableHead>
+                  <TableHead >Status OT</TableHead>
+                  <TableHead ></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {noticesData.length > 0 ? (
+                  noticesData.map((data, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Input className='bg-white' value={data.name} onChange={(e) => {
+                          const updatedNotices = [...noticesData];
+                          updatedNotices[index].name = e.target.value;
+                          setNoticesData(updatedNotices);
+                        }} />
+                      </TableCell>
+                      <TableCell>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              data-empty={!date_status}
+                              className="data-[empty=true]:text-muted-foreground justify-start text-left font-normal w-full"
+                            >
+                              <CalendarIcon />
+                              {date_status ? format(date_status, "dd/MM/yyyy", { locale: es }) : <span>Selecciona una fecha</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar mode="single" selected={date_status} onSelect={setDateStatus} locale={es} />
+                          </PopoverContent>
+                        </Popover>
+                      </TableCell>
+                      <TableCell>
+                        <Select value={data.status.toString()} onValueChange={(value) => {
+                          const updatedNotices = [...noticesData];
+                          updatedNotices[index].status = parseInt(value);
+                          setNoticesData(updatedNotices);
+                        }}>
+                          <SelectTrigger className='w-full bg-white'>
+                            <SelectValue placeholder="Seleccionar..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">Abierto</SelectItem>
+                            <SelectItem value="2">Cerrado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Input className='bg-white' value={data.ot_number} onChange={(e) => {
+                          const updatedNotices = [...noticesData];
+                          updatedNotices[index].ot_number = e.target.value;
+                          setNoticesData(updatedNotices);
+                        }} />
+                      </TableCell>
+                      <TableCell>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              data-empty={!date_ot}
+                              className="data-[empty=true]:text-muted-foreground justify-start text-left font-normal w-full"
+                            >
+                              <CalendarIcon />
+                              {date_ot ? format(date_ot, "dd/MM/yyyy", { locale: es }) : <span>Selecciona una fecha</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar mode="single" selected={date_ot} onSelect={setDateOt} locale={es} />
+                          </PopoverContent>
+                        </Popover>
+                      </TableCell>
+                      <TableCell>
+                        <Select value={data.ot_status.toString()} onValueChange={(value) => {
+                          const updatedNotices = [...noticesData];
+                          updatedNotices[index].ot_status = parseInt(value);
+                          setNoticesData(updatedNotices);
+                        }}>
+                          <SelectTrigger className='w-full bg-white'>
+                            <SelectValue placeholder="Seleccionar..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">Abierto</SelectItem>
+                            <SelectItem value="2">Cerrado</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                      </TableCell>
+                      <TableCell>
+                        <button
+                          onClick={() => {
+                            if (noticesData[index].id) {
+                              handleDeleteNotice(index);
+                            } else {
+                              const updatedNotices = noticesData.filter((_, i) => i !== index);
+                              setNoticesData(updatedNotices);
+                            }
+                          }}>
+                          <FaTrash className='text-red-600' />
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center">No hay datos de avisos disponibles.</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            <div className='w-full flex flex-row gap-2'>
+              <div className='flex flex-col gap-2 w-2/3'>
+                <Label className='font-semibold'>Status Real:</Label>
+                <Select >
+                  <SelectTrigger className='w-full bg-white'>
+                    <SelectValue placeholder="Seleccionar..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Abierto</SelectItem>
+                    <SelectItem value="2">Cerrado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className='flex flex-col gap-2 w-2/3'>
+                <Label className='font-semibold'>Comentario:</Label>
+                <Input className='bg-white' />
+              </div>
             </div>
           </div>
         </div>
         <DialogFooter>
           <Button
             onClick={() => {
-              if (registerSelected && registerSelected.id != null) {
-                editReport(registerSelected.id, registerSelected);
-              }
+              handleSubmitNotices();
             }}
           >
             {loading ? 'Guardando...' : 'Guardar'}
           </Button>
-          {/* <Button>Guardar y agregar nuevo</Button> */}
         </DialogFooter>
       </DialogContent>
     </Dialog>
