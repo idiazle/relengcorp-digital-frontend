@@ -35,6 +35,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    disabled
                     variant="outline"
                     data-empty={!date}
                     className="data-[empty=true]:text-muted-foreground justify-start text-left font-normal w-full"
@@ -50,7 +51,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Programación:</Label>
-              <Select value={registerSelected ? registerSelected.program.toString() : ""} >
+              <Select disabled value={registerSelected ? registerSelected.program.toString() : ""} >
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
@@ -68,7 +69,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Área:</Label>
-              <Select>
+              <Select disabled>
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
@@ -84,7 +85,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/4'>
               <Label className='font-semibold'>TAG:</Label>
-              <Select>
+              <Select disabled>
                 <SelectTrigger className='bg-white w-full'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
@@ -99,6 +100,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='flex flex-col gap-2 w-2/4'>
               <Label className='font-semibold'>Nombre de equipo:</Label>
               <Input
+                disabled
                 className='bg-white'
                 value={registerSelected ? registerSelected.entity : ""}
                 onChange={(e) => {
@@ -109,9 +111,10 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
                 }}
               />
             </div>
-            <div className='flex flex-col gap-2 w-1/4'>
+            {/* <div className='flex flex-col gap-2 w-1/4'>
               <Label className='font-semibold'>Tipo de componente:</Label>
               <Input
+                disabled
                 className='bg-white'
                 value={registerSelected ? registerSelected.entity : ""}
                 onChange={(e) => {
@@ -121,12 +124,13 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
                   })
                 }}
               />
-            </div>
+            </div> */}
           </div>
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/4'>
               <Label className='font-semibold'>Tipo de tarea:</Label>
               <Select
+                disabled
                 value={registerSelected ? registerSelected.task_type.toString() : ""}
                 onValueChange={(value) => {
                   setRegisterSelected({
@@ -149,6 +153,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='flex flex-col gap-2 w-1/4'>
               <Label className='font-semibold'>Status de ejecución:</Label>
               <Select
+                disabled
                 value={registerSelected ? registerSelected.execution_status.toString() : ""}
                 onValueChange={(value) => {
                   setRegisterSelected({
@@ -169,6 +174,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='flex flex-col gap-2 w-2/4'>
               <Label className='font-semibold'>Observación:</Label>
               <Input
+                disabled
                 className='bg-white'
                 value={registerSelected ? registerSelected.observations : ""}
                 onChange={(e) => {
@@ -184,6 +190,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='flex flex-col gap-2 w-1/5'>
               <Label className='font-semibold'>Condición:</Label>
               <Select
+                disabled
                 value={registerSelected ? registerSelected.condition.toString() : ""}
                 onValueChange={(value) => {
                   setRegisterSelected({
@@ -206,6 +213,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='flex flex-col gap-2 w-2/5'>
               <Label className='font-semibold'>Diagnóstico:</Label>
               <Input
+                disabled
                 className='bg-white'
                 value={registerSelected ? registerSelected.diagnostic : ""}
                 onChange={(e) => {
@@ -219,6 +227,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='flex flex-col gap-2 w-2/5'>
               <Label className='font-semibold'>Recomendación:</Label>
               <Input
+                disabled
                 className='bg-white'
                 value={registerSelected ? registerSelected.recomendations : ""}
                 onChange={(e) => {
@@ -231,8 +240,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             </div>
           </div>
           <div className='w-full flex flex-row gap-2'>
-            <div className='flex flex-col gap-2 w-1/3'>
-              {/* Obtiene nombre de archivo subido */}
+            {/* <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>N° de reporte:</Label>
               <Input
                 className='bg-white'
@@ -244,10 +252,12 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
                   })
                 }}
               />
-            </div>
+            </div> */}
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Archivo:</Label>
-
+              <a href={registerSelected ? 'http://192.168.100.8:8000' + registerSelected.attachment : "#"} target="_blank" rel="noopener noreferrer" className='bg-white p-1.5 rounded-md underline'>
+                Archivo 1
+              </a>
             </div>
           </div>
 
@@ -263,7 +273,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Status de aviso:</Label>
-              <Select value={String(noticesData[0]?.status)}>
+              <Select disabled value={String(noticesData[0]?.status)}>
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
@@ -299,7 +309,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Status Real:</Label>
-              <Select value={noticesData[0]?.status_real ? String(noticesData[0]?.status_real) : ""}>
+              <Select disabled value={noticesData[0]?.status_real ? String(noticesData[0]?.status_real) : ""}>
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
@@ -311,7 +321,7 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Comentario:</Label>
-              <Input className='bg-white p-1.5 rounded-md'>{noticesData[0]?.comment}</Input>
+              <Input disabled className='bg-white p-1.5 rounded-md'>{noticesData[0]?.comment}</Input>
             </div>
           </div>
         </div>

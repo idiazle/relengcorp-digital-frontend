@@ -56,6 +56,10 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
     getEntities()
       .then((response) => {
         setEntities(response.data)
+        const equipemmentsList = response.data.filter((entity: Entity) => entity.parent === 8 || entity.parent === 9 || entity.parent > 9);
+        setEquipments(equipemmentsList);
+        const areasList = response.data.filter((entity: Entity) => entity.parent !== null && entity.parent === 7);
+        setAreas(areasList);
       })
       .catch((error) => {
         console.error("Error fetching entities:", error)
@@ -81,13 +85,6 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Área:</Label>
               <Select
-                value={data ? String(data.entity) : ""}
-                onValueChange={(value) => {
-                  setData({
-                    ...data!,
-                    entity: parseInt(value)
-                  })
-                }}
               >
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
@@ -117,10 +114,11 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Componente1</SelectItem>
-                  <SelectItem value="2"></SelectItem>
-                  <SelectItem value="3"></SelectItem>
-                  <SelectItem value="4"></SelectItem>
+                  {
+                    equipments.map((equipment) => (
+                      <SelectItem key={equipment.id} value={String(equipment.id)}>{equipment.name}</SelectItem>
+                    ))
+                  }
                 </SelectContent>
               </Select>
             </div>

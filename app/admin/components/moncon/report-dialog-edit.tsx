@@ -22,24 +22,36 @@ type ReportDialogEditProps = {
 }
 
 const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSelected, registerSelected, getAllReport }: ReportDialogEditProps) => {
+  console.log("registerSelected", registerSelected)
+  const [loading, setLoading] = useState(false);
   const [noticesData, setNoticesData] = useState<NoticesType[]>([]);
   const [date, setDate] = useState<Date | undefined>(new Date())
+  const [file, setFile] = useState<File | null>(null);
 
   const editReport = (reportId: number, updatedData: ReportType) => {
+    setLoading(true);
     // Aquí puedes hacer la llamada a la API para editar el reporte
     if (!updatedData) return;
     console.log('Editing report:', reportId, updatedData);
     const formData = new FormData()
-    formData.append("name", String(updatedData.name ?? ""))
     formData.append("condition", String(updatedData.condition ?? ""))
     formData.append("diagnostic", String(updatedData.diagnostic ?? ""))
-    formData.append("recomendations", String(updatedData.recomendations ?? ""))
-    formData.append("program", String(updatedData.program ?? ""))
-    formData.append("observations", String(updatedData.observations ?? ""))
     formData.append("execution_status", String(updatedData.execution_status ?? ""))
+    formData.append("name", String(updatedData.name ?? ""))
+    formData.append("observations", String(updatedData.observations ?? ""))
+    formData.append("program", String(updatedData.program ?? ""))
+    formData.append("recomendations", String(updatedData.recomendations ?? ""))
+    formData.append("task_type", String(updatedData.task_type ?? ""))
+    if (date) {
+      formData.append("execution_date", date.toISOString().slice(0, 10))
+    }
+    if (file) {
+      formData.append("attachment", file)
+    }
 
     updateReport(reportId, formData).then((response) => {
       console.log("Report updated successfully:", response);
+      setLoading(false);
       setOpenEditRegister(false);
       getAllReport();
       setRegisterSelected(null)
@@ -278,7 +290,11 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Archivo:</Label>
-              <Input className='bg-white' type='file' accept='.pdf'></Input>
+              <Input className='bg-white' type='file' accept='.pdf' onChange={(e) => {
+                if (e.target.files) {
+                  setFile(e.target.files[0]);
+                }
+              }} />
             </div>
           </div>
 
@@ -353,7 +369,9 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                 editReport(registerSelected.id, registerSelected);
               }
             }}
-          >Guardar y salir</Button>
+          >
+            {loading ? 'Guardando...' : 'Guardar'}
+          </Button>
           {/* <Button>Guardar y agregar nuevo</Button> */}
         </DialogFooter>
       </DialogContent>

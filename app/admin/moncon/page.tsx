@@ -211,6 +211,8 @@ const MonitoreoCondiciones = () => {
     // Aquí puedes hacer la llamada a la API para enviar los datos
   }
 
+  console.log("generalData", generalData)
+
   return (
     <div>
       {/* Cabecera */}
@@ -249,7 +251,7 @@ const MonitoreoCondiciones = () => {
                 <TableCell>{data.program == 1 ? 'Programado' : 'No Programado'}</TableCell>
                 <TableCell>{data.created_at.slice(0, 10)}</TableCell>
                 <TableCell>{data.execution_status === 1 ? 'Ejecutado' : 'No Ejecutado'}</TableCell>
-                <TableCell>{data?.execution_date}</TableCell>
+                <TableCell>{data?.execution_date.slice(0, 10)}</TableCell>
                 <TableCell>Molino SAG</TableCell>
                 <TableCell>MLS-001-B1</TableCell>
                 <TableCell>Bomba</TableCell>
@@ -258,7 +260,7 @@ const MonitoreoCondiciones = () => {
                 <TableCell className="flex flex-row gap-2">
                   <Button size="sm"
                     // disabled={!data.attachments || data.attachments.length === 0}
-                    onClick={() => setOpenPDF(true)}>
+                    onClick={() => {setOpenPDF(true); setRegisterSelected(data)}}>
                     <FaFilePdf />
                   </Button>
                   {/* <Button size="sm"
@@ -306,7 +308,7 @@ const MonitoreoCondiciones = () => {
       }
 
       {
-        openPDF && <PDFViewer urlPDF={''} openDialog={openPDF} setOpenDialog={setOpenPDF} />
+        openPDF && <PDFViewer urlPDF={registerSelected} openDialog={openPDF} setOpenDialog={setOpenPDF} />
       }
     </div >
 
