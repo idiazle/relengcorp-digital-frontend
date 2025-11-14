@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useEffect } from 'react';
 import packageJson from '../../../package.json'
@@ -21,7 +21,7 @@ type PDFViewerProps = {
 }
 
 const PDFViewer = ({ urlPDF, openDialog, setOpenDialog }: PDFViewerProps) => {
-  const urlBackend = "http://192.168.100.8:8000"
+  const urlBackend = "http://localhost:8000"
   const selectionModePluginInstance = selectionModePlugin()
   const { SwitchSelectionModeButton } = selectionModePluginInstance
   const zoomPluginInstance = zoomPlugin()
@@ -168,7 +168,7 @@ zoomTo(SpecialZoomLevel.PageWidth)
             <div className='h-full w-full'>
               <Viewer
                 localization={es_ES}
-                fileUrl={urlBackend + urlPDF.attachment}
+                fileUrl={urlBackend + urlPDF}
                 defaultScale={1}
                 renderError={renderError}
                 plugins={[

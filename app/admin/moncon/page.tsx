@@ -230,7 +230,7 @@ const MonitoreoCondiciones = () => {
           <TableHeader className="bg-gray-300 sticky top-0 z-10">
             <TableRow>
               <TableHead className="w-[50px]">N°</TableHead>
-              <TableHead>NOMBRE REPORTE</TableHead>
+              {/* <TableHead>NOMBRE REPORTE</TableHead> */}
               <TableHead>PROGRAMA</TableHead>
               <TableHead>FECHA PROGR.</TableHead>
               <TableHead>EJECUCIÓN</TableHead>
@@ -247,7 +247,7 @@ const MonitoreoCondiciones = () => {
             {generalData.map((data, index) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{data.name}</TableCell>
+                {/* <TableCell>{data.name}</TableCell> */}
                 <TableCell>{data.program == 1 ? 'Programado' : 'No Programado'}</TableCell>
                 <TableCell>{data.created_at.slice(0, 10)}</TableCell>
                 <TableCell>{data.execution_status === 1 ? 'Ejecutado' : 'No Ejecutado'}</TableCell>
@@ -308,7 +308,7 @@ const MonitoreoCondiciones = () => {
       }
 
       {
-        openPDF && <PDFViewer urlPDF={registerSelected} openDialog={openPDF} setOpenDialog={setOpenPDF} />
+        openPDF && <PDFViewer urlPDF={registerSelected?.attachment} openDialog={openPDF} setOpenDialog={setOpenPDF} />
       }
     </div >
 

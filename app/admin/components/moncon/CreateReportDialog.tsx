@@ -56,9 +56,9 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
     getEntities()
       .then((response) => {
         setEntities(response.data)
-        const equipemmentsList = response.data.filter((entity: Entity) => entity.parent === 8 || entity.parent === 9 || entity.parent > 9);
-        setEquipments(equipemmentsList);
-        const areasList = response.data.filter((entity: Entity) => entity.parent !== null && entity.parent === 7);
+        const equipmentsList = response.data.filter((entity: Entity) => entity.parent != null && (entity.parent === 8 || entity.parent === 9 || entity.parent > 9));
+        setEquipments(equipmentsList);
+        const areasList = response.data.filter((entity: Entity) => entity.parent != null && entity.parent === 7);
         setAreas(areasList);
       })
       .catch((error) => {

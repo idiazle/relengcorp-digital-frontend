@@ -27,7 +27,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
   console.log("registerSelected", registerSelected)
   const [loading, setLoading] = useState(false);
   const [noticesData, setNoticesData] = useState<NoticesType[]>([]);
-  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date, setDate] = useState<Date | undefined>(new Date(registerSelected?.execution_date ?? undefined))
   const [date_status, setDateStatus] = useState<Date | undefined>(new Date())
   const [date_ot, setDateOt] = useState<Date | undefined>(new Date())
   const [file, setFile] = useState<File | null>(null);
@@ -520,7 +520,9 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
         <DialogFooter>
           <Button
             onClick={() => {
-              handleSubmitNotices();
+              if (registerSelected) {
+                editReport(registerSelected.id, registerSelected);
+              }
             }}
           >
             {loading ? 'Guardando...' : 'Guardar'}
