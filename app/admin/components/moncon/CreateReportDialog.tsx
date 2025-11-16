@@ -21,8 +21,13 @@ type CreateReportDialogProps = {
 
 const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport }: CreateReportDialogProps) => {
   const [entities, setEntities] = useState<Entity[]>([])
+  const [plant, setPlant] = useState<Entity | null>(null)
   const [areas, setAreas] = useState<Entity[]>([])
+  const [areaSelected, setAreaSelected] = useState<Entity | null>(null)
   const [equipments, setEquipments] = useState<Entity[]>([])
+  const [equipmentSelected, setEquipmentSelected] = useState<Entity | null>(null)
+  const [components, setComponents] = useState<Entity[]>([])
+  const [componentSelected, setComponentSelected] = useState<Entity | null>(null)
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [data, setData] = useState<ReportType>({
     id: 0,
@@ -39,32 +44,55 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
     created_at: "",
   });
 
-  const createSingleRegister = () => {
-    createMonconReport(data)
-      .then((response) => {
-        console.log("Report created successfully:", response);
-        setOpenNewRegister(false);
-        getAllReport();
-        // Optionally, you can reset the form or update the UI
-      })
-      .catch((error) => {
-        console.error("Error creating report:", error);
-      });
-  }
-
   useEffect(() => {
     getEntities()
       .then((response) => {
         setEntities(response.data)
-        const equipmentsList = response.data.filter((entity: Entity) => entity.parent != null && (entity.parent === 8 || entity.parent === 9 || entity.parent > 9));
-        setEquipments(equipmentsList);
-        const areasList = response.data.filter((entity: Entity) => entity.parent != null && entity.parent === 7);
+        const plant = response.data.find((entity: Entity) => entity.parent === null);
+        setPlant(plant || null);
+        // const equipemmentsList = response.data.filter((entity: Entity) => entity.parent === 8 || entity.parent === 9 || entity.parent > 9);
+        // setEquipments(equipemmentsList);
+        const areasList = response.data.filter((entity: Entity) => entity.parent !== null && entity.parent === 6);
         setAreas(areasList);
       })
       .catch((error) => {
         console.error("Error fetching entities:", error)
       })
   }, [])
+
+  useEffect(() => {
+    if (areaSelected) {
+      const equipemmentsList = entities.filter((entity: Entity) => entity.parent === areaSelected.id);
+      setEquipments(equipemmentsList);
+    }
+  }, [areaSelected, entities])
+
+  useEffect(() => {
+    if (equipmentSelected) {
+      const componentsList = entities.filter((entity: Entity) => entity.parent === equipmentSelected.id);
+      setComponents(componentsList);
+    }
+  }, [equipmentSelected, entities])
+
+  const createSingleRegister = () => {
+    const temp = {
+      entity: componentSelected ? componentSelected.id : 0,
+      program: data ? data.program : 2,
+      task_type: data ? data.task_type : 0,
+      execution_status: data ? data.execution_status : 2,
+      condition: data ? data.condition : 1,
+      observations: data ? data.observations : ""
+    }
+    createMonconReport(temp)
+      .then((response) => {
+        console.log("Report created successfully:", response.data);
+        setOpenNewRegister(false);
+        getAllReport();
+      })
+      .catch((error) => {
+        console.error("Error creating report:", error);
+      })
+  }
 
   console.log("Entities in dialog:", entities);
 
@@ -80,11 +108,16 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
             <div className='flex flex-col gap-2 w_-1/3'>
               <Label className='font-semibold'>Planta:</Label>
               <Input
-                className='bg-white' value={String(entities.find(entity => entity.parent === null)?.name)} disabled></Input>
+                className='bg-white' value={plant ? plant.name : ""} disabled></Input>
             </div>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Área:</Label>
               <Select
+                onValueChange={(value: string) => {
+                  const selectedArea = areas.find((area) => String(area.id) === value);
+                  setAreaSelected(selectedArea || null);
+                }}
+                value={areaSelected ? String(areaSelected.id) : ""}
               >
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
@@ -99,16 +132,13 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
               </Select>
             </div>
             <div className='flex flex-col gap-2 w-1/4'>
-              <Label className='font-semibold'>TAG:</Label>
+              <Label className='font-semibold'>Equipo:</Label>
               <Select
-
-                value={data ? String(data.entity) : ""}
-                onValueChange={(value) => {
-                  setData({
-                    ...data!,
-                    entity: parseInt(value)
-                  })
+                onValueChange={(value: string) => {
+                  const selectedEquipment = equipments.find((equipment) => String(equipment.id) === value);
+                  setEquipmentSelected(selectedEquipment || null);
                 }}
+                value={equipmentSelected ? String(equipmentSelected.id) : ""}
               >
                 <SelectTrigger className='bg-white w-full'>
                   <SelectValue placeholder="Seleccionar..." />
@@ -116,15 +146,34 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
                 <SelectContent>
                   {
                     equipments.map((equipment) => (
-                      <SelectItem key={equipment.id} value={String(equipment.id)}>{equipment.name}</SelectItem>
+                      <SelectItem key={equipment.id} value={String(equipment.id)}>
+                        {equipment.extra_info.tag}/{equipment.name}
+                      </SelectItem>
                     ))
                   }
                 </SelectContent>
               </Select>
             </div>
-            <div className='flex flex-col gap-2 w-2/4'>
-              <Label className='font-semibold'>Nombre de equipo:</Label>
-              <Input className='bg-white' />
+            <div className='flex flex-col gap-2 w-1/4'>
+              <Label className='font-semibold'>Componente:</Label>
+              <Select
+                onValueChange={(value: string) => {
+                  const selectedComponent = components.find((component) => String(component.id) === value);
+                  setComponentSelected(selectedComponent || null);
+                }}
+                value={componentSelected ? String(componentSelected.id) : ""}
+              >
+                <SelectTrigger className='bg-white w-full'>
+                  <SelectValue placeholder="Seleccionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {
+                    components.map((component) => (
+                      <SelectItem key={component.id} value={String(component.id)}>{component.name}</SelectItem>
+                    ))
+                  }
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className='w-full flex flex-row gap-2'>

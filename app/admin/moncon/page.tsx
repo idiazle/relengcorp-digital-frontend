@@ -251,7 +251,9 @@ const MonitoreoCondiciones = () => {
                 <TableCell>{data.program == 1 ? 'Programado' : 'No Programado'}</TableCell>
                 <TableCell>{data.created_at.slice(0, 10)}</TableCell>
                 <TableCell>{data.execution_status === 1 ? 'Ejecutado' : 'No Ejecutado'}</TableCell>
-                <TableCell>{data?.execution_date.slice(0, 10)}</TableCell>
+                <TableCell>
+                  {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
+                </TableCell>
                 <TableCell>Molino SAG</TableCell>
                 <TableCell>MLS-001-B1</TableCell>
                 <TableCell>Bomba</TableCell>
