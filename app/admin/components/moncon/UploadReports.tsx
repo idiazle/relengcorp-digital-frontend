@@ -58,18 +58,18 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports }: UploadReport
                 />
               </div>
             </div>
-            <div className="bg-white mt-4 rounded-lg shadow">
+            <div className="bg-white mt-4 rounded-lg shadow h-96 overflow-auto">
               <Table>
-                <TableHeader className="bg-gray-300 sticky top-0 z-10">
+                <TableHeader className="bg-gray-300 ">
                   <TableRow>
                     <TableHead className='w-[2%]'>N°</TableHead>
                     <TableHead className='w-[10%]'>FECHA PROGR.</TableHead>
-                    <TableHead className='w-[10%]'>PROGRAMACION</TableHead>
+                    <TableHead className='w-[10%]'>PROGRAMA</TableHead>
                     <TableHead className='w-[10%]'>AREA</TableHead>
-                    <TableHead className='w-[10%]'>TAG</TableHead>
-                    <TableHead className='w-[10%]'>EQUIPO/ITEM</TableHead>
+                    <TableHead className='w-[10%]'>TAG/EQUIPO</TableHead>
                     <TableHead className='w-[10%]'>COMPONENTE</TableHead>
-                    <TableHead className='w-[10%]'>TIPO DE TAREA</TableHead>
+                    {/* <TableHead className='w-[10%]'>CONDICIÓN</TableHead> */}
+                    <TableHead className='w-[10%]'>T. TAREA</TableHead>
                     {/* <TableHead className='w-[10%]'>ACCIONES</TableHead> */}
                   </TableRow>
                 </TableHeader>
@@ -77,18 +77,18 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports }: UploadReport
                   {routeData.length > 0 ? (
                     routeData.map((data, index) => (
                       <TableRow key={index}>
-                        <TableCell className='w-[2%]'>{index + 1}</TableCell>
+                        <TableCell className='w-[2%]'>{data["ITEM"]}</TableCell>
                         <TableCell className='w-[10%]'>
                           {
-                            new Date((data["FECHA PROGRAMACION"] - 25569) * 86400 * 1000)
+                            new Date((data["FECHA PROGRAMADA"] - 25569) * 86400 * 1000)
                               .toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' })
                           }
                         </TableCell>
-                        <TableCell className='w-[10%]'>{data["PROGRAMACION"]}</TableCell>
+                        <TableCell className='w-[10%]'>{data["TIPO ACTIVIDAD"]}</TableCell>
                         <TableCell className='w-[10%]'>{data["AREA"]}</TableCell>
                         <TableCell className='w-[10%]'>{data["TAG"]}</TableCell>
-                        <TableCell className='w-[10%]'>{data["EQUIPO / ITEM"]}</TableCell>
                         <TableCell className='w-[10%]'>{data["COMPONENTE"]}</TableCell>
+                        {/* <TableCell className='w-[10%]'>{data["CONDICION"]}</TableCell> */}
                         <TableCell className='w-[10%]'>{data["TIPO TAREA"]}</TableCell>
                         {/* <TableCell className='w-[10%]'>
                             <div className='flex flex-row gap-1'>
@@ -105,7 +105,7 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports }: UploadReport
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center">
+                      <TableCell colSpan={8} className="text-center">
                         No hay datos cargados
                       </TableCell>
                     </TableRow>
