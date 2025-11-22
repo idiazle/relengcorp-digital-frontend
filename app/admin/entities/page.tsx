@@ -15,7 +15,7 @@ type Entity = {
   attachment?: File
   parent?: number
   children?: Entity[]
-  extra_info?: { name: string }
+  extra_info?: { tag: string }
   deleted?: boolean
 }
 
@@ -47,6 +47,7 @@ const Entities = () => {
       [name]: value,
     }))
   }
+  
 
   const handleSubmit = () => {
     createEntity(entityData)
@@ -120,10 +121,25 @@ const Entities = () => {
             <DialogTitle>Crear Nueva Entidad</DialogTitle>
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-1">
-                <Label>TAG:</Label>
+                <Label>Nombre de equipo:</Label>
                 <Input name="name" className="bg-white" placeholder="Ingrese el nombre de la entidad"
                   value={entityData.name}
                   onChange={handleInputChange}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label>Tag:</Label>
+                <Input name="tag" className="bg-white" placeholder="Ingrese el tag de la entidad"
+                  value={entityData.extra_info?.tag || ''}
+                  onChange={
+                    (e) => setEntityData((prevData) => ({
+                      ...prevData,
+                      extra_info: {
+                        ...prevData.extra_info,
+                        tag: e.target.value,
+                      }
+                    }))
+                  }
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -142,6 +158,7 @@ const Entities = () => {
                   </SelectContent>
                 </Select>
               </div>
+              
               <div className="flex flex-col gap-1">
                 <Label>Superior:</Label>
                 <Select value={entityData.parent ? String(entityData.parent) : undefined} onValueChange={(value) => setEntityData((prevData) => ({
@@ -154,7 +171,7 @@ const Entities = () => {
                   <SelectContent>
                     {entities.map((entity) => (
                       <SelectItem key={entity.id} value={entity.id.toString()}>
-                        {entity.name}
+                        {entity.extra_info?.tag ? entity.extra_info.tag + " - " + entity.name : entity.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

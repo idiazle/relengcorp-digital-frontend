@@ -4,6 +4,7 @@ export type ReportType = {
   name: string;
   attachment?: File[];
   program: number;
+  service_type: number;
   task_type: number;
   execution_status: number;
   execution_date?: string;

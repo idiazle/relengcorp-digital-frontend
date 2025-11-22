@@ -34,6 +34,7 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
     entity: 0,
     name: "",
     program: 2,
+    service_type: 0,
     task_type: 0,
     execution_status: 2,
     condition: 1,
@@ -52,7 +53,7 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
         setPlant(plant || null);
         // const equipemmentsList = response.data.filter((entity: Entity) => entity.parent === 8 || entity.parent === 9 || entity.parent > 9);
         // setEquipments(equipemmentsList);
-        const areasList = response.data.filter((entity: Entity) => entity.parent !== null && entity.parent === 6);
+        const areasList = response.data.filter((entity: Entity) => entity.parent !== null && entity.parent === plant?.id);
         setAreas(areasList);
       })
       .catch((error) => {
@@ -78,6 +79,7 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
     const temp = {
       entity: componentSelected ? componentSelected.id : 0,
       program: data ? data.program : 2,
+      service_type: data ? data.service_type : 0,
       task_type: data ? data.task_type : 0,
       execution_status: data ? data.execution_status : 2,
       condition: data ? data.condition : 1,
@@ -95,6 +97,24 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
   }
 
   console.log("Entities in dialog:", entities);
+
+  const tareas = [
+    { id: 1, name: "Vibraciones y Temperatura" },
+    { id: 2, name: "Alineamiento de Ejes" },
+    { id: 3, name: "Alineamiento de Poleas" },
+    { id: 4, name: "Ultrasonido acústico" },
+    { id: 5, name: "Termografía infrarroja" },
+    { id: 6, name: "Fuga de corriente" },
+    { id: 7, name: "Vibraciones fases" },
+    { id: 8, name: "Vibraciones ODS" },
+    { id: 9, name: "Vibraciones Pump Test" },
+    { id: 10, name: "Ultrasonido Convencional" },
+    { id: 11, name: "Tintes penetrantes" },
+    { id: 12, name: "Partículas magnéticas" },
+    { id: 13, name: "Ultrasonido avanzado" },
+    { id: 14, name: "Metrología" },
+    { id: 15, name: "Inspección visual" },
+  ]
 
   return (
     <Dialog open={openNewRegister} onOpenChange={setOpenNewRegister}>
@@ -178,6 +198,29 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
           </div>
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/3'>
+              <Label className='font-semibold'>Tipo de Servicio:</Label>
+              <Select 
+                value={data ? String(data.service_type) : ""}
+                onValueChange={(value) => {
+                  setData({
+                    ...data!,
+                    service_type: parseInt(value)
+                  })
+                }}
+              >
+                <SelectTrigger className='w-full bg-white'>
+                  <SelectValue placeholder="Seleccionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">PDM PTAE</SelectItem>
+                  <SelectItem value="2">PDM Antapaccay</SelectItem>
+                  <SelectItem value="3">NDT PTAE</SelectItem>
+                  <SelectItem value="4">NDT Antapaccay</SelectItem>
+                  <SelectItem value="5">NDT Tintaya</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Fecha de programación:</Label>
               <h1 className='p-2 text-sm bg-white rounded-md'>{format(new Date(), "dd/MM/yyyy")}</h1>
             </div>
@@ -240,10 +283,11 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">PDM</SelectItem>
-                  <SelectItem value="2">NDT</SelectItem>
-                  <SelectItem value="3">Alineamiento</SelectItem>
-                  <SelectItem value="4">Visual</SelectItem>
+                  {
+                    tareas.map((tarea) => (
+                      <SelectItem key={tarea.id} value={String(tarea.id)}>{tarea.name}</SelectItem>
+                    ))
+                  }
                 </SelectContent>
               </Select>
             </div>

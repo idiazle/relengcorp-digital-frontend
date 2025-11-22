@@ -21,7 +21,7 @@ type PDFViewerProps = {
 }
 
 const PDFViewer = ({ urlPDF, openDialog, setOpenDialog }: PDFViewerProps) => {
-  const urlBackend = "http://localhost:8000"
+  const urlBackend = process.env.NEXT_PUBLIC_MEDIA_URL
   const selectionModePluginInstance = selectionModePlugin()
   const { SwitchSelectionModeButton } = selectionModePluginInstance
   const zoomPluginInstance = zoomPlugin()
@@ -162,7 +162,7 @@ zoomTo(SpecialZoomLevel.PageWidth)
             PDF Viewer
           </DialogTitle>
         </DialogHeader>
-        <AspectRatio ratio={16 / 9} className='h-[91vh] w-full overflow-auto z-50 flex justify-center items-center'>
+        <AspectRatio ratio={16 / 9} className='h-[85vh] w-full overflow-auto z-50 flex justify-center items-center'>
           <Worker workerUrl={`https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`}>
 
             <div className='h-full w-full'>

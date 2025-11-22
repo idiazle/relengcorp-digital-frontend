@@ -27,7 +27,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
   console.log("registerSelected", registerSelected)
   const [loading, setLoading] = useState(false);
   const [noticesData, setNoticesData] = useState<NoticesType[]>([]);
-  const [date, setDate] = useState<Date | undefined>(new Date(registerSelected?.execution_date ?? undefined))
+  const [date, setDate] = useState<Date | undefined>(registerSelected?.execution_date ? new Date(registerSelected.execution_date) : undefined)
   const [date_status, setDateStatus] = useState<Date | undefined>(new Date())
   const [date_ot, setDateOt] = useState<Date | undefined>(new Date())
   const [file, setFile] = useState<File | null>(null);
@@ -172,7 +172,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w_-1/3'>
               <Label className='font-semibold'>Planta:</Label>
-              {/* <Input className='bg-white' disabled></Input> */}
+              <Input className='bg-white' disabled></Input>
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Área:</Label>
@@ -188,10 +188,38 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                 </SelectContent>
               </Select>
             </div>
+            <div className='flex flex-col gap-2 w-2/3'>
+              <Label className='font-semibold'>Equipo:</Label>
+              <Select>
+                <SelectTrigger className='w-full bg-white'>
+                  <SelectValue placeholder="Seleccionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PTAE">PTAE</SelectItem>
+                  <SelectItem value="MOLIENDA">Molienda</SelectItem>
+                  <SelectItem value="CHANCADO_PRIMARIO">Chancado Primario</SelectItem>
+                  <SelectItem value="FLOTACION_Y_REMOLIENDA">Flotación y Remolienda</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className='flex flex-col gap-2 w-2/3'>
+              <Label className='font-semibold'>Componente:</Label>
+              <Select>
+                <SelectTrigger className='w-full bg-white'>
+                  <SelectValue placeholder="Seleccionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PTAE">PTAE</SelectItem>
+                  <SelectItem value="MOLIENDA">Molienda</SelectItem>
+                  <SelectItem value="CHANCADO_PRIMARIO">Chancado Primario</SelectItem>
+                  <SelectItem value="FLOTACION_Y_REMOLIENDA">Flotación y Remolienda</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/4'>
-              <Label className='font-semibold'>TAG:</Label>
+              <Label className='font-semibold'>Tipo de servicio:</Label>
               <Select>
                 <SelectTrigger className='bg-white w-full'>
                   <SelectValue placeholder="Seleccionar..." />
