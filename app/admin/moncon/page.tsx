@@ -1,20 +1,10 @@
 'use client'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useEffect, useState } from 'react'
-import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import * as XLSX from "xlsx";
-import { FaBell, FaCircle, FaEye, FaFilePdf, FaPencil, FaPlus, FaTrash, FaUpload } from 'react-icons/fa6'
-import { createMonconReport, deleteMonconReport, getMonconReports, getNoticesByReportId, updateReport } from '../../services/monconServices'
+import { FaCircle, FaEye, FaFilePdf, FaPencil, FaPlus, FaTrash, FaUpload } from 'react-icons/fa6'
+import { deleteMonconReport, getMonconReports } from '../../services/monconServices'
 import { getEntities } from '@/app/services/entitiesServices'
 import { Entity, ReportType } from '@/lib/types'
 import PDFViewer from '../components/PDFViewer'
@@ -24,34 +14,14 @@ import CreateReportDialog from '../components/moncon/CreateReportDialog'
 import UploadReports from '../components/moncon/UploadReports'
 
 const MonitoreoCondiciones = () => {
+  const [entities, setEntities] = useState<Entity[]>([]);
   const [openNewRegister, setOpenNewRegister] = useState<boolean>(false);
   const [openPDF, setOpenPDF] = useState<boolean>(false);
   const [openUploadRoute, setOpenUploadRoute] = useState<boolean>(false);
   const [registerSelected, setRegisterSelected] = useState<ReportType | null>(null);
   const [openEditRegister, setOpenEditRegister] = useState<boolean>(false);
   const [openViewRegister, setOpenViewRegister] = useState<boolean>(false);
-  const [openNoticesDialog, setOpenNoticesDialog] = useState<boolean>(false);
-  const [data, setData] = useState<ReportType>({
-    id: 0,
-    entity: 0,
-    name: "",
-    program: 2,
-    task_type: 0,
-    execution_status: 2,
-    execution_date: "",
-    condition: 1,
-    diagnostic: "",
-    recomendations: "",
-    observations: "",
-    attachment: [],
-    created_at: "",
-  });
-
-  const [routeData, setRouteData] = useState<any[]>([]);
   const [generalData, setGeneralData] = useState<any[]>([]);
-  const [noticesData, setNoticesData] = useState<any[]>([]);
-
-  const [date, setDate] = useState<Date | undefined>(new Date())
 
   const getAllReport = () => {
     getMonconReports()
@@ -62,37 +32,12 @@ const MonitoreoCondiciones = () => {
 
   useEffect(() => {
     getAllReport();
+    getEntities()
+      .then((response) => {
+        setEntities(response.data);
+      });
   }, []);
 
-  const chargeDataFromFile = (file: File | null) => {
-    if (!file) {
-      alert("Debe seleccionar un archivo Excel");
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      const data = e.target?.result;
-      if (!data) return;
-      // 📘 Leer el libro de Excel
-      const wb = XLSX.read(data, { type: "array" });
-      // 📗 Tomar la primera hoja
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      // 🔄 Convertir a JSON
-      const json: any[] = XLSX.utils.sheet_to_json(ws);
-      console.log(json);
-      setRouteData(json);
-    };
-    // Leer el archivo como array buffer (necesario para XLSX)
-    reader.readAsArrayBuffer(file);
-  };
-
-  const addReportsInGeneralData = (newReports: any[]) => {
-    setGeneralData((prevData) => [...prevData, ...newReports]);
-    setOpenUploadRoute(false);
-  }
 
   const handleDeleteRegister = (index: number, dataId: string) => {
     if (confirm(`¿Estás seguro de que deseas eliminar este registro?`)) {
@@ -100,21 +45,41 @@ const MonitoreoCondiciones = () => {
         console.log("eliminado", response)
         getAllReport()
       })
-
-      //setGeneralData(updatedData);
     }
   };
 
   const getTaskTypeName = (taskTypeCode: number) => {
     switch (taskTypeCode) {
       case 1:
-        return 'NTD';
+        return 'Vibraciones y Temperatura';
       case 2:
-        return 'PDM';
+        return 'Alineamiento de Ejes';
       case 3:
-        return 'Alineacion';
+        return 'Alineamiento de Poleas';
       case 4:
-        return 'Insp. Visual';
+        return 'Ultrasonido acústico';
+      case 5:
+        return 'Termografía infrarroja';
+      case 6:
+        return 'Fuga de corriente';
+      case 7:
+        return 'Vibraciones fases';
+      case 8:
+        return 'Vibraciones ODS';
+      case 9:
+        return 'Vibraciones Pump Test';
+      case 10:
+        return 'Ultrasonido Convencional';
+      case 11:
+        return 'Tintes penetrantes';
+      case 12:
+        return 'Partículas magnéticas';
+      case 13:
+        return 'Ultrasonido avanzado';
+      case 14:
+        return 'Metrología';
+      case 15:
+        return 'Inspección visual';
       default:
         return 'Desconocido';
     }
@@ -160,59 +125,6 @@ const MonitoreoCondiciones = () => {
     }
   };
 
-  const searchNotices = (reportId: number) => {
-    getNoticesByReportId(reportId)
-      .then((response) => {
-        setNoticesData(response.data);
-        setOpenNoticesDialog(true);
-      });
-  }
-
-  //SECCION ENTIDADES
-  const [entities, setEntities] = useState<Entity[]>([])
-
-  const createSingleRegister = () => {
-    createMonconReport(data)
-      .then((response) => {
-        console.log("Report created successfully:", response);
-        setOpenNewRegister(false);
-        getAllReport();
-        // Optionally, you can reset the form or update the UI
-      })
-      .catch((error) => {
-        console.error("Error creating report:", error);
-      });
-  }
-
-  useEffect(() => {
-    getEntities()
-      .then((response) => {
-        console.log("Fetched entities:", response)
-        setEntities(response.data)
-      })
-      .catch((error) => {
-        console.error("Error fetching entities:", error)
-      })
-  }, [])
-
-  const handleSubmit = () => {
-    console.log('Submitting data:', {
-      ...data,
-      program_date: date ? format(date, "yyyy-MM-dd") : "",
-    });
-    // const formData = new FormData();
-    // formData.append("name", data.name || "");
-    // formData.append("diagnostic", data.diagnostic || "");
-    // formData.append("recommendations", data.recommendations || "");
-    // formData.append("task_type", data.task_type);
-    // formData.append("execution_status", data.execution_status);
-    // formData.append("condition", data.condition);
-
-    // Aquí puedes hacer la llamada a la API para enviar los datos
-  }
-
-  console.log("generalData", generalData)
-
   return (
     <div>
       {/* Cabecera */}
@@ -235,8 +147,7 @@ const MonitoreoCondiciones = () => {
               <TableHead>FECHA PROGR.</TableHead>
               <TableHead>EJECUCIÓN</TableHead>
               <TableHead>FECHA EJEC.</TableHead>
-              <TableHead>EQUIPO/FAMILIA.</TableHead>
-              <TableHead>TAG (Comp.)</TableHead>
+              <TableHead>TAG EQUIPO</TableHead>
               <TableHead>COMP/ITEM</TableHead>
               <TableHead>TIPO TAREA</TableHead>
               <TableHead>CONDICIÓN</TableHead>
@@ -254,15 +165,14 @@ const MonitoreoCondiciones = () => {
                 <TableCell>
                   {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
                 </TableCell>
-                <TableCell>Molino SAG</TableCell>
-                <TableCell>MLS-001-B1</TableCell>
-                <TableCell>Bomba</TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
                 <TableCell>{getTaskTypeName(data.task_type)}</TableCell>
                 <TableCell>{getConditionName(data.condition)}</TableCell>
                 <TableCell className="flex flex-row gap-2">
                   <Button size="sm"
                     // disabled={!data.attachments || data.attachments.length === 0}
-                    onClick={() => {setOpenPDF(true); setRegisterSelected(data)}}>
+                    onClick={() => { setOpenPDF(true); setRegisterSelected(data) }}>
                     <FaFilePdf />
                   </Button>
                   {/* <Button size="sm"
@@ -273,7 +183,6 @@ const MonitoreoCondiciones = () => {
                     onClick={() => {
                       setRegisterSelected(data);
                       setOpenViewRegister(true)
-                      searchNotices(data.id)
                     }}>
                     <FaEye />
                   </Button>
@@ -281,7 +190,6 @@ const MonitoreoCondiciones = () => {
                     onClick={() => {
                       setRegisterSelected(data);
                       setOpenEditRegister(true)
-                      // searchNotices(data.id)
                     }}>
                     <FaPencil />
                   </Button>
@@ -305,13 +213,9 @@ const MonitoreoCondiciones = () => {
       {openViewRegister && <ReportDialogView openViewRegister={openViewRegister} setOpenViewRegister={setOpenViewRegister} registerSelected={registerSelected} setRegisterSelected={setRegisterSelected} />}
 
       {/* Añadir ruta de trabajo */}
-      {
-        openUploadRoute && <UploadReports openUploadReports={openUploadRoute} setOpenUploadReports={setOpenUploadRoute} />
-      }
+      {openUploadRoute && <UploadReports openUploadReports={openUploadRoute} setOpenUploadReports={setOpenUploadRoute} getAllReport={getAllReport} />}
 
-      {
-        openPDF && <PDFViewer urlPDF={registerSelected?.attachment} openDialog={openPDF} setOpenDialog={setOpenPDF} />
-      }
+      {openPDF && <PDFViewer urlPDF={registerSelected?.attachment} openDialog={openPDF} setOpenDialog={setOpenPDF} />}
     </div >
 
   )

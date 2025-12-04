@@ -21,7 +21,7 @@ type PDFViewerProps = {
 }
 
 const PDFViewer = ({ urlPDF, openDialog, setOpenDialog }: PDFViewerProps) => {
-  const urlBackend = process.env.NEXT_PUBLIC_MEDIA_URL
+  const urlBackend = 'http://localhost:8000' // Cambiar según configuración
   const selectionModePluginInstance = selectionModePlugin()
   const { SwitchSelectionModeButton } = selectionModePluginInstance
   const zoomPluginInstance = zoomPlugin()
@@ -150,8 +150,8 @@ const PDFViewer = ({ urlPDF, openDialog, setOpenDialog }: PDFViewerProps) => {
     )
   }
 
-  const { zoomTo } = zoomPluginInstance
-zoomTo(SpecialZoomLevel.PageWidth)
+  // const { zoomTo } = zoomPluginInstance
+  // zoomTo(SpecialZoomLevel.PageWidth)
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>

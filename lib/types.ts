@@ -22,11 +22,11 @@ export type ReportType = {
 export type Entity = {
   id: number
   name: string
-  type: string
+  type: number
   attachment?: File
   parent?: number
   children?: Entity[]
-  extra_info?: string
+  extra_info?: { tag: string, component?: boolean }
   deleted?: boolean
 }
 

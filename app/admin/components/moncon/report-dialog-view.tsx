@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { NoticesType, ReportType } from '@/lib/types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PDFViewer from '../PDFViewer'
+import { getNoticeById } from '@/app/services/monconServices'
 
 type ReportDialogViewProps = {
   openViewRegister: boolean
@@ -23,6 +24,20 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
   const [noticesData, setNoticesData] = useState<NoticesType[]>([]);
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [openPDF, setOpenPDF] = useState<boolean>(false);
+
+  const getNoticesData = () => {
+    getNoticeById(registerSelected?.id || "")
+      .then((response) => {
+        console.log("noticesData", response.data);
+        setNoticesData(response.data);
+      });
+  }
+
+  useEffect(() => {
+    if (registerSelected) {
+      getNoticesData();
+    }
+  }, [registerSelected]);
 
   return (
     <>
@@ -255,15 +270,15 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='w-full flex flex-row gap-2 mt-5'>
               <div className='flex flex-col gap-2 w-2/3'>
                 <Label className='font-semibold'>N° de avisos:</Label>
-                <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.name ? noticesData[0]?.name : "---"}</h1>
+                <h1 className='bg-white p-1.5 rounded-md'>{noticesData?.name ? noticesData?.name : "---"}</h1>
               </div>
               <div className='flex flex-col gap-2 w-2/3'>
                 <Label className='font-semibold'>Fecha de aviso:</Label>
-                <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.date ? noticesData[0]?.date : "---"}</h1>
+                <h1 className='bg-white p-1.5 rounded-md'>{noticesData?.date ? noticesData?.date : "---"}</h1>
               </div>
               <div className='flex flex-col gap-2 w-2/3'>
                 <Label className='font-semibold'>Status de aviso:</Label>
-                <Select disabled value={String(noticesData[0]?.status)}>
+                <Select disabled value={String(noticesData?.status)}>
                   <SelectTrigger className='w-full bg-white'>
                     <SelectValue placeholder="Seleccionar..." />
                   </SelectTrigger>
@@ -277,11 +292,11 @@ const ReportDialogView = ({ openViewRegister, setOpenViewRegister, setRegisterSe
             <div className='w-full flex flex-row gap-2'>
               <div className='flex flex-col gap-2 w-2/3'>
                 <Label className='font-semibold'>N° de OT:</Label>
-                <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.ot_number ? noticesData[0]?.ot_number : "---"}</h1>
+                <h1 className='bg-white p-1.5 rounded-md'>{noticesData?.ot_number ? noticesData?.ot_number : "---"}</h1>
               </div>
               <div className='flex flex-col gap-2 w-2/3'>
                 <Label className='font-semibold'>Fecha de OT:</Label>
-                <h1 className='bg-white p-1.5 rounded-md'>{noticesData[0]?.ot_date ? noticesData[0]?.ot_date : "---"}</h1>
+                <h1 className='bg-white p-1.5 rounded-md'>{noticesData?.ot_date ? noticesData?.ot_date : "---"}</h1>
               </div>
               <div className='flex flex-col gap-2 w-2/3'>
                 <Label className='font-semibold'>Status de OT:</Label>

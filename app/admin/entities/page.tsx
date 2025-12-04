@@ -7,17 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
-type Entity = {
-  id: number
-  name: string
-  type?: number
-  attachment?: File
-  parent?: number
-  children?: Entity[]
-  extra_info?: { tag: string }
-  deleted?: boolean
-}
+import { Entity } from "@/lib/types"
 
 const Entities = () => {
   const [entities, setEntities] = useState<Entity[]>([])
@@ -31,8 +21,8 @@ const Entities = () => {
   useEffect(() => {
     getEntities()
       .then((response) => {
-        const resp = response.data.filter(entity => entity.type === 3)
-        console.log("Fetched entities:", response)
+        const resp = response.data;
+        console.log("Fetched entities:", resp)
         setEntities(resp)
       })
       .catch((error) => {
@@ -47,27 +37,58 @@ const Entities = () => {
       [name]: value,
     }))
   }
-  
+
 
   const handleSubmit = () => {
-    createEntity(entityData)
-      .then((response) => {
-        console.log("Entity created successfully:", response)
-        return getEntities()
-      })
-      .then((response) => {
-        setEntities(response.data)
-        setOpenModal(false)
-        // Resetear el formulario
-        setEntityData({
-          id: 0,
-          name: '',
-          type: 1,
+    let resp;
+    if (entityData.type === 4) {
+      resp = {
+        ...entityData,
+        type: 3,
+        extra_info: {
+          ...entityData.extra_info,
+          component: true,
+        }
+      }
+
+      createEntity(resp)
+        .then((response) => {
+          console.log("Entity created successfully:", response)
+          return getEntities()
         })
-      })
-      .catch((error) => {
-        console.error("Error creating entity:", error)
-      })
+        .then((response) => {
+          setEntities(response.data)
+          setOpenModal(false)
+          // Resetear el formulario
+          setEntityData({
+            id: 0,
+            name: '',
+            type: 1,
+          })
+        })
+        .catch((error) => {
+          console.error("Error creating entity:", error)
+        })
+    } else {
+      createEntity(entityData)
+        .then((response) => {
+          console.log("Entity created successfully:", response)
+          return getEntities()
+        })
+        .then((response) => {
+          setEntities(response.data)
+          setOpenModal(false)
+          // Resetear el formulario
+          setEntityData({
+            id: 0,
+            name: '',
+            type: 1,
+          })
+        })
+        .catch((error) => {
+          console.error("Error creating entity:", error)
+        })
+    }
   }
 
   const handleDeleteEntity = (id: number) => {
@@ -83,28 +104,28 @@ const Entities = () => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex flex-row justify-between">
         <h1 className="text-xl font-bold mb-4">Gestión de Entidades</h1>
         <Button size='sm' onClick={() => setOpenModal(true)} className="mb-4">Crear entidad</Button>
       </div>
-      <Table>
-        <TableHeader className="bg-gray-300">
+      <Table className="h-[90vh]">
+        <TableHeader className="bg-gray-300 sticky top-0">
           <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Extra info</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Acciones</TableHead>
+            <TableHead className="font-bold">ID</TableHead>
+            <TableHead className="font-bold">NOMBRE</TableHead>
+            <TableHead className="font-bold">INFO. EXTRA</TableHead>
+            <TableHead className="font-bold">TIPO</TableHead>
+            <TableHead className="font-bold">ACCIONES</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="overflow-y-auto">
           {entities.map((entity) => (
             <TableRow key={entity.id}>
               <TableCell>{entity.id}</TableCell>
               <TableCell>{entity.name}</TableCell>
-              <TableCell>{entity.extra_info?.name}</TableCell>
-              <TableCell>{entity.type === 1 ? "Planta" : entity.type === 2 ? "Area" : entity.type === 3 ? "Equipo" : "Componente"}</TableCell>
+              <TableCell>{entity.extra_info?.tag}</TableCell>
+              <TableCell>{entity.extra_info?.component === true ? "Componente" : "Equipo"}</TableCell>
               <TableCell>
                 <div className="flex flex-row gap-2">
                   <Button size="sm">Editar</Button>
@@ -155,10 +176,11 @@ const Entities = () => {
                     <SelectItem value="1">Planta</SelectItem>
                     <SelectItem value="2">Area</SelectItem>
                     <SelectItem value="3">Equipo</SelectItem>
+                    <SelectItem value="4">Componente</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex flex-col gap-1">
                 <Label>Superior:</Label>
                 <Select value={entityData.parent ? String(entityData.parent) : undefined} onValueChange={(value) => setEntityData((prevData) => ({
