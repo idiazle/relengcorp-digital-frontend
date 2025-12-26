@@ -2,7 +2,7 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TabsContent } from '@radix-ui/react-tabs'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaHouse } from 'react-icons/fa6'
 import {
   VictoryAxis,
@@ -15,6 +15,8 @@ import {
   VictoryPie
   , VictoryStack, VictoryTheme
 } from "victory";
+
+import { getConditionsData, getEquipmentConditionByMonth } from '../../services/monconUserServices'
 
 const Moncon = () => {
   const myDataset = [
@@ -56,6 +58,108 @@ const Moncon = () => {
     ],
   ];
 
+
+
+  const dataCerrado = [
+    { category: "OTs", value: 12 },
+    { category: "Avisos", value: 18 },
+  ];
+
+  const dataAbierto = [
+    { category: "OTs", value: 25 },
+    { category: "Avisos", value: 21 },
+  ];
+
+  const [conditionData, setConditionData] = useState(
+    [
+      { x: "Normal", y: 0 },
+      { x: "Tolerable", y: 0 },
+      { x: "Precaucion", y: 0 },
+      { x: "Critico", y: 0 },
+    ]
+  );
+  const [EquipCondBYMonth, setEquipCondBYMonth] = useState([
+    [ // Condicion Normal
+      { x: "a", y: 1 },
+      { x: "b", y: 2 },
+      { x: "c", y: 3 },
+      { x: "d", y: 2 },
+      { x: "e", y: 3 },
+      { x: "f", y: 3 },
+      { x: "g", y: 3 },
+    ],
+    [ // Condicion Tolerable
+      { x: "a", y: 2 },
+      { x: "b", y: 3 },
+      { x: "c", y: 7 },
+      { x: "d", y: 5 },
+      { x: "e", y: 3 },
+      { x: "f", y: 3 },
+      { x: "g", y: 3 },
+    ],
+    [ // Condicion Precaucion
+      { x: "a", y: 5 },
+      { x: "b", y: 2 },
+      { x: "c", y: 3 },
+      { x: "d", y: 4 },
+      { x: "e", y: 4 },
+      { x: "f", y: 4 },
+      { x: "g", y: 4 },
+    ],
+    [ // Condicion Critico
+      { x: "a", y: 5 },
+      { x: "b", y: 2 },
+      { x: "c", y: 3 },
+      { x: "d", y: 4 },
+      { x: "e", y: 4 },
+      { x: "f", y: 4 },
+      { x: "g", y: 4 },
+    ],
+  ]);
+
+
+  useEffect(() => {
+    getConditionsData().then((response) => {
+      setConditionData(
+        [
+          { x: "Normal", y: response.data.c1 },
+          { x: "Tolerable", y: response.data.c2 },
+          { x: "Precaucion", y: response.data.c3 },
+          { x: "Critico", y: response.data.c4 },
+        ]
+      );
+    });
+    getEquipmentConditionByMonth().then((response) => {
+      setEquipCondBYMonth(response.data);
+    });
+  }, []);
+
+  const transformDataForVictory = (data: any) => {
+    const condition1: any[] = [];
+    const condition2: any[] = [];
+    const condition3: any[] = [];
+    const condition4: any[] = [];
+
+    Object.entries(data).forEach(([month, values]: any) => {
+      console.log("VALUESSSS ", values, month.toString());
+      condition1.push({ x: month, y: values.c1 });
+      condition2.push({ x: month, y: values.c2 });
+      condition3.push({ x: month, y: values.c3 });
+      condition4.push({ x: month, y: values.c4 });
+    });
+
+    return [condition1, condition2, condition3, condition4];
+  };
+  const [chartData, setChartData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!EquipCondBYMonth) return;
+
+    const formatted = transformDataForVictory(EquipCondBYMonth);
+    setChartData(formatted);
+
+  }, [EquipCondBYMonth]);
+
   function transformData(dataset) {
     const totals = dataset[0].map(
       (data, i) => {
@@ -81,16 +185,29 @@ const Moncon = () => {
   const dataset =
     transformData(myDataset);
 
-  const dataCerrado = [
-    { category: "OTs", value: 12 },
-    { category: "Avisos", value: 18 },
+  const getColor = (condition: string) => {
+    switch (condition) {
+      case "Normal":
+        return "#4CAF50";
+      case "Tolerable":
+        return "#FFC107";
+      case "Precaucion":
+        return "#FF9800";
+      case "Critico":
+        return "#F44336";
+      default:
+        return "#BDBDBD";
+    }
+  };
+
+  const COLORS = [
+    "#4CAF50", // Normal
+    "#FFC107", // Tolerable
+    "#FF9800", // Precaución
+    "#F44336", // Crítico
   ];
 
-  const dataAbierto = [
-    { category: "OTs", value: 25 },
-    { category: "Avisos", value: 21 },
-  ];
-
+  console.log("chartData ", chartData);
 
   return (
     <div className='w-full h-full gap-2 flex flex-col'>
@@ -106,73 +223,68 @@ const Moncon = () => {
           <div className=' flex flex-col w-1/2 h-full gap-2'>
             <div className='flex flex-col w-full h-1/3 bg-white rounded-md border border-gray-300'>
               <div className='w-full flex justify-center bg-gray-200 font-bold p-1 rounded-t-md'><h1>CONDICION DE EQUIPOS/COMPONENTES</h1></div>
-              <div className='flex flex-row gap-1'>
-                <div className='flex w-1/2'>
-                  <VictoryPie
-                    labels={({ datum }) => `${datum.x}: ${datum.y}%`}
-                    data={[
-                      { x: "Normal", y: 35 },
-                      { x: "Tolerable", y: 40 },
-                      { x: "Precaucion", y: 55 },
-                      { x: "Critico", y: 55 },
-                    ]}
-                    theme={VictoryTheme.clean}
-                  />
-                  {/* <VictoryLegend x={125} y={10}
-                      orientation="vertical"
-                      gutter={20}
-                      data={[
-                        { name: "Normal", symbol: { fill: "blue" } },
-                        { name: "Tolerable", symbol: { fill: "green" } },
-                        { name: "Precaucion", symbol: { fill: "orange" } },
-                        { name: "Critico", symbol: { fill: "red" } },
-                      ]}
-                    /> */}
-                </div>
-                <div className='flex w-1/2'>
-                  <VictoryChart
-                    domainPadding={{ x: 30, y: 20 }}
-                    theme={VictoryTheme.clean}
-                  >
-                    <VictoryStack>
-                      {dataset.map((data, i) => {
-                        return (
-                          <VictoryBar
-                            data={data}
-                            key={i}
-                          />
-                        );
-                      })}
-                    </VictoryStack>
-                    <VictoryAxis
-                      dependentAxis
-                      tickFormat={(tick) =>
-                        `${tick}%`
-                      }
+              <div className='flex flex-col'>
+                <div className='flex flex-row gap-1'>
+                  <div className='flex w-1/2 h-56'>
+                    <VictoryPie
+                      labels={({ datum }) =>
+                        datum.y > 0 ? `${datum.x}: ${datum.y}%` : ''}
+                      data={conditionData}
+                      theme={VictoryTheme.clean}
+                      style={{
+                        labels: { fontSize: 14, fill: "#333" },
+                        data: {
+                          fill: ({ datum }) => getColor(datum.x),
+                        }
+                      }}
                     />
-                    <VictoryAxis
-                      tickFormat={[
-                        "a",
-                        "b",
-                        "c",
-                        "d",
-                        "e",
-                        "f",
-                        "g",
-                      ]}
-                    />
-                    <VictoryLegend x={10} y={10}
-                      orientation="horizontal"
-                      gutter={20}
-                      data={[
-                        { name: "Normal", symbol: { fill: "blue" } },
-                        { name: "Tolerable", symbol: { fill: "green" } },
-                        { name: "Precaucion", symbol: { fill: "orange" } },
-                        { name: "Critico", symbol: { fill: "red" } },
-                      ]}
-                    />
-                  </VictoryChart>
+                  </div>
+                  <div className='flex w-1/2 h-56'>
+                    <VictoryChart
+                      domainPadding={{ x: 30, y: 20 }}
+                      theme={VictoryTheme.clean}
+                    >
+                      <VictoryStack>
+                        {chartData?.map((data, i) => {
+                          return (
+                            <VictoryBar
+                              data={data}
+                              key={i}
+                              style={{
+                                data: {
+                                  fill: COLORS[i]
+                                }
+                              }}
+                            />
+                          );
+                        })}
+                      </VictoryStack>
+                      <VictoryAxis
+                        tickValues={chartData[0]?.map(d => d.x)}
+                        style={{
+                          tickLabels: {
+                            angle: -45,
+                            textAnchor: "end",
+                            fontSize: 10
+                          }
+                        }}
+                      />
 
+                    </VictoryChart>
+
+                  </div>
+                </div>
+                <div className='h-64 flex justify-center'>
+                  <VictoryLegend x={10} y={10}
+                    orientation="horizontal"
+                    gutter={20}
+                    data={[
+                      { name: "Normal", symbol: { fill: "#4CAF50" } },
+                      { name: "Tolerable", symbol: { fill: "#FFC107" } },
+                      { name: "Precaucion", symbol: { fill: "#FF9800" } },
+                      { name: "Critico", symbol: { fill: "#F44336" } },
+                    ]}
+                  />
                 </div>
               </div>
             </div>
