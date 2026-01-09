@@ -31,22 +31,22 @@ const Sidebar = () => {
       role: ['1', '2', '3'],
       enabled: true
     },
-    // {
-    //   id: 4,
-    //   name: 'Gestión de Documentos',
-    //   icon: <FaRegFileLines />,
-    //   path: '/admin/documents',
-    //   role: ['1', '2', '3'],
-    //   enabled: true
-    // },
-    // {
-    //   id: 5,
-    //   name: 'Gestión de TAGS',
-    //   icon: <FaRegFileLines />,
-    //   path: '/admin/equipments',
-    //   role: ['1', '2', '3'],
-    //   enabled: true
-    // },
+    {
+      id: 4,
+      name: 'Monitoreo de Equipos Rotatorios',
+      icon: <FaRegFileLines />,
+      path: '/admin/moncon-equipos-rotatorios',
+      role: ['1', '2', '3'],
+      enabled: true
+    },
+    {
+      id: 5,
+      name: 'Monitoreo de Equipos Estáticos',
+      icon: <FaRegFileLines />,
+      path: '/admin/moncon-equipos-estaticos',
+      role: ['1', '2', '3'],
+      enabled: true
+    },
   ]
 
   return (

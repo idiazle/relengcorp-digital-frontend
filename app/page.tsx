@@ -1,12 +1,5 @@
-import MonitoreoCondiciones from "./admin/moncon/page";
-import Menu from "./menu/page";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div >
-      <main >
-        <Menu />
-      </main>
-    </div>
-  );
+  redirect('/auth/login');
 }
