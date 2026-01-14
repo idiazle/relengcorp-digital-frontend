@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { NoticesType, ReportType } from '@/lib/types'
 import { useEffect, useState } from 'react'
-import PDFViewer from '../PDFViewer'
+import PDFViewer from '../../components/PDFViewer'
 import { getNoticeById } from '@/app/services/monconServices'
 
 type ReportDialogViewProps = {

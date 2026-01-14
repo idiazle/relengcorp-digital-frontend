@@ -9,14 +9,6 @@ const Sidebar = () => {
   const routes = [
     {
       id: 1,
-      name: 'Gestión de Usuarios',
-      icon: <FaRegFileLines />,
-      path: '/admin/users',
-      role: ['1', '2'],
-      enabled: true
-    },
-    {
-      id: 2,
       name: 'Gestión de Entidades',
       icon: <FaRegFileLines />,
       path: '/admin/entities',
@@ -24,7 +16,23 @@ const Sidebar = () => {
       enabled: true
     },
     {
+      id: 2,
+      name: 'Gestión de Permisos',
+      icon: <FaRegFileLines />,
+      path: '/admin/permissions',
+      role: ['1', '2'],
+      enabled: true
+    },
+    {
       id: 3,
+      name: 'Gestión de Usuarios',
+      icon: <FaRegFileLines />,
+      path: '/admin/users',
+      role: ['1', '2'],
+      enabled: true
+    },
+    {
+      id: 4,
       name: 'Monitoreo de Condicion',
       icon: <FaRegFileLines />,
       path: '/admin/moncon',
@@ -32,18 +40,18 @@ const Sidebar = () => {
       enabled: true
     },
     {
-      id: 4,
-      name: 'Monitoreo de Equipos Rotatorios',
+      id: 5,
+      name: 'Gestión de Equipos Rotatorios',
       icon: <FaRegFileLines />,
-      path: '/admin/moncon-equipos-rotatorios',
+      path: '/admin/equipos-rotatorios',
       role: ['1', '2', '3'],
       enabled: true
     },
     {
-      id: 5,
-      name: 'Monitoreo de Equipos Estáticos',
+      id: 6,
+      name: 'Gestión de Equipos Estáticos',
       icon: <FaRegFileLines />,
-      path: '/admin/moncon-equipos-estaticos',
+      path: '/admin/equipos-estaticos',
       role: ['1', '2', '3'],
       enabled: true
     },

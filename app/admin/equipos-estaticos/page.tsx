@@ -1,15 +1,14 @@
-'use client';
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FaPlus } from "react-icons/fa6";
+'use client'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Table, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { FaPlus } from 'react-icons/fa6'
 
-
-const MonitoreoEquiposRotatorios = () => {
+const EquiposEstaticos = () => {
   return (
-    <div>
+     <div>
        <div className='w-full flex flex-row justify-between items-center mb-4'>
-        <h1 className='font-bold text-lg'>MONITOREO DE EQUIPOS ROTATORIOS</h1>
+        <h1 className='font-bold text-lg'>GESTIÓN DE EQUIPOS ESTATICOS</h1>
         <div className='flex flex-row items-center gap-2'>
           <Button onClick={() => {console.log('Agregando equipo')}}><FaPlus /> Agregar equipo</Button>
         </div>
@@ -30,8 +29,7 @@ const MonitoreoEquiposRotatorios = () => {
         </TableHeader>
        </Table>
     </div>
-
   )
 }
 
-export default MonitoreoEquiposRotatorios;
+export default EquiposEstaticos

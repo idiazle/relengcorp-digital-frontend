@@ -8,10 +8,10 @@ import { deleteMonconReport, getMonconReports } from '../../services/monconServi
 import { getEntities } from '@/app/services/entitiesServices'
 import { Entity, ReportType } from '@/lib/types'
 import PDFViewer from '../components/PDFViewer'
-import ReportDialogView from '../components/moncon/report-dialog-view'
-import ReportDialogEdit from '../components/moncon/report-dialog-edit'
-import CreateReportDialog from '../components/moncon/CreateReportDialog'
-import UploadReports from '../components/moncon/UploadReports'
+import ReportDialogView from './components/report-dialog-view'
+import ReportDialogEdit from './components/report-dialog-edit'
+import CreateReportDialog from './components/CreateReportDialog'
+import UploadReports from './components/UploadReports'
 
 const MonitoreoCondiciones = () => {
   const [entities, setEntities] = useState<Entity[]>([]);
