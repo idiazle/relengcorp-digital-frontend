@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { getUsers } from "@/app/services/userServices"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
+import CreateUserModal from "./components/CreateUserModal"
 
 type User = {
   id: number
@@ -36,7 +37,7 @@ const Users = () => {
     <div>
       <div className="flex flex-row justify-between">
         <h1 className="text-xl font-bold mb-4">Gestión de Entidades</h1>
-        <Button size='sm' onClick={() => setOpenModal(true)} className="mb-4">Crear entidad</Button>
+        <Button size='sm' onClick={() => setOpenModal(true)} className="mb-4">Crear usuario</Button>
       </div>
       <Table>
         <TableHeader>
@@ -64,6 +65,9 @@ const Users = () => {
           ))}
         </TableBody>
       </Table>
+      {
+        <CreateUserModal openModal={openModal} setOpenModal={setOpenModal} />
+      }
     </div>
   )
 }
