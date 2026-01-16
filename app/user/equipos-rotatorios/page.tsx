@@ -18,7 +18,7 @@ import {
 
 import { getConditionsData, getEquipmentConditionByMonth } from '../../services/monconUserServices'
 
-const Moncon = () => {
+const EquiposRotatorios = () => {
   const myDataset = [
     [ // Condicion Normal
       { x: "a", y: 1 },
@@ -207,15 +207,17 @@ const Moncon = () => {
     "#F44336", // Crítico
   ];
 
+  console.log("chartData ", chartData);
+
   return (
-    <div className='w-full h-[88vh]'>
+    <div className='w-full h-full gap-2 flex flex-col'>
       <Tabs defaultValue='pdmp' className='w-full h-full flex flex-col'>
-        <TabsList className='w-full flex flex-row bg-gray-300 '>
-          <TabsTrigger value='pdmp' className='cursor-pointer hover:bg-gray-400'>PDM PTAE</TabsTrigger>
-          <TabsTrigger value='pdma' className='cursor-pointer hover:bg-gray-400'>PDM ANTAPACCAY</TabsTrigger>
-          <TabsTrigger value='ndtp' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS PTAE</TabsTrigger>
-          <TabsTrigger value='ndta' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS ANTAPACCAY</TabsTrigger>
-          <TabsTrigger value='ndtt' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS TINTAYA</TabsTrigger>
+        <TabsList className='w-full flex flex-row bg-gray-200'>
+          <TabsTrigger value='pdmp'>PDM PTAE</TabsTrigger>
+          <TabsTrigger value='pdma'>PDM ANTAPACCAY</TabsTrigger>
+          <TabsTrigger value='ndtp'>NDT TUBERIAS PTAE</TabsTrigger>
+          <TabsTrigger value='ndta'>NDT TUBERIAS ANTAPACCAY</TabsTrigger>
+          <TabsTrigger value='ndtt'>NDT TUBERIAS TINTAYA</TabsTrigger>
         </TabsList>
         <TabsContent value='pdmp' className='flex flex-row w-full h-full gap-2'>
           <div className=' flex flex-col w-1/2 h-full gap-2'>
@@ -223,7 +225,7 @@ const Moncon = () => {
               <div className='w-full flex justify-center bg-gray-200 font-bold p-1 rounded-t-md'><h1>CONDICION DE EQUIPOS/COMPONENTES</h1></div>
               <div className='flex flex-col'>
                 <div className='flex flex-row gap-1'>
-                  <div className='flex w-1/2 h-48'>
+                  <div className='flex w-1/2 h-56'>
                     <VictoryPie
                       labels={({ datum }) =>
                         datum.y > 0 ? `${datum.x}: ${datum.y}%` : ''}
@@ -237,7 +239,7 @@ const Moncon = () => {
                       }}
                     />
                   </div>
-                  <div className='flex w-1/2 h-48'>
+                  <div className='flex w-1/2 h-56'>
                     <VictoryChart
                       domainPadding={{ x: 30, y: 20 }}
                       theme={VictoryTheme.clean}
@@ -296,7 +298,7 @@ const Moncon = () => {
                     <button className='w-1/3 border border-black bg-gray-100 hover:bg-gray-200 cursor-pointer'>Mes</button>
                   </div>
                   <div className='flex flex-row'>
-                   {/*  <VictoryChart
+                    <VictoryChart
                       domain={{ x: [0.5, 5.5], y: [0, 100] }}
                       theme={VictoryTheme.clean}
                     >
@@ -311,7 +313,7 @@ const Moncon = () => {
                           { x: '16 nov', y: 85 },
                         ]
                       } />
-                    </VictoryChart> */}
+                    </VictoryChart>
 
                   </div>
                   <div className='flex flex-row'>
@@ -380,83 +382,87 @@ const Moncon = () => {
             </div>
           </div>
 
-          <div className='flex flex-col w-1/2 h-full gap-2 overflow-hidden'>
-            <div className='flex flex-col w-full h-2/3 bg-white rounded-md border border-gray-300 overflow-hidden'>
+          <div className=' flex flex-col w-1/2 h-full gap-2'>
+            <div className='flex flex-col w-full h-2/3 bg-white rounded-md border border-gray-300'>
 
             </div>
-            <div className='flex flex-col w-full h-1/3 bg-white rounded-md border border-gray-300 overflow-hidden'>
+            <div className='flex flex-col w-full h-1/3 bg-white rounded-md border border-gray-300'>
               <div className='w-full flex justify-center bg-gray-200 font-bold p-1 rounded-t-md'><h1>AVISOS & OT</h1></div>
-              <div className='flex flex-row gap-2 flex-1 overflow-hidden p-2'>
-                <div className='flex w-1/2 items-center justify-center'>
+              <div className='flex flex-row gap-1'>
+                <div className='flex w-1/2'>
                   <h1>Grafica Circular</h1>
                 </div>
-                <div className='flex w-1/2 flex-col min-h-0 gap-2'>
-                  <div className='flex flex-col flex-1 border border-gray-300 rounded-md p-2 overflow-auto'>
-                    <VictoryChart
-                      horizontal
-                      domain={{ y: [0, 30] }}
-                      padding={{ top: 20, bottom: 50,  }}
-                      domainPadding={{ x: 60 }}
+                <div className='flex w-1/2 flex-col'>
+                  <VictoryChart
+                    horizontal
+                    domain={{ x: [0, 30] }}
+                    height={250}
+                    padding={{ top: 20, bottom: 20, left: 80, right: 70 }}
+
+                  >
+                    {/* Categorías */}
+                    <VictoryAxis
+                      style={{
+                        axis: { stroke: "transparent" },
+                        tickLabels: { fontSize: 14, padding: 5 },
+                      }}
+                    />
+
+                    {/* Eje numérico */}
+                    <VictoryAxis
+                      dependentAxis
+                      tickValues={[0, 10, 20, 30]}
+                      tickFormat={(t) => t}
+                      style={{
+                        grid: { stroke: "#ccc", strokeDasharray: "4" },
+                        tickLabels: { fontSize: 12 },
+                      }}
+                    />
+
+                    {/* GRUPOS DE BARRAS */}
+                    <VictoryGroup
+                      offset={20} // separación entre barras del grupo
+                      colorScale={["#1f4bd8", "#ff5722"]} // azul / naranja
                     >
-                      {/* Categorías */}
-                      <VictoryAxis
-                        style={{
-                          axis: { stroke: "#333" },
-                          tickLabels: { fontSize: 20, padding: 10 },
-                        }}
+                      {/* Cerrado */}
+                      <VictoryBar
+                        data={dataCerrado}
+                        x="category"
+                        y="value"
+                        barWidth={16}
+                        labels={({ datum }) => datum.value}
+                        labelComponent={<VictoryLabel dx={25} />}
                       />
 
-                      {/* Eje numérico */}
-                      <VictoryAxis
-                        dependentAxis
-                        tickValues={[0, 10, 20, 30]}
-                        tickFormat={(t) => t}
-                        style={{
-                          grid: { stroke: "#e0e0e0", strokeDasharray: "3,3" },
-                          tickLabels: { fontSize: 20 },
-                          axis: { stroke: "#333" },
-                        }}
+                      {/* Abierto */}
+                      <VictoryBar
+                        data={dataAbierto}
+                        x="category"
+                        y="value"
+                        barWidth={16}
+                        labels={({ datum }) => datum.value}
+                        labelComponent={<VictoryLabel dx={25} />}
                       />
-
-                      {/* GRUPOS DE BARRAS */}
-                      <VictoryGroup
-                        horizontal
-                        offset={30}
-                        colorScale={["#1f4bd8", "#ff5722"]}
-                      >
-                        {/* Cerrado */}
-                        <VictoryBar
-                          data={dataCerrado}
-                          x="category"
-                          y="value"
-                          barWidth={25}
-                          labels={({ datum }) => datum.value}
-                          labelComponent={<VictoryLabel dx={15} style={{ fontSize: 20 }} />}
-                        />
-
-                        {/* Abierto */}
-                        <VictoryBar
-                          data={dataAbierto}
-                          x="category"
-                          y="value"
-                          barWidth={25}
-                          labels={({ datum }) => datum.value}
-                          labelComponent={<VictoryLabel dx={15} style={{ fontSize: 20 }} />}
-                        />
-                      </VictoryGroup>
-                    </VictoryChart>
-                  </div>
+                    </VictoryGroup>
+                  </VictoryChart>
 
                   {/* LEYENDA ABAJO */}
-                  <div className='flex justify-center gap-6 pb-2'>
-                    <div className='flex items-center gap-1.5'>
-                      <div className='w-3 h-3' style={{ background: "#1f4bd8" }}></div>
-                      <span className='text-xs'>Cerrado</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 30,
+                      marginTop: 10,
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 14, height: 14, background: "#1f4bd8" }}></div>
+                      Cerrado
                     </div>
 
-                    <div className='flex items-center gap-1.5'>
-                      <div className='w-3 h-3' style={{ background: "#ff5722" }}></div>
-                      <span className='text-xs'>Abierto</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 14, height: 14, background: "#ff5722" }}></div>
+                      Abierto
                     </div>
                   </div>
                 </div>
@@ -481,4 +487,4 @@ const Moncon = () => {
   )
 }
 
-export default Moncon
+export default EquiposRotatorios

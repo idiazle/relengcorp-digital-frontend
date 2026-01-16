@@ -159,16 +159,17 @@ export default function Login() {
                 </FormItem>
               )}
             />
-            <Button className='w-full mt-5 hover:bg-[#eb611e]  bg-[#eb611e]' type={'submit'} disabled={loading}>
+            <Button className='w-full mt-5 hover:bg-[#eb611e]  bg-[#eb611e]' onClick={() => {router.push('/user/main')}}>Ingresar</Button>
+            {/* <Button className='w-full mt-5 hover:bg-[#eb611e]  bg-[#eb611e]' type={'submit'} disabled={loading}>
               {
                 loading
                   ? <div className='flex flex-row'>
-                    {/* <ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> */}
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                     Cargando Sistema
                   </div>
                   : <p>Ingresar</p>
               }
-            </Button>
+            </Button> */}
           </form>
         </Form>
         {/* <div className='w-80'>
