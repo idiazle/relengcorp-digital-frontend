@@ -126,9 +126,9 @@ const MonitoreoCondiciones = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       {/* Cabecera */}
-      <div className='w-full flex flex-row justify-between items-center mb-4'>
+      <div className='w-full flex flex-row justify-between items-center mb-2 shrink-0'>
         <h1 className='font-bold text-lg'>MONITOREO DE CONDICIONES</h1>
         <div className='flex flex-row items-center gap-2'>
           {/* <Input type='file' accept='.xlsx' className='' /> */}
@@ -136,8 +136,8 @@ const MonitoreoCondiciones = () => {
           <Button onClick={() => { setOpenNewRegister(true) }}><FaPlus /> Agregar registro</Button>
         </div>
       </div>
-      <Separator className='my-4' />
-      <div className="h-[85vh] overflow-auto">
+      <Separator className='my-2 shrink-0' />
+      <div className="flex-1 overflow-auto">
         <Table className="bg-white">
           <TableHeader className="bg-gray-300 sticky top-0 z-10">
             <TableRow>
