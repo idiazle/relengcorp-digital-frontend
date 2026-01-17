@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Entity } from "@/lib/types"
+import { Separator } from "@/components/ui/separator"
+import { FaEye, FaPlus, FaTrash } from "react-icons/fa6"
+import { FaEdit } from "react-icons/fa"
 
 const EntitiesPage = () => {
   const [entities, setEntities] = useState<Entity[]>([])
@@ -105,10 +108,11 @@ const EntitiesPage = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex flex-row justify-between">
-        <h1 className="text-xl font-bold mb-4">Gestión de Entidades</h1>
-        <Button size='sm' onClick={() => setOpenModal(true)} className="mb-4">Crear entidad</Button>
+      <div className='flex justify-between items-center'>
+        <h1 className='font-bold text-lg'>GESTIÓN DE ENTIDADES</h1>
+        <Button className='' onClick={() => {setOpenModal(true)}}><FaPlus /> Nueva entidad</Button>
       </div>
+      <Separator className='my-2' />
       <Table className="h-[90vh]">
         <TableHeader className="bg-gray-300 sticky top-0">
           <TableRow>
@@ -128,8 +132,9 @@ const EntitiesPage = () => {
               <TableCell>{entity.extra_info?.component === true ? "Componente" : "Equipo"}</TableCell>
               <TableCell>
                 <div className="flex flex-row gap-2">
-                  <Button size="sm">Editar</Button>
-                  <Button onClick={() => handleDeleteEntity(entity.id)} size="sm" variant="destructive">Eliminar</Button>
+                  <Button size="sm"><FaEye /></Button>
+                  <Button size="sm"><FaEdit /></Button>
+                  <Button onClick={() => handleDeleteEntity(entity.id)} size="sm" variant="destructive"><FaTrash /></Button>
                 </div>
               </TableCell>
             </TableRow>

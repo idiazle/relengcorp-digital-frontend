@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table' 
+import { FaEdit } from 'react-icons/fa';
+import { FaEye, FaPlus, FaTrash } from 'react-icons/fa6';
 
 const permissionsData = [
   // Aquí irían los datos de permisos, por ejemplo:
@@ -17,7 +19,7 @@ const PermissionsPage = () => {
     <div className='flex flex-col h-full'>
       <div className='flex justify-between items-center'>
         <h1 className='font-bold text-lg'>GESTIÓN DE PERMISOS</h1>
-        <Button className=''>Crear Nuevo Permiso</Button>
+        <Button className=''><FaPlus /> Nuevo permiso</Button>
       </div>
       <Separator className='my-2' />
       <div className='flex-1 overflow-auto'>
@@ -36,9 +38,10 @@ const PermissionsPage = () => {
                 {/* <TableCell>{index + 1}</TableCell> */}
                 <TableCell>{permission.name}</TableCell>
                 <TableCell>{permission.description}</TableCell>
-                <TableCell>
-                  <Button variant="link" className='mr-2'>Editar</Button>
-                  <Button variant="link" className='text-red-600'>Eliminar</Button>
+                <TableCell className='flex flex-row gap-2'>
+                  <Button><FaEye /></Button>
+                  <Button ><FaEdit /></Button>
+                  <Button variant="destructive"><FaTrash /></Button>
                 </TableCell>
               </TableRow>
             ))}

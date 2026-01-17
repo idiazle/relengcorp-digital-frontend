@@ -12,6 +12,7 @@ import ReportDialogView from './components/report-dialog-view'
 import ReportDialogEdit from './components/report-dialog-edit'
 import CreateReportDialog from './components/CreateReportDialog'
 import UploadReports from './components/UploadReports'
+import { FaEdit } from 'react-icons/fa'
 
 const MonconPage = () => {
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -127,16 +128,14 @@ const MonconPage = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Cabecera */}
-      <div className='w-full flex flex-row justify-between items-center mb-2 shrink-0'>
-        <h1 className='font-bold text-lg'>MONITOREO DE CONDICIONES</h1>
+      <div className='flex justify-between items-center'>
+        <h1 className='font-bold text-lg'>GESTIÓN DE MONITOREO DE CONDICIONES</h1>
         <div className='flex flex-row items-center gap-2'>
-          {/* <Input type='file' accept='.xlsx' className='' /> */}
-          <Button onClick={() => { console.log('Subiendo archivo', setOpenUploadRoute(true)) }}><FaUpload /> Crear ruta</Button>
-          <Button onClick={() => { setOpenNewRegister(true) }}><FaPlus /> Agregar registro</Button>
+          <Button onClick={() => { console.log('Subiendo archivo', setOpenUploadRoute(true)) }}><FaUpload /> Nueva ruta</Button>
+          <Button onClick={() => { setOpenNewRegister(true) }}><FaPlus /> Nuevo registro</Button>
         </div>
       </div>
-      <Separator className='my-2 shrink-0' />
+      <Separator className='my-2' />
       <div className="flex-1 overflow-auto">
         <Table className="bg-white">
           <TableHeader className="bg-gray-300 sticky top-0 z-10">
@@ -191,7 +190,7 @@ const MonconPage = () => {
                       setRegisterSelected(data);
                       setOpenEditRegister(true)
                     }}>
-                    <FaPencil />
+                    <FaEdit />
                   </Button>
                   <Button
                     variant="destructive"

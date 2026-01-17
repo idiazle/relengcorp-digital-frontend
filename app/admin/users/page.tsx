@@ -4,6 +4,8 @@ import { getUsers } from "@/app/services/userServices"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import CreateUserModal from "./components/CreateUserModal"
+import { FaPlus } from "react-icons/fa6"
+import { Separator } from "@/components/ui/separator"
 
 type User = {
   id: number
@@ -34,11 +36,12 @@ const UsersPage = () => {
   }, [])
 
   return (
-    <div>
-      <div className="flex flex-row justify-between">
-        <h1 className="text-xl font-bold mb-4">Gestión de Entidades</h1>
-        <Button size='sm' onClick={() => setOpenModal(true)} className="mb-4">Crear usuario</Button>
+    <div className="flex flex-col h-full">
+      <div className='flex justify-between items-center'>
+        <h1 className='font-bold text-lg'>GESTIÓN DE USUARIOS</h1>
+        <Button className='' onClick={() => {setOpenModal(true)}}><FaPlus /> Nuevo usuario</Button>
       </div>
+      <Separator className='my-2' />
       <Table>
         <TableHeader>
           <TableRow>
