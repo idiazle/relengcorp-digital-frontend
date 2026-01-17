@@ -6,14 +6,12 @@ import { FaPlus } from 'react-icons/fa6'
 
 const StaticEquipmentPage = () => {
   return (
-     <div>
-       <div className='w-full flex flex-row justify-between items-center mb-4'>
-        <h1 className='font-bold text-lg'>GESTIÓN DE EQUIPOS ESTATICOS</h1>
-        <div className='flex flex-row items-center gap-2'>
-          <Button onClick={() => {console.log('Agregando equipo')}}><FaPlus /> Agregar equipo</Button>
-        </div>
+     <div className='flex flex-col h-full'>
+      <div className='flex justify-between items-center'>
+        <h1 className='font-bold text-lg'>GESTIÓN DE EQUIPOS ESTÁTICOS</h1>
+          <Button onClick={() => {console.log('Agregando equipo')}}><FaPlus /> Nuevo equipo</Button>
       </div>
-       <Separator className='my-4' />
+      <Separator className='my-2' />
        <Table className="bg-white">
         <TableHeader className="bg-gray-300 sticky top-0 z-10">
           <TableRow>

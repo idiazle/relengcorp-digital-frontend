@@ -2,7 +2,9 @@
 
 const AdminDashboardPage = () => {
   return (
-    <div>Dashboard</div>
+    <div className="flex flex-col h-full bg-gray-400">
+
+    </div>
   )
 }
 
