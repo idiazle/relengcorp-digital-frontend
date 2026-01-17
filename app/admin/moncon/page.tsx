@@ -13,7 +13,7 @@ import ReportDialogEdit from './components/report-dialog-edit'
 import CreateReportDialog from './components/CreateReportDialog'
 import UploadReports from './components/UploadReports'
 
-const MonitoreoCondiciones = () => {
+const MonconPage = () => {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [openNewRegister, setOpenNewRegister] = useState<boolean>(false);
   const [openPDF, setOpenPDF] = useState<boolean>(false);
@@ -221,4 +221,4 @@ const MonitoreoCondiciones = () => {
   )
 }
 
-export default MonitoreoCondiciones
+export default MonconPage;

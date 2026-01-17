@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator'
 import { Table, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { FaPlus } from 'react-icons/fa6'
 
-const EquiposEstaticos = () => {
+const StaticEquipmentPage = () => {
   return (
      <div>
        <div className='w-full flex flex-row justify-between items-center mb-4'>
@@ -32,4 +32,4 @@ const EquiposEstaticos = () => {
   )
 }
 
-export default EquiposEstaticos
+export default StaticEquipmentPage;

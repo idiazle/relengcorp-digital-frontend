@@ -1,11 +1,7 @@
 import { FaUser } from "react-icons/fa6";
 import Sidebar from "./components/Sidebar";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const AdminLayout =({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col w-full h-screen bg-gray-50 overflow-hidden">
       <div className="bg-[#16292f] flex justify-between p-2 items-center text-white gap-4 shrink-0">
@@ -29,3 +25,5 @@ export default function RootLayout({
     </div>
   );
 }
+
+export default AdminLayout;

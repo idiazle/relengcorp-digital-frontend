@@ -1,9 +1,9 @@
 'use client';
 
-const AdminDashboard = () => {
+const AdminDashboardPage = () => {
   return (
     <div>Dashboard</div>
   )
 }
 
-export default AdminDashboard;
+export default AdminDashboardPage;

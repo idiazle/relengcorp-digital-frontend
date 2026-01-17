@@ -1,16 +1,24 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FaRegFileLines } from 'react-icons/fa6'
+import { FaChartLine, FaBuilding, FaShieldAlt, FaUsers, FaClipboardCheck, FaCog, FaIndustry, FaPalette } from 'react-icons/fa'
 import { MdOutlineDisabledVisible } from 'react-icons/md'
 
 const Sidebar = () => {
   const getUrl = usePathname()
   const routes = [
     {
+      id: 0,
+      name: 'Personalización',
+      icon: <FaPalette />,
+      path: '/admin/customization',
+      role: ['1', '2'],
+      enabled: true
+    },
+    {
       id: 1,
       name: 'Gestión de Entidades',
-      icon: <FaRegFileLines />,
+      icon: <FaBuilding />,
       path: '/admin/entities',
       role: ['1', '2'],
       enabled: true
@@ -18,7 +26,7 @@ const Sidebar = () => {
     {
       id: 2,
       name: 'Gestión de Permisos',
-      icon: <FaRegFileLines />,
+      icon: <FaShieldAlt />,
       path: '/admin/permissions',
       role: ['1', '2'],
       enabled: true
@@ -26,7 +34,7 @@ const Sidebar = () => {
     {
       id: 3,
       name: 'Gestión de Usuarios',
-      icon: <FaRegFileLines />,
+      icon: <FaUsers />,
       path: '/admin/users',
       role: ['1', '2'],
       enabled: true
@@ -34,7 +42,7 @@ const Sidebar = () => {
     {
       id: 4,
       name: 'Monitoreo de Condicion',
-      icon: <FaRegFileLines />,
+      icon: <FaClipboardCheck />,
       path: '/admin/moncon',
       role: ['1', '2', '3'],
       enabled: true
@@ -42,16 +50,16 @@ const Sidebar = () => {
     {
       id: 5,
       name: 'Gestión de Equipos Rotatorios',
-      icon: <FaRegFileLines />,
-      path: '/admin/equipos-rotatorios',
+      icon: <FaCog />,
+      path: '/admin/rotary-equipment',
       role: ['1', '2', '3'],
       enabled: true
     },
     {
       id: 6,
       name: 'Gestión de Equipos Estáticos',
-      icon: <FaRegFileLines />,
-      path: '/admin/equipos-estaticos',
+      icon: <FaIndustry />,
+      path: '/admin/static-equipment',
       role: ['1', '2', '3'],
       enabled: true
     },
@@ -59,9 +67,9 @@ const Sidebar = () => {
 
   return (
     <div className="bg-[#16292f] flex-col items-center sm:flex border-r h-full w-[220px]">
-      <div className='flex flex-col justify-center items-center w-full p-1'>
+      <div className='flex flex-col justify-center items-center w-full p-1 gap-2 border-b mb-2 shrink-0'>
         <Link href={'/admin'} className={`text-white flex flex-row w-full justify-start items-center gap-2 hover:bg-zinc-500 rounded p-3 ${getUrl === '/admin' ? 'bg-zinc-500' : ''}`}>
-          <FaRegFileLines />
+          <FaChartLine />
           <span className={'text-sm font-medium'}>
             Dashboard
           </span>

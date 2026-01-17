@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Entity } from "@/lib/types"
 
-const Entities = () => {
+const EntitiesPage = () => {
   const [entities, setEntities] = useState<Entity[]>([])
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [entityData, setEntityData] = useState<Entity>({
@@ -215,4 +215,4 @@ const Entities = () => {
   )
 }
 
-export default Entities
+export default EntitiesPage;

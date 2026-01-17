@@ -18,7 +18,7 @@ type User = {
   deleted: boolean
 }
 
-const Users = () => {
+const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([])
   const [openModal, setOpenModal] = useState<boolean>(false)
 
@@ -72,4 +72,4 @@ const Users = () => {
   )
 }
 
-export default Users
+export default UsersPage;

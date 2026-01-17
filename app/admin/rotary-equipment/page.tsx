@@ -6,7 +6,7 @@ import { useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 import EquipmentCreateModal from "./components/EquipmentCreateModal";
 
-const EquiposRotatorios = () => {
+const RotaryEquipmentPage = () => {
   const [equipments, setEquipments] = useState([]);
   const [openCreateModal, setOpenCreateModal] = useState(false)
 
@@ -69,4 +69,4 @@ const EquiposRotatorios = () => {
   )
 }
 
-export default EquiposRotatorios;
+export default RotaryEquipmentPage
