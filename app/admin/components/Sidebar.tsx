@@ -61,8 +61,25 @@ const Sidebar = () => {
       icon: <FaIndustry />,
       path: '/admin/static-equipment',
       role: ['1', '2', '3'],
-      enabled: true
+      enabled: false
     },
+    {
+      id: 7,
+      name: 'Gestión de Planos',
+      icon: <FaIndustry />,
+      path: '/admin/blueprints',
+      role: ['1', '2', '3'],
+      enabled: false
+    },
+    {
+      id: 8,
+      name: 'Gestión de Interactivos',
+      icon: <FaIndustry />,
+      path: '/admin/interactives',
+      role: ['1', '2', '3'],
+      enabled: false
+    },
+
   ]
 
   return (

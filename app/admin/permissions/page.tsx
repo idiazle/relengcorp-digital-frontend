@@ -3,10 +3,34 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table' 
 import { FaEdit } from 'react-icons/fa';
 import { FaEye, FaPlus, FaTrash } from 'react-icons/fa6';
+import PermissionTarjet from './components/PermissionTarjet';
 
 const permissionsData = [
   // Aquí irían los datos de permisos, por ejemplo:
-  { id: 1, name: 'SuperAdmin', description: 'Acceso completo al sistema' },
+  { 
+    id: 1,
+    name: 'SuperAdmin',
+    description: 'Acceso completo al sistema',
+    accessTables: [
+      {
+        id: 1,
+        name: 'entities',
+        permissions: ['view', 'create', 'edit', 'delete']
+      },
+      { id: 2,
+        name: 'users',
+        permissions: ['view', 'create', 'edit', 'delete']
+      },
+      { id: 3,
+        name: 'settings',
+        permissions: ['view', 'create', 'edit', 'delete']
+      },
+      { id: 4,
+        name: 'reports',
+        permissions: ['view', 'create', 'edit', 'delete']
+      }
+    ]
+  },
   { id: 2, name: 'Administrador', description: 'Acceso administrativo' },
   { id: 3, name: 'Editor', description: 'Acceso de edicion' },
   { id: 4, name: 'Usuario', description: 'Acceso de visualización' },
@@ -29,6 +53,7 @@ const PermissionsPage = () => {
               {/* <TableHead className='font-bold text-black'>N°</TableHead> */}
               <TableHead className='font-bold text-black'>Nombre del permiso</TableHead>
               <TableHead className='font-bold text-black'>Descripción</TableHead>
+              <TableHead className='font-bold text-black'>Tablas de acceso</TableHead>
               <TableHead className='font-bold text-black'>Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -38,6 +63,13 @@ const PermissionsPage = () => {
                 {/* <TableCell>{index + 1}</TableCell> */}
                 <TableCell>{permission.name}</TableCell>
                 <TableCell>{permission.description}</TableCell>
+                <TableCell className='gap-1'>
+                  {
+                    permission.accessTables?.map((table) => (
+                      <PermissionTarjet key={table.id} name={table.name} permissions={table.permissions} />
+                    ))
+                  }
+                </TableCell>
                 <TableCell className='flex flex-row gap-2'>
                   <Button><FaEye /></Button>
                   <Button ><FaEdit /></Button>

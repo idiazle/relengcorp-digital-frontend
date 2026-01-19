@@ -3,15 +3,73 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { IoReload } from 'react-icons/io5'
-import { FaEye } from 'react-icons/fa6'
+import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useState } from 'react'
 
 type CreateUserModalProps = {
   openModal: boolean
   setOpenModal: (open: boolean) => void
 }
 
+type UserData = {
+  code: string
+  dni: string
+  firstName: string
+  lastName: string
+  shortName: string
+  email: string
+  phone: string
+  username: string
+  password: string
+  permissions: string[]
+}
+
 const CreateUserModal = ({ openModal, setOpenModal }: CreateUserModalProps) => {
+  const [viewPassword, setViewPassword] = useState<boolean>(false);
+  const [userData, setUserData] = useState<UserData>({
+    code: '',
+    dni: '',
+    firstName: '',
+    lastName: '',
+    shortName: '',
+    email: '',
+    phone: '',
+    username: '',
+    password: '',
+    permissions: [] as string[]
+  });
+
+  const generateRandomPassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+    let password = '';
+    for (let i = 0; i < 8; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      password += chars[randomIndex];
+    }
+    return password;
+  }
+
+  const resetValues = () => {
+    setUserData({
+      code: '',
+      dni: '',
+      firstName: '',
+      lastName: '',
+      shortName: '',
+      email: '',
+      phone: '',
+      username: '',
+      password: '',
+      permissions: [] as string[]
+    });
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUserData({ ...userData, [name]: value });
+  }
+
   return (
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogContent className='bg-slate-200'>
@@ -22,45 +80,79 @@ const CreateUserModal = ({ openModal, setOpenModal }: CreateUserModalProps) => {
           <div className='flex flex-col gap-2'>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Código:</Label>
-              <Input placeholder='AUTH-000' className='bg-white' disabled />
+              <Input
+                name='code'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='AUTH-000' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>DNI:</Label>
-              <Input placeholder='DNI del usuario' className='bg-white' />
+              <Input
+                name='dni'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='DNI del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Nombres:</Label>
-              <Input placeholder='Nombres del usuario' className='bg-white' />
+              <Input
+                name='firstName'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='Nombres del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Apellidos:</Label>
-              <Input placeholder='Apellidos del usuario' className='bg-white' />
+              <Input
+                name='lastName'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='Apellidos del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Nombre corto:</Label>
-              <Input placeholder='Nombre corto del usuario' className='bg-white' />
+              <Input
+                name='shortName'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='Nombre corto del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Correo electrónico:</Label>
-              <Input placeholder='Correo electrónico del usuario' className='bg-white' />
+              <Input
+                name='email'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='Correo electrónico del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Teléfono:</Label>
-              <Input placeholder='Teléfono del usuario' className='bg-white' />
+              <Input
+                name='phone'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='Teléfono del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Usuario:</Label>
-              <Input placeholder='Usuario del usuario' className='bg-white' />
+              <Input
+                name='username'
+                onChange={(e) => { handleInputChange(e) }}
+                placeholder='Usuario del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Contraseña:</Label>
-              <Input placeholder='Contraseña del usuario' className='bg-white' />
-              <Button variant='outline'><FaEye /></Button>
-              <Button variant='outline'><IoReload /></Button>
+              <Input
+                name='password'
+                onChange={(e) => { handleInputChange(e) }}
+                type={viewPassword ? 'text' : 'password'} placeholder='Contraseña del usuario' className='bg-white' />
+              <Button variant='outline' onClick={() => setViewPassword(!viewPassword)}>
+                {viewPassword ? <FaEyeSlash /> : <FaEye />}
+              </Button>
+              <Button
+                onClick={() => {
+                  const newPassword = generateRandomPassword();
+                  setUserData({ ...userData, password: newPassword });
+                }}
+                variant='outline'><IoReload /></Button>
             </div>
             <div className='flex flex-row items-center gap-2'>
               <Label className='font-bold'>Permisos:</Label>
-              <div className='flex flex-col gap-2 bg-white p-2 rounded-md w-full'>
+                <div className='flex flex-col gap-2 bg-white p-2 rounded-md w-full'>
                 <div className="flex gap-3">
                   <Checkbox id="1" className='bg-white' />
                   <Label htmlFor="1">Administrador General</Label>
@@ -84,7 +176,10 @@ const CreateUserModal = ({ openModal, setOpenModal }: CreateUserModalProps) => {
         <DialogFooter>
           <Button
             variant='destructive'
-            onClick={() => setOpenModal(false)}>
+            onClick={() => {
+              setOpenModal(false);
+              resetValues();
+            }}>
             Cancelar
           </Button>
           <Button>Guardar</Button>
