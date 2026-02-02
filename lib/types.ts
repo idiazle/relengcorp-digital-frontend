@@ -20,7 +20,7 @@ export type ReportType = {
 }
 
 export type Entity = {
-  id: number
+  id?: number
   name: string
   type: number
   attachment?: File

@@ -39,21 +39,21 @@ const UsersPage = () => {
     <div className="flex flex-col h-full">
       <div className='flex justify-between items-center'>
         <h1 className='font-bold text-lg'>GESTIÓN DE USUARIOS</h1>
-        <Button className='' onClick={() => {setOpenModal(true)}}><FaPlus /> Nuevo usuario</Button>
+        <Button className='' onClick={() => { setOpenModal(true) }}><FaPlus /> Nuevo usuario</Button>
       </div>
       <Separator className='my-2' />
-      <Table>
-        <TableHeader>
+      <Table className="max-h-[90vh]">
+        <TableHeader className="bg-gray-300 sticky top-0">
           <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Nombre</TableCell>
-            <TableCell>Apellido</TableCell>
-            <TableCell>Usuario</TableCell>
-            <TableCell>Rol</TableCell>
-            <TableCell>Acciones</TableCell>
+            <TableCell className="font-bold">Id</TableCell>
+            <TableCell className="font-bold">Nombre</TableCell>
+            <TableCell className="font-bold">Apellido</TableCell>
+            <TableCell className="font-bold">Usuario</TableCell>
+            <TableCell className="font-bold">Rol</TableCell>
+            <TableCell className="font-bold">Acciones</TableCell>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="overflow-y-auto">
           {users.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.id}</TableCell>
