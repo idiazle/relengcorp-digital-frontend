@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Entity } from "@/lib/types"
 import { Separator } from "@/components/ui/separator"
 import { FaEye, FaPlus, FaTrash } from "react-icons/fa6"
 import { FaEdit } from "react-icons/fa"
@@ -26,7 +25,7 @@ const EntitiesPage = () => {
     getEntities()
       .then((response) => {
         const resp = response.data
-        const filtered = resp.filter((ent: Entity) => ent.type === 1 || ent.type === 2)
+        const filtered = resp.filter((ent: Plant | Area) => ent.type === 1 || ent.type === 2)
         setEntities(filtered)
       })
       .catch((error) => {

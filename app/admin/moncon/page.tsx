@@ -6,23 +6,27 @@ import { Separator } from '@/components/ui/separator'
 import { FaCircle, FaEye, FaFilePdf, FaPencil, FaPlus, FaTrash, FaUpload } from 'react-icons/fa6'
 import { deleteMonconReport, getMonconReports } from '../../services/monconServices'
 import { getEntities } from '@/app/services/entitiesServices'
-import { Entity, ReportType } from '@/lib/types'
+import { Entity } from '@/lib/types'
 import PDFViewer from '../components/PDFViewer'
 import ReportDialogView from './components/report-dialog-view'
 import ReportDialogEdit from './components/report-dialog-edit'
 import CreateReportDialog from './components/CreateReportDialog'
 import UploadReports from './components/UploadReports'
 import { FaEdit } from 'react-icons/fa'
+import { Report } from '../utils/moncon.types'
+import { Equipment } from '../utils/types'
 
 const MonconPage = () => {
-  const [entities, setEntities] = useState<Entity[]>([]);
+  const [entities, setEntities] = useState<Equipment[]>([]);
   const [openNewRegister, setOpenNewRegister] = useState<boolean>(false);
   const [openPDF, setOpenPDF] = useState<boolean>(false);
   const [openUploadRoute, setOpenUploadRoute] = useState<boolean>(false);
-  const [registerSelected, setRegisterSelected] = useState<ReportType | null>(null);
+  const [registerSelected, setRegisterSelected] = useState<Report | null>(null);
   const [openEditRegister, setOpenEditRegister] = useState<boolean>(false);
   const [openViewRegister, setOpenViewRegister] = useState<boolean>(false);
-  const [generalData, setGeneralData] = useState<any[]>([]);
+  const [generalData, setGeneralData] = useState<Report[]>([]);
+
+  console.log("generalData", generalData)
 
   const getAllReport = () => {
     getMonconReports()
@@ -33,11 +37,20 @@ const MonconPage = () => {
 
   useEffect(() => {
     getAllReport();
-    getEntities()
-      .then((response) => {
-        setEntities(response.data);
-      });
   }, []);
+
+  useEffect(() => {
+    if(!openNewRegister) {
+    getEntities().then((response) => {
+        const filtered = response.data.filter((ent: Equipment) => ent.type === 3)
+        setEntities(filtered)
+        console.log("entities", filtered)
+      })
+      .catch((error) => {
+        console.error("Error fetching entities:", error)
+      })
+    }
+  }, [openNewRegister]);
 
 
   const handleDeleteRegister = (index: number, dataId: string) => {
