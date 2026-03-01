@@ -5,27 +5,32 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { useEffect, useState } from 'react'
-import { Entity, ReportType } from '@/lib/types'
 import { getEntities } from '../../../services/entitiesServices'
 import { createMonconReport } from '@/app/services/monconServices'
+import { Area, Component, Equipment, Plant } from '../../utils/types'
+import { Report } from '../../../../lib/types'
+import { services, tareas } from '../../../../lib/types'
 
-type CreateReportDialogProps = {
+interface CreateReportDialogProps {
   openNewRegister: boolean
   setOpenNewRegister: (open: boolean) => void
   getAllReport: () => void
 }
 
-const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport }: CreateReportDialogProps) => {
-  const [entities, setEntities] = useState<Entity[]>([])
-  const [plant, setPlant] = useState<Entity | null>(null)
-  const [areas, setAreas] = useState<Entity[]>([])
-  const [areaSelected, setAreaSelected] = useState<Entity | null>(null)
-  const [equipments, setEquipments] = useState<Entity[]>([])
-  const [equipmentSelected, setEquipmentSelected] = useState<Entity | null>(null)
-  const [components, setComponents] = useState<Entity[]>([])
-  const [componentSelected, setComponentSelected] = useState<Entity | null>(null)
-  const [date, setDate] = useState<Date | undefined>(new Date())
-  const [data, setData] = useState<ReportType>({
+const CreateReportDialog = ({
+  openNewRegister,
+  setOpenNewRegister,
+  getAllReport,
+}: CreateReportDialogProps) => {
+  const [equipments, setEquipments] = useState<Equipment[]>([]);
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
+  const [components, setComponents] = useState<Component[]>([]);
+
+  const [areaSelected, setAreaSelected] = useState<Area | null>(null)
+  const [equipmentSelected, setEquipmentSelected] = useState<Equipment | null>(null)
+  const [componentSelected, setComponentSelected] = useState<Component | null>(null)
+  const [data, setData] = useState<Report>({
     id: 0,
     entity: 0,
     name: "",
@@ -42,34 +47,21 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
   });
 
   useEffect(() => {
-    getEntities()
-      .then((response) => {
-        setEntities(response.data)
-        const plant = response.data.find((entity: Entity) => entity.parent === null);
-        setPlant(plant || null);
-        // const equipemmentsList = response.data.filter((entity: Entity) => entity.parent === 8 || entity.parent === 9 || entity.parent > 9);
-        // setEquipments(equipemmentsList);
-        const areasList = response.data.filter((entity: Entity) => entity.parent !== null && entity.parent === plant?.id);
-        setAreas(areasList);
-      })
-      .catch((error) => {
+    if (openNewRegister) {
+      getEntities().then((response) => {
+        const filteredEquipments = response.data.filter((ent: Equipment) => ent.type === 3)
+        const filteredPlants = response.data.filter((ent: Plant) => ent.type === 1)
+        const filteredAreas = response.data.filter((ent: Area) => ent.type === 2)
+        const filteredComponents = response.data.filter((ent: Component) => ent.type === 4)
+        setPlants(filteredPlants)
+        setAreas(filteredAreas)
+        setEquipments(filteredEquipments)
+        setComponents(filteredComponents)
+      }).catch((error) => {
         console.error("Error fetching entities:", error)
       })
-  }, [])
-
-  useEffect(() => {
-    if (areaSelected) {
-      const equipemmentsList = entities.filter((entity: Entity) => entity.parent === areaSelected.id);
-      setEquipments(equipemmentsList);
     }
-  }, [areaSelected, entities])
-
-  useEffect(() => {
-    if (equipmentSelected) {
-      const componentsList = entities.filter((entity: Entity) => entity.parent === equipmentSelected.id);
-      setComponents(componentsList);
-    }
-  }, [equipmentSelected, entities])
+  }, [openNewRegister])
 
   const createSingleRegister = () => {
     const temp = {
@@ -92,25 +84,7 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
       })
   }
 
-  console.log("Entities in dialog:", entities);
 
-  const tareas = [
-    { id: 1, name: "Vibraciones y Temperatura" },
-    { id: 2, name: "Alineamiento de Ejes" },
-    { id: 3, name: "Alineamiento de Poleas" },
-    { id: 4, name: "Ultrasonido acústico" },
-    { id: 5, name: "Termografía infrarroja" },
-    { id: 6, name: "Fuga de corriente" },
-    { id: 7, name: "Vibraciones fases" },
-    { id: 8, name: "Vibraciones ODS" },
-    { id: 9, name: "Vibraciones Pump Test" },
-    { id: 10, name: "Ultrasonido Convencional" },
-    { id: 11, name: "Tintes penetrantes" },
-    { id: 12, name: "Partículas magnéticas" },
-    { id: 13, name: "Ultrasonido avanzado" },
-    { id: 14, name: "Metrología" },
-    { id: 15, name: "Inspección visual" },
-  ]
 
   return (
     <Dialog open={openNewRegister} onOpenChange={setOpenNewRegister}>
@@ -121,10 +95,10 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
         </DialogHeader>
         <div className='w-full p-2 rounded-md gap-4 flex flex-col mt-4'>
           <div className='w-full flex flex-row gap-2'>
-            <div className='flex flex-col gap-2 w_-1/3'>
+            <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Planta:</Label>
               <Input
-                className='bg-white' value={plant ? plant.name : ""} disabled></Input>
+                className='bg-white' value={plants?.length > 0 ? plants[0].name : ""} disabled></Input>
             </div>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Área:</Label>
@@ -140,7 +114,7 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
                 </SelectTrigger>
                 <SelectContent>
                   {
-                    areas.map((area) => (
+                    areas?.map((area) => (
                       <SelectItem key={area.id} value={String(area.id)}>{area.name}</SelectItem>
                     ))
                   }
@@ -161,9 +135,9 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
                 </SelectTrigger>
                 <SelectContent>
                   {
-                    equipments.map((equipment) => (
+                    equipments?.map((equipment) => (
                       <SelectItem key={equipment.id} value={String(equipment.id)}>
-                        {equipment.extra_info.tag}/{equipment.name}
+                        {equipment.tag}/{equipment.name}
                       </SelectItem>
                     ))
                   }
@@ -184,7 +158,7 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
                 </SelectTrigger>
                 <SelectContent>
                   {
-                    components.map((component) => (
+                    components?.map((component) => (
                       <SelectItem key={component.id} value={String(component.id)}>{component.name}</SelectItem>
                     ))
                   }
@@ -195,7 +169,7 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Tipo de Servicio:</Label>
-              <Select 
+              <Select
                 value={data ? String(data.service_type) : ""}
                 onValueChange={(value) => {
                   setData({
@@ -208,11 +182,11 @@ const CreateReportDialog = ({ openNewRegister, setOpenNewRegister, getAllReport 
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">PDM PTAE</SelectItem>
-                  <SelectItem value="2">PDM Antapaccay</SelectItem>
-                  <SelectItem value="3">NDT PTAE</SelectItem>
-                  <SelectItem value="4">NDT Antapaccay</SelectItem>
-                  <SelectItem value="5">NDT Tintaya</SelectItem>
+                  {
+                    services.map((service) => (
+                      <SelectItem key={service.id} value={String(service.id)}>{service.name}</SelectItem>
+                    ))
+                  }
                 </SelectContent>
               </Select>
             </div>

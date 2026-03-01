@@ -5,69 +5,62 @@ import { Button } from '@/components/ui/button'
 import { IoReload } from 'react-icons/io5'
 import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { createUser, getUserGroups } from '@/app/services/userServices'
+import { generateRandomPassword } from '../utils/utils'
+import type { Groups, User } from '../models/user.models'
 
-type CreateUserModalProps = {
+interface CreateUserModalProps {
   openModal: boolean
   setOpenModal: (open: boolean) => void
+  onUserCreated: () => void
 }
 
-type UserData = {
-  code: string
-  dni: string
-  firstName: string
-  lastName: string
-  shortName: string
-  email: string
-  phone: string
-  username: string
-  password: string
-  permissions: string[]
-}
-
-const CreateUserModal = ({ openModal, setOpenModal }: CreateUserModalProps) => {
+const CreateUserModal = ({ openModal, setOpenModal, onUserCreated }: CreateUserModalProps) => {
   const [viewPassword, setViewPassword] = useState<boolean>(false);
-  const [userData, setUserData] = useState<UserData>({
-    code: '',
-    dni: '',
-    firstName: '',
-    lastName: '',
-    shortName: '',
-    email: '',
-    phone: '',
-    username: '',
-    password: '',
-    permissions: [] as string[]
-  });
+  const [groups, setGroups] = useState<Groups[]>([]);
 
-  const generateRandomPassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-    let password = '';
-    for (let i = 0; i < 8; i++) {
-      const randomIndex = Math.floor(Math.random() * chars.length);
-      password += chars[randomIndex];
-    }
-    return password;
-  }
+  useEffect(() => {
+    getUserGroups()
+      .then((response) => {
+        setGroups(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching user groups:', error);
+      });
+  }, []);
 
-  const resetValues = () => {
-    setUserData({
+  const { register, control, handleSubmit, reset, setValue,  } = useForm<User>({
+    defaultValues: {
       code: '',
-      dni: '',
-      firstName: '',
-      lastName: '',
-      shortName: '',
+      dui: '',
+      name: '',
+      last_name: '',
+      short_name: '',
       email: '',
       phone: '',
       username: '',
       password: '',
-      permissions: [] as string[]
-    });
+      position: '',
+      groups: []
+    }
+  });
+
+  const handleClose = () => {
+    reset();
+    setOpenModal(false);
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
+  const onSubmit = async (data: User) => {
+    try {
+      await createUser(data);
+      console.log('Usuario creado exitosamente');
+      handleClose();
+      onUserCreated();
+    } catch (error) {
+      console.error('Error al crear usuario:', error);
+    }
   }
 
   return (
@@ -76,114 +69,127 @@ const CreateUserModal = ({ openModal, setOpenModal }: CreateUserModalProps) => {
         <DialogHeader>
           <DialogTitle className='font-bold'>CREAR USUARIO</DialogTitle>
         </DialogHeader>
-        <div className='flex flex-col gap-4'>
+        <form
+          onSubmit={
+            handleSubmit(onSubmit,
+              (errors) => {
+                console.error('Form errors:', errors);
+              })}
+          className='flex flex-col gap-4'>
           <div className='flex flex-col gap-2'>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Código:</Label>
               <Input
-                name='code'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('code')}
                 placeholder='AUTH-000' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
-              <Label className='font-bold'>DNI:</Label>
+              <Label className='font-bold'>DUI:</Label>
               <Input
-                name='dni'
-                onChange={(e) => { handleInputChange(e) }}
-                placeholder='DNI del usuario' className='bg-white' />
+                {...register('dui')}
+                placeholder='DUI del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Nombres:</Label>
               <Input
-                name='firstName'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('name')}
                 placeholder='Nombres del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Apellidos:</Label>
               <Input
-                name='lastName'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('last_name')}
                 placeholder='Apellidos del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Nombre corto:</Label>
               <Input
-                name='shortName'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('short_name')}
                 placeholder='Nombre corto del usuario' className='bg-white' />
+            </div>
+            <div className='flex flex-row justify-center items-center gap-2'>
+              <Label className='font-bold'>Posición:</Label>
+              <Input
+                {...register('position')}
+                placeholder='Posición del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Correo electrónico:</Label>
               <Input
-                name='email'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('email')}
                 placeholder='Correo electrónico del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Teléfono:</Label>
               <Input
-                name='phone'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('phone')}
                 placeholder='Teléfono del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Usuario:</Label>
               <Input
-                name='username'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('username')}
                 placeholder='Usuario del usuario' className='bg-white' />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Contraseña:</Label>
               <Input
-                name='password'
-                onChange={(e) => { handleInputChange(e) }}
+                {...register('password')}
                 type={viewPassword ? 'text' : 'password'} placeholder='Contraseña del usuario' className='bg-white' />
-              <Button variant='outline' onClick={() => setViewPassword(!viewPassword)}>
+              <Button type='button' variant='outline' onClick={() => setViewPassword(!viewPassword)}>
                 {viewPassword ? <FaEyeSlash /> : <FaEye />}
               </Button>
               <Button
+                type='button'
                 onClick={() => {
                   const newPassword = generateRandomPassword();
-                  setUserData({ ...userData, password: newPassword });
+                  setValue('password', newPassword);
                 }}
                 variant='outline'><IoReload /></Button>
             </div>
             <div className='flex flex-row items-center gap-2'>
-              <Label className='font-bold'>Permisos:</Label>
-                <div className='flex flex-col gap-2 bg-white p-2 rounded-md w-full'>
-                <div className="flex gap-3">
-                  <Checkbox id="1" className='bg-white' />
-                  <Label htmlFor="1">Administrador General</Label>
-                </div>
-                <div className="flex gap-3">
-                  <Checkbox id="2" className='bg-white' />
-                  <Label htmlFor="2">Administrador</Label>
-                </div>
-                <div className="flex gap-3">
-                  <Checkbox id="3" className='bg-white' />
-                  <Label htmlFor="3">Editor</Label>
-                </div>
-                <div className="flex gap-3">
-                  <Checkbox id="4" className='bg-white' />
-                  <Label htmlFor="4">Usuario</Label>
-                </div>
-              </div>
+              <Label className='font-bold'>Grupos:</Label>
+              {
+                groups.length === 0 ? <p className='text-sm text-gray-500'>No se pudieron cargar los grupos</p> :
+                  <div className='flex flex-col gap-2 bg-white p-2 rounded-md w-full'>
+                    {groups.map((group) => (
+                      <div key={group.id} className="flex gap-3">
+                        <Controller
+                          name="groups"
+                          control={control}
+                          render={({ field }) => (
+                            <Checkbox
+                              id={`group-${group.id}`}
+                              className='bg-white'
+                              checked={field.value?.includes(group.id)}
+                              onCheckedChange={(checked) => {
+                                const currentValue = field.value || [];
+                                if (checked) {
+                                  field.onChange([...currentValue, group.id]);
+                                } else {
+                                  field.onChange(currentValue.filter((g) => g !== group.id));
+                                }
+                              }}
+                            />
+                          )}
+                        />
+                        <Label htmlFor={`group-${group.id}`}>{group.name}</Label>
+                      </div>
+                    ))}
+                  </div>
+              }
             </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button
-            variant='destructive'
-            onClick={() => {
-              setOpenModal(false);
-              resetValues();
-            }}>
-            Cancelar
-          </Button>
-          <Button>Guardar</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='destructive'
+              onClick={handleClose}>
+              Cancelar
+            </Button>
+            <Button type='submit'>Guardar</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

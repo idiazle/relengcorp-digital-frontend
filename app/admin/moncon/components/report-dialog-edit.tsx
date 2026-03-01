@@ -8,31 +8,42 @@ import { es } from 'date-fns/locale'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { NoticesType, ReportType } from '@/lib/types'
+import { Notices, Report, services, tareas } from '@/lib/types'
 import { useEffect, useState } from 'react'
 import { createNotice, deleteNotice, getNoticesByReportId, updateReport } from '@/app/services/monconServices'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { FaTrash } from 'react-icons/fa6'
+import { Equipment } from '../../utils/types'
+import { getEntities } from '@/app/services/entitiesServices'
 
 
-type ReportDialogEditProps = {
+interface ReportDialogEditProps {
   openEditRegister: boolean
   setOpenEditRegister: (open: boolean) => void
-  registerSelected: ReportType | null
-  setRegisterSelected: (report: ReportType | null) => void
+  registerSelected: Report | null
+  setRegisterSelected: (report: Report | null) => void
   getAllReport: () => void
 }
 
 const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSelected, registerSelected, getAllReport }: ReportDialogEditProps) => {
   console.log("registerSelected", registerSelected)
+  const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(false);
-  const [noticesData, setNoticesData] = useState<NoticesType[]>([]);
+  const [noticesData, setNoticesData] = useState<Notices[]>([]);
   const [date, setDate] = useState<Date | undefined>(registerSelected?.execution_date ? new Date(registerSelected.execution_date) : undefined)
   const [date_status, setDateStatus] = useState<Date | undefined>(new Date())
   const [date_ot, setDateOt] = useState<Date | undefined>(new Date())
   const [file, setFile] = useState<File | null>(null);
 
-  const editReport = (reportId: number, updatedData: ReportType) => {
+  const entityDetail = registerSelected?.entity_detail
+  const plantLabel = entityDetail?.plant ? `${entityDetail.plant.name} (${entityDetail.plant.tag})` : ""
+  const areaLabel = entityDetail?.area ? `${entityDetail.area.name} (${entityDetail.area.tag})` : ""
+  const equipmentLabel = entityDetail?.equipment ? `${entityDetail.equipment.name} (${entityDetail.equipment.tag})` : ""
+  const componentLabel = entityDetail?.current ? `${entityDetail.current.name} (${entityDetail.current.tag})` : ""
+
+  console.log("noticesData", plantLabel, areaLabel, equipmentLabel, componentLabel)
+
+  const editReport = (reportId: number, updatedData: Report) => {
     setLoading(true);
     // Aquí puedes hacer la llamada a la API para editar el reporte
     if (!updatedData) return;
@@ -55,6 +66,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
 
     updateReport(reportId, formData).then((response) => {
       console.log("Report updated successfully:", response);
+      alert("Reporte actualizado exitosamente");
       setLoading(false);
       setOpenEditRegister(false);
       getAllReport();
@@ -65,9 +77,28 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
     });
   };
 
+  useEffect(() => {
+    getEntities().then(response => {
+      setEquipments(response.data.filter((entity: Equipment) => entity.type === 3 || entity.type === 4))
+    }).catch(error => {
+      console.error('Error al obtener los equipos y componentes:', error)
+    })
+  }, []);
+
+  const searchInfoComponent = () => {
+    const component = equipments.find(item => item.id === registerSelected?.entity);
+    console.log("component", component)
+  }
+
+  useEffect(() => {
+    if (registerSelected) {
+      searchInfoComponent();
+    }
+  }, [equipments]);
+
   const handleAddNotice = () => {
     // Lógica para añadir un nuevo aviso
-    const newNotice: NoticesType = {
+    const newNotice: Notices = {
       name: '',
       date: '',
       status: 1,
@@ -75,7 +106,9 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
       ot_date: '',
       ot_status: 1,
       status_real: 1,
-      comment: ''
+      comment: '',
+      created_by: '',
+      report: registerSelected ? registerSelected.id || 0 : 0,
     };
     setNoticesData([...noticesData, newNotice]);
   }
@@ -90,7 +123,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
     // Lógica para obtener los avisos relacionados con un reporte
   }
   useEffect(() => {
-    if (registerSelected) {
+    if (registerSelected && registerSelected.id) {
       noticesByReport(registerSelected.id);
     }
   }, [registerSelected]);
@@ -102,6 +135,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
       console.log(`Submitting notice ${index + 1}:`, temp);
       createNotice(temp).then((response) => {
         console.log(`Notice ${index + 1} created successfully:`, response);
+        alert("Aviso creado exitosamente");
       }).catch((error) => {
         console.error(`Error creating notice ${index + 1}:`, error);
       });
@@ -136,7 +170,10 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label>Fecha de programación:</Label>
-              <Input className='bg-white' value={registerSelected?.created_at?.slice(0, 10) ?? ""} disabled />
+              <Input
+                disabled
+                className='bg-white'
+                value={registerSelected?.created_at?.slice(0, 10) ?? ""} />
             </div>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Fecha de ejecución:</Label>
@@ -158,7 +195,9 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Programación:</Label>
-              <Select value={registerSelected ? registerSelected.program.toString() : ""}>
+              <Select
+                disabled
+                value={registerSelected ? registerSelected.program.toString() : ""} >
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
@@ -170,99 +209,46 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
             </div>
           </div>
           <div className='w-full flex flex-row gap-2'>
-            <div className='flex flex-col gap-2 w_-1/3'>
+            <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Planta:</Label>
-              <Input className='bg-white' disabled></Input>
+              <Input disabled className='bg-white' value={plantLabel} />
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Área:</Label>
-              <Select>
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PTAE">PTAE</SelectItem>
-                  <SelectItem value="MOLIENDA">Molienda</SelectItem>
-                  <SelectItem value="CHANCADO_PRIMARIO">Chancado Primario</SelectItem>
-                  <SelectItem value="FLOTACION_Y_REMOLIENDA">Flotación y Remolienda</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input disabled className='bg-white' value={areaLabel} />
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Equipo:</Label>
-              <Select>
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PTAE">PTAE</SelectItem>
-                  <SelectItem value="MOLIENDA">Molienda</SelectItem>
-                  <SelectItem value="CHANCADO_PRIMARIO">Chancado Primario</SelectItem>
-                  <SelectItem value="FLOTACION_Y_REMOLIENDA">Flotación y Remolienda</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input disabled className='bg-white' value={equipmentLabel} />
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Componente:</Label>
-              <Select>
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PTAE">PTAE</SelectItem>
-                  <SelectItem value="MOLIENDA">Molienda</SelectItem>
-                  <SelectItem value="CHANCADO_PRIMARIO">Chancado Primario</SelectItem>
-                  <SelectItem value="FLOTACION_Y_REMOLIENDA">Flotación y Remolienda</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input disabled className='bg-white' value={componentLabel} />
             </div>
           </div>
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/4'>
-              <Label className='font-semibold'>Tipo de servicio:</Label>
-              <Select>
+              <Label className='font-semibold'>Servicio:</Label>
+              <Select
+                disabled
+                value={registerSelected ? registerSelected.service_type.toString() : ""}
+              >
                 <SelectTrigger className='bg-white w-full'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1"></SelectItem>
-                  <SelectItem value="2"></SelectItem>
-                  <SelectItem value="3"></SelectItem>
-                  <SelectItem value="4"></SelectItem>
+                  {
+                    services.map((service) => (
+                      <SelectItem key={service.id} value={String(service.id)}>{service.name}</SelectItem>
+                    ))
+                  }
                 </SelectContent>
               </Select>
             </div>
-            <div className='flex flex-col gap-2 w-2/4'>
-              <Label className='font-semibold'>Nombre de equipo:</Label>
-              <Input
-                className='bg-white'
-                value={registerSelected ? registerSelected.entity : ""}
-                onChange={(e) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    entity: e.target.value
-                  })
-                }}
-              />
-            </div>
             <div className='flex flex-col gap-2 w-1/4'>
-              <Label className='font-semibold'>Tipo de componente:</Label>
-              <Input
-                className='bg-white'
-                value={registerSelected ? registerSelected.entity : ""}
-                onChange={(e) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    entity: e.target.value
-                  })
-                }}
-              />
-            </div>
-          </div>
-          <div className='w-full flex flex-row gap-2'>
-            <div className='flex flex-col gap-2 w-1/4'>
-              <Label className='font-semibold'>Tipo de tarea:</Label>
+              <Label className='font-semibold'>Tarea:</Label>
               <Select
+                disabled
                 value={registerSelected ? registerSelected.task_type.toString() : ""}
                 onValueChange={(value) => {
                   setRegisterSelected({
@@ -275,10 +261,11 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">PDM</SelectItem>
-                  <SelectItem value="2">NDT</SelectItem>
-                  <SelectItem value="3">Alineamiento</SelectItem>
-                  <SelectItem value="4">Insp. visual</SelectItem>
+                  {
+                    tareas.map((tarea) => (
+                      <SelectItem key={tarea.id} value={tarea.id.toString()}>{tarea.name}</SelectItem>
+                    ))
+                  }
                 </SelectContent>
               </Select>
             </div>
@@ -383,11 +370,15 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Archivo:</Label>
-              <Input className='bg-white' type='file' accept='.pdf' onChange={(e) => {
-                if (e.target.files) {
-                  setFile(e.target.files[0]);
-                }
-              }} />
+              <Input
+                className='bg-white'
+                type='file'
+                accept='.pdf'
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setFile(e.target.files[0]);
+                  }
+                }} />
             </div>
           </div>
 
@@ -417,6 +408,8 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                   <TableHead >N° OT</TableHead>
                   <TableHead >Fecha OT</TableHead>
                   <TableHead >Status OT</TableHead>
+                  <TableHead >Status Real</TableHead>
+                  <TableHead >Comentario</TableHead>
                   <TableHead ></TableHead>
                 </TableRow>
               </TableHeader>
@@ -425,11 +418,14 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                   noticesData.map((data, index) => (
                     <TableRow key={index}>
                       <TableCell>
-                        <Input className='bg-white' value={data.name} onChange={(e) => {
-                          const updatedNotices = [...noticesData];
-                          updatedNotices[index].name = e.target.value;
-                          setNoticesData(updatedNotices);
-                        }} />
+                        <Input
+                          className='bg-white'
+                          value={data.name ? data.name : ""}
+                          onChange={(e) => {
+                            const updatedNotices = [...noticesData];
+                            updatedNotices[index].name = e.target.value;
+                            setNoticesData(updatedNotices);
+                          }} />
                       </TableCell>
                       <TableCell>
                         <Popover>
@@ -464,11 +460,14 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <Input className='bg-white' value={data.ot_number} onChange={(e) => {
-                          const updatedNotices = [...noticesData];
-                          updatedNotices[index].ot_number = e.target.value;
-                          setNoticesData(updatedNotices);
-                        }} />
+                        <Input
+                          className='bg-white'
+                          value={data.ot_number ? data.ot_number : ""}
+                          onChange={(e) => {
+                            const updatedNotices = [...noticesData];
+                            updatedNotices[index].ot_number = e.target.value;
+                            setNoticesData(updatedNotices);
+                          }} />
                       </TableCell>
                       <TableCell>
                         <Popover>
@@ -488,7 +487,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                         </Popover>
                       </TableCell>
                       <TableCell>
-                        <Select value={data.ot_status.toString()} onValueChange={(value) => {
+                        <Select value={(data.ot_status ?? 1).toString()} onValueChange={(value) => {
                           const updatedNotices = [...noticesData];
                           updatedNotices[index].ot_status = parseInt(value);
                           setNoticesData(updatedNotices);
@@ -502,6 +501,31 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                           </SelectContent>
                         </Select>
 
+                      </TableCell>
+                      <TableCell>
+                        <Select value={(data.status_real ?? 1).toString()} onValueChange={(value) => {
+                          const updatedNotices = [...noticesData];
+                          updatedNotices[index].status_real = parseInt(value);
+                          setNoticesData(updatedNotices);
+                        }}>
+                          <SelectTrigger className='w-full bg-white'>
+                            <SelectValue placeholder="Seleccionar..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">Atendido</SelectItem>
+                            <SelectItem value="2">No atendido</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          className='bg-white'
+                          value={data.comment ? data.comment : ""}
+                          onChange={(e) => {
+                            const updatedNotices = [...noticesData];
+                            updatedNotices[index].comment = e.target.value;
+                            setNoticesData(updatedNotices);
+                          }} />
                       </TableCell>
                       <TableCell>
                         <button
@@ -525,30 +549,12 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                 )}
               </TableBody>
             </Table>
-            <div className='w-full flex flex-row gap-2'>
-              <div className='flex flex-col gap-2 w-2/3'>
-                <Label className='font-semibold'>Status Real:</Label>
-                <Select >
-                  <SelectTrigger className='w-full bg-white'>
-                    <SelectValue placeholder="Seleccionar..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Abierto</SelectItem>
-                    <SelectItem value="2">Cerrado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className='flex flex-col gap-2 w-2/3'>
-                <Label className='font-semibold'>Comentario:</Label>
-                <Input className='bg-white' />
-              </div>
-            </div>
           </div>
         </div>
         <DialogFooter>
           <Button
             onClick={() => {
-              if (registerSelected) {
+              if (registerSelected && registerSelected.id) {
                 editReport(registerSelected.id, registerSelected);
               }
             }}

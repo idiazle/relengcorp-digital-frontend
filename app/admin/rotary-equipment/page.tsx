@@ -7,11 +7,13 @@ import { FaPlus } from "react-icons/fa6";
 import EquipmentCreateModal from "./components/EquipmentCreateModal";
 import { deleteEntity, getEntities } from "@/app/services/entitiesServices";
 import { Area, Equipment, Property } from "../utils/types";
+import ComponentCreateModal from "./components/ComponentCreateModal";
 
 const RotaryEquipmentPage = () => {
   const [areas, setAreas] = useState<Area[]>([])
   const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [openCreateModal, setOpenCreateModal] = useState(false)
+  const [openComponentCreateModal, setOpenComponentCreateModal] = useState(false)
   
   const getEquipmentsData = () => {
     getEntities().then(response => {
@@ -50,7 +52,10 @@ const RotaryEquipmentPage = () => {
     <div className="flex flex-col h-full">
       <div className='flex justify-between items-center'>
         <h1 className='font-bold text-lg'>GESTIÓN DE EQUIPOS ROTATORIOS</h1>
+        <div className='flex flex-row gap-2'>
+        <Button className='' onClick={() => { setOpenComponentCreateModal(true) }}><FaPlus /> Nuevo Componente</Button>
         <Button className='' onClick={() => { setOpenCreateModal(true) }}><FaPlus /> Nuevo equipo</Button>
+        </div>
       </div>
       <Separator className='my-2' />
       <Table className="bg-white">
@@ -108,6 +113,9 @@ const RotaryEquipmentPage = () => {
       </Table>
       {
         <EquipmentCreateModal openModal={openCreateModal} setOpenModal={setOpenCreateModal} areas={areas} />
+      }
+      {
+        <ComponentCreateModal openModal={openComponentCreateModal} setOpenModal={setOpenComponentCreateModal} equipments={equipments} />
       }
     </div>
 

@@ -1,47 +1,33 @@
 'use client'
 import { useEffect, useState } from "react"
 import { getUsers } from "@/app/services/userServices"
-import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import CreateUserModal from "./components/CreateUserModal"
-import { FaPlus } from "react-icons/fa6"
-import { Separator } from "@/components/ui/separator"
-
-type User = {
-  id: number
-  name: string
-  last_name: string
-  username: string
-  dui: string
-  short_name: string
-  position: string
-  email: string
-  phone: string
-  deleted: boolean
-}
+import type { User, PaginatedResponse } from "./models/user.models"
+import HeaderForm from "../components/HeaderForm"
 
 const UsersPage = () => {
-  const [users, setUsers] = useState<User[]>([])
+  const [usersData, setUsersData] = useState<PaginatedResponse<User> | null>(null)
   const [openModal, setOpenModal] = useState<boolean>(false)
 
-  useEffect(() => {
+  const loadUsers = () => {
     getUsers()
       .then((response) => {
         console.log("Fetched users:", response)
-        setUsers(response.data)
+        setUsersData(response.data)
       })
       .catch((error) => {
         console.error("Error fetching users:", error)
       })
+  }
+
+  useEffect(() => {
+    loadUsers()
   }, [])
 
   return (
     <div className="flex flex-col h-full">
-      <div className='flex justify-between items-center'>
-        <h1 className='font-bold text-lg'>GESTIÓN DE USUARIOS</h1>
-        <Button className='' onClick={() => { setOpenModal(true) }}><FaPlus /> Nuevo usuario</Button>
-      </div>
-      <Separator className='my-2' />
+      <HeaderForm setOpenModal={setOpenModal} nameModule="Usuarios" />
       <Table className="max-h-[90vh]">
         <TableHeader className="bg-gray-300 sticky top-0">
           <TableRow>
@@ -54,7 +40,7 @@ const UsersPage = () => {
           </TableRow>
         </TableHeader>
         <TableBody className="overflow-y-auto">
-          {users.map((user) => (
+          {usersData?.results?.map((user: User) => (
             <TableRow key={user.id}>
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.name}</TableCell>
@@ -69,7 +55,11 @@ const UsersPage = () => {
         </TableBody>
       </Table>
       {
-        <CreateUserModal openModal={openModal} setOpenModal={setOpenModal} />
+        <CreateUserModal
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          onUserCreated={loadUsers}
+        />
       }
     </div>
   )

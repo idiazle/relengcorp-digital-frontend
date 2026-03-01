@@ -65,3 +65,13 @@ export const deleteUser = async (id) => {
     throw error;
   }
 };
+
+export const getUserGroups = async () => {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/groups`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching user groups:', error);
+    throw error;
+  }
+}

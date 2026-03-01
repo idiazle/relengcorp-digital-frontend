@@ -1,9 +1,7 @@
 'use client'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TabsContent } from '@radix-ui/react-tabs'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { FaHouse } from 'react-icons/fa6'
+import { useEffect, useState } from 'react'
 import {
   VictoryAxis,
   VictoryBar,
@@ -57,8 +55,6 @@ const EquiposEstaticos = () => {
       { x: "g", y: 4 },
     ],
   ];
-
-
 
   const dataCerrado = [
     { category: "OTs", value: 12 },
