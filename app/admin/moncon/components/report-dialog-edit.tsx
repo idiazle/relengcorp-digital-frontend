@@ -8,7 +8,7 @@ import { es } from 'date-fns/locale'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Notices, Report, services, tareas } from '@/lib/types'
+import { Notices, Report, services, works } from '../models/moncon.models'
 import { useEffect, useState } from 'react'
 import { createNotice, deleteNotice, getNoticesByReportId, updateReport } from '@/app/services/monconServices'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -231,15 +231,15 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
               <Label className='font-semibold'>Servicio:</Label>
               <Select
                 disabled
-                value={registerSelected ? registerSelected.service_type.toString() : ""}
+                value={registerSelected ? registerSelected.work_type.toString() : ""}
               >
                 <SelectTrigger className='bg-white w-full'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
                 <SelectContent>
                   {
-                    services.map((service) => (
-                      <SelectItem key={service.id} value={String(service.id)}>{service.name}</SelectItem>
+                    works.map((work) => (
+                      <SelectItem key={work.id} value={String(work.id)}>{work.name}</SelectItem>
                     ))
                   }
                 </SelectContent>
@@ -249,11 +249,11 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
               <Label className='font-semibold'>Tarea:</Label>
               <Select
                 disabled
-                value={registerSelected ? registerSelected.task_type.toString() : ""}
+                value={registerSelected ? registerSelected.service_type.toString() : ""}
                 onValueChange={(value) => {
                   setRegisterSelected({
                     ...registerSelected!,
-                    task_type: parseInt(value)
+                    service_type: parseInt(value)
                   })
                 }}
               >
@@ -262,8 +262,8 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                 </SelectTrigger>
                 <SelectContent>
                   {
-                    tareas.map((tarea) => (
-                      <SelectItem key={tarea.id} value={tarea.id.toString()}>{tarea.name}</SelectItem>
+                    services.map((service) => (
+                      <SelectItem key={service.id} value={String(service.id)}>{service.name}</SelectItem>
                     ))
                   }
                 </SelectContent>
@@ -331,7 +331,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
               <Label className='font-semibold'>Diagnóstico:</Label>
               <Input
                 className='bg-white'
-                value={registerSelected ? registerSelected.diagnostic : ""}
+                value={registerSelected?.diagnostic ?? ""}
                 onChange={(e) => {
                   setRegisterSelected({
                     ...registerSelected!,
@@ -344,7 +344,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
               <Label className='font-semibold'>Recomendación:</Label>
               <Input
                 className='bg-white'
-                value={registerSelected ? registerSelected.recomendations : ""}
+                value={registerSelected?.recomendations ?? ""}
                 onChange={(e) => {
                   setRegisterSelected({
                     ...registerSelected!,
@@ -359,7 +359,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
               <Label className='font-semibold'>N° de reporte:</Label>
               <Input
                 className='bg-white'
-                value={registerSelected ? registerSelected.name : ""}
+                value={registerSelected?.name ?? ""}
                 onChange={(e) => {
                   setRegisterSelected({
                     ...registerSelected!,

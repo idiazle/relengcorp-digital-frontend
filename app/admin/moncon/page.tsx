@@ -12,8 +12,9 @@ import ReportDialogEdit from './components/report-dialog-edit'
 import CreateReportDialog from './components/CreateReportDialog'
 import UploadReports from './components/UploadReports'
 import { FaEdit } from 'react-icons/fa'
-import { Equipment, Component } from '../utils/types'
-import { Report, tareas } from '../../../lib/types'
+import type { Entity } from '../entities/models/entity.model'
+import { works } from './models/moncon.models'
+import type {Report} from './models/moncon.models'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const MonconPage = () => {
@@ -23,24 +24,22 @@ const MonconPage = () => {
   const [registerSelected, setRegisterSelected] = useState<Report | null>(null);
   const [openEditRegister, setOpenEditRegister] = useState<boolean>(false);
   const [openViewRegister, setOpenViewRegister] = useState<boolean>(false);
-  const [generalData, setGeneralData] = useState<Report[]>([]);
   const [programmedReports, setProgrammedReports] = useState<Report[]>([]);
   const [notProgrammedReports, setNotProgrammedReports] = useState<Report[]>([]);
-  const [equipmentsandComponents, setEquipmentsAndComponents] = useState<Equipment[] | Component[]>([]);
+  const [equipmentsandComponents, setEquipmentsAndComponents] = useState<Entity[]>([]);
 
   const getAllReport = () => {
     getMonconReports()
       .then((response) => {
-        setGeneralData(response.data);
-        setProgrammedReports(response.data.filter((report: Report) => report.program === 1));
-        setNotProgrammedReports(response.data.filter((report: Report) => report.program === 2));
+        setProgrammedReports(response.data.results.filter((report: Report) => report.program === 1));
+        setNotProgrammedReports(response.data.results.filter((report: Report) => report.program === 2));
       });
   }
 
   useEffect(() => {
     getAllReport();
     getEntities().then(response => {
-      setEquipmentsAndComponents(response.data.filter((entity: Equipment | Component) => entity.type === 3 || entity.type === 4))
+      setEquipmentsAndComponents(response.data.filter((entity: Entity) => entity.type === 3 || entity.type === 4))
     }).catch(error => {
       console.error('Error al obtener los equipos y componentes:', error)
     })
@@ -56,7 +55,7 @@ const MonconPage = () => {
   };
 
   const getTaskTypeName = (taskTypeCode: number) => {
-    return tareas.find((tarea) => tarea.id === taskTypeCode)?.name || 'Desconocido'
+    return works.find((tarea) => tarea.id === taskTypeCode)?.name || 'Desconocido'
   };
 
   const getConditionName = (conditionCode: number) => {
@@ -120,7 +119,6 @@ const MonconPage = () => {
               <TableHeader className="bg-gray-300 sticky top-0 z-10">
                 <TableRow>
                   <TableHead className="w-[50px]">N°</TableHead>
-                  {/* <TableHead>PROGRAMA</TableHead> */}
                   <TableHead>FECHA PROGR.</TableHead>
                   <TableHead>EJECUCIÓN</TableHead>
                   <TableHead>FECHA EJEC.</TableHead>
@@ -142,7 +140,6 @@ const MonconPage = () => {
                   programmedReports.map((data, index) => (
                     <TableRow key={index}>
                       <TableCell>{index + 1}</TableCell>
-                      {/* <TableCell>{data.program == 1 ? 'Programado' : 'No Programado'}</TableCell> */}
                       <TableCell>{data.created_at ? data.created_at.slice(0, 10) : 'N/A'}</TableCell>
                       <TableCell>{data.execution_status === 1 ? 'Ejecutado' : 'No Ejecutado'}</TableCell>
                       <TableCell>
@@ -260,6 +257,7 @@ const MonconPage = () => {
           openNewRegister={openNewRegister}
           setOpenNewRegister={setOpenNewRegister}
           getAllReport={getAllReport}
+          entities={equipmentsandComponents}
         />
       }
 
