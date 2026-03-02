@@ -5,102 +5,60 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DialogTitle } from '@radix-ui/react-dialog'
-import { useState } from 'react'
+import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
-import { Area, Equipment, Property } from '../../utils/types'
 import { createEntity } from '@/app/services/entitiesServices'
+import { Entity } from '../../entities/models/entity.model'
 
 interface EquipmentCreateModalProps {
   openModal: boolean
   setOpenModal: (open: boolean) => void
-  areas: Area[]
+  entities: Entity[]
 }
 
-const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreateModalProps) => {
-  const [properties, setProperties] = useState<Property[]>([])
-  const [equipmentData, setEquipmentData] = useState<Equipment>({
-    name: '',
-    tag: '',
-    type: 3,
-    children: [],
-    extra_info: {
-      properties: []
-    },
-    deleted: false
+const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCreateModalProps) => {
+  const { register, control, handleSubmit, reset, setValue } = useForm<Entity>({
+    defaultValues: {
+      name: '',
+      tag: '',
+      parent: 0,
+      extra_info: {
+        name_en: '',
+        description: '',
+        properties: []
+      }
+    }
   })
 
-  const handleChangeProperty = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setProperties((prev) => {
-      const updated = prev.map((item, i) => (i === index ? { ...item, [name]: value } : item))
-      setEquipmentData((prevData) => ({
-        ...prevData,
-        extra_info: {
-          ...prevData.extra_info,
-          properties: updated
-        }
-      }))
-      return updated
-    })
-  }
-
-  const handleAddProperty = () => {
-    setProperties((prev) => {
-      const updated = [...prev, { name: '', value: '' }]
-      setEquipmentData((prevData) => ({
-        ...prevData,
-        extra_info: {
-          ...prevData.extra_info,
-          properties: updated
-        }
-      }))
-      return updated
-    })
-  }
-
-  const handleRemoveProperty = (index: number) => {
-    setProperties((prev) => {
-      const updated = prev.filter((_, i) => i !== index)
-      setEquipmentData((prevData) => ({
-        ...prevData,
-        extra_info: {
-          ...prevData.extra_info,
-          properties: updated
-        }
-      }))
-      return updated
-    })
-  }
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'extra_info.properties'
+  })
 
   const handleSelectArea = (areaName: string) => {
-    const selectedArea = areas.find(area => area.name === areaName)
+    const selectedArea = entities.find(entity => entity.name === areaName)
     if (selectedArea) {
-      setEquipmentData({
-        ...equipmentData,
-        parent: selectedArea.id
-      })
+      setValue('parent', selectedArea.id || 0)
     }
   }
 
-  const handleSubmit = () => {
-    console.log('Equipo a guardar:', equipmentData)
-    createEntity(equipmentData).then(response => {
-      console.log('Equipo creado:', response)
-      setOpenModal(false)
-      setEquipmentData({
-        name: '',
-        tag: '',
+  const onSubmit = async (formData: Entity) => {
+    try {
+      const equipmentData = {
+        ...formData,
         type: 3,
-        children: [],
         extra_info: {
-          properties: []
-        },
-        deleted: false
-      })
-      setProperties([])
-    }).catch(error => {
+          ...formData.extra_info,
+          properties: formData.extra_info?.properties || []
+        }
+      }
+      const response = await createEntity(equipmentData)
+      console.log('Equipo creado:', response)
+      reset()
+      setOpenModal(false)
+    } catch (error) {
       console.error('Error al crear el equipo:', error)
-    })
+    }
   }
 
   return (
@@ -109,14 +67,13 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
         <DialogHeader>
           <DialogTitle className='font-bold'>CREAR EQUIPO</DialogTitle>
         </DialogHeader>
-        <div className='flex flex-col gap-4'>
+        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
           <div className='flex flex-col gap-2'>
             {/* <h1 className='font-bold'>Información</h1> */}
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Nombre español:</Label>
               <Input
-                value={equipmentData.name}
-                onChange={(e) => setEquipmentData({ ...equipmentData, name: e.target.value })}
+                {...register('name')}
                 className='bg-white'
                 placeholder='Nombre del equipo'
               />
@@ -124,8 +81,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Nombre inglés:</Label>
               <Input
-                value={equipmentData.extra_info?.name_en || ''}
-                onChange={(e) => setEquipmentData({ ...equipmentData, extra_info: { ...equipmentData.extra_info, name_en: e.target.value } })}
+                {...register('extra_info.name_en')}
                 className='bg-white'
                 placeholder='Equipment name'
               />
@@ -133,80 +89,91 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>TAG:</Label>
               <Input
-                value={equipmentData.tag}
-                onChange={(e) => setEquipmentData({ ...equipmentData, tag: e.target.value })}
+                {...register('tag')}
                 className='bg-white'
                 placeholder='TAG del equipo'
               />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Área:</Label>
-              <Select
-                onValueChange={(value) => handleSelectArea(value)}
-                value={areas.find(area => area.id === equipmentData.parent)?.name || ''}
-              >
-                <SelectTrigger className="w-full bg-white">
-                  <SelectValue placeholder="Seleccione un área" />
-                </SelectTrigger>
-                <SelectContent>
-                  {areas.map((area) => (
-                    <SelectItem key={area.id} value={area.name}>
-                      {area?.tag ? "[" + area?.tag + "] - " + area.name : "[S/T] - " + area.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="parent"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) => handleSelectArea(value)}
+                    value={entities.find(entity => entity.id === field.value)?.name || ''}
+                  >
+                    <SelectTrigger className="w-full bg-white">
+                      <SelectValue placeholder="Seleccione un área" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {entities.map((entity) => (
+                        <SelectItem key={entity.id} value={entity.id?.toString() || ''}>
+                          {entity?.tag ? "[" + entity?.tag + "] - " + entity.name : "[S/T] - " + entity.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
               <Label className='font-bold'>Descripción:</Label>
-              <Textarea
-                value={equipmentData.extra_info?.description || ''}
-                onChange={(e) => setEquipmentData({ ...equipmentData, extra_info: { ...equipmentData.extra_info, description: e.target.value } })}
-                placeholder='Descripción del equipo' className='bg-white resize-none' />
+              <Controller
+                name="extra_info.description"
+                control={control}
+                render={({ field }) => (
+                  <Textarea
+                    {...field}
+                    placeholder='Descripción del equipo'
+                    className='bg-white resize-none'
+                  />
+                )}
+              />
             </div>
           </div>
           <div className='flex flex-col gap-2'>
             <div className='flex flex-row items-center gap-2'>
               <h1 className='font-bold'>Propiedades</h1>
-              <button onClick={() => handleAddProperty()} className='bg-blue-700 p-1 rounded-sm'><FaPlus color='white' /></button>
+              <button type='button' onClick={() => append({ name: '', value: '' })} className='bg-blue-700 p-1 rounded-sm'><FaPlus color='white' /></button>
             </div>
             <div>
               {
-                properties.length === 0 ?
+                fields.length === 0 ?
                   <p className='italic'>No hay propiedades agregadas.</p>
                   :
-                  properties.map((property, index) => (
-                    <div key={index} className='flex flex-row gap-2 mb-2'>
+                  fields.map((field, index) => (
+                    <div key={field.id} className='flex flex-row gap-2 mb-2'>
                       <Input
-                        value={property.name}
-                        onChange={(e) => handleChangeProperty(index, e)}
-                        name='name'
+                        {...register(`extra_info.properties.${index}.name`)}
                         placeholder='Nombre'
                         className='bg-white'
                       />
                       <Input
-                        value={property.value}
-                        name='value'
-                        onChange={(e) => handleChangeProperty(index, e)}
+                        {...register(`extra_info.properties.${index}.value`)}
                         placeholder='Valor'
                         className='bg-white'
                       />
-                      <button onClick={() => handleRemoveProperty(index)} className='bg-red-700 p-1 rounded-sm'><FaMinus color='white' /></button>
+                      <button type='button' onClick={() => remove(index)} className='bg-red-700 p-1 rounded-sm'><FaMinus color='white' /></button>
                     </div>
-                  ))}
+                  ))
+              }
             </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button
-            variant='destructive'
-            onClick={() => setOpenModal(false)}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={() => handleSubmit()}
-          >Guardar</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='destructive'
+              onClick={() => {
+                reset()
+                setOpenModal(false)
+              }}>
+              Cancelar
+            </Button>
+            <Button type='submit'>Guardar</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

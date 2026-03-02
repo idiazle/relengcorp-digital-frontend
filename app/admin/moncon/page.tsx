@@ -7,15 +7,15 @@ import { FaCircle, FaEye, FaFilePdf, FaPlus, FaTrash, FaUpload } from 'react-ico
 import { deleteMonconReport, getMonconReports } from '../../services/monconServices'
 import { getEntities } from '@/app/services/entitiesServices'
 import PDFViewer from '../components/PDFViewer'
-import ReportDialogView from './components/report-dialog-view'
-import ReportDialogEdit from './components/report-dialog-edit'
 import CreateReportDialog from './components/CreateReportDialog'
 import UploadReports from './components/UploadReports'
 import { FaEdit } from 'react-icons/fa'
 import type { Entity } from '../entities/models/entity.model'
 import { works } from './models/moncon.models'
-import type {Report} from './models/moncon.models'
+import type { Report } from './models/moncon.models'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import EditReportDialog from './components/EditReportDialog'
+import ViewReportDialog from './components/ViewReportDialog'
 
 const MonconPage = () => {
   const [openNewRegister, setOpenNewRegister] = useState<boolean>(false);
@@ -26,7 +26,7 @@ const MonconPage = () => {
   const [openViewRegister, setOpenViewRegister] = useState<boolean>(false);
   const [programmedReports, setProgrammedReports] = useState<Report[]>([]);
   const [notProgrammedReports, setNotProgrammedReports] = useState<Report[]>([]);
-  const [equipmentsandComponents, setEquipmentsAndComponents] = useState<Entity[]>([]);
+  const [allEntities, setAllEntities] = useState<Entity[]>([]);
 
   const getAllReport = () => {
     getMonconReports()
@@ -39,7 +39,7 @@ const MonconPage = () => {
   useEffect(() => {
     getAllReport();
     getEntities().then(response => {
-      setEquipmentsAndComponents(response.data.filter((entity: Entity) => entity.type === 3 || entity.type === 4))
+      setAllEntities(response.data.results)
     }).catch(error => {
       console.error('Error al obtener los equipos y componentes:', error)
     })
@@ -54,9 +54,26 @@ const MonconPage = () => {
     }
   };
 
+  console.log('no programados', notProgrammedReports)
+
   const getTaskTypeName = (taskTypeCode: number) => {
     return works.find((tarea) => tarea.id === taskTypeCode)?.name || 'Desconocido'
   };
+
+  const getEquipmentTag = (report: Report) => {
+    const routeOrEquipmentTag = report.parents?.find((entity) => entity.type === 3 || entity.type === 4)?.tag
+    return routeOrEquipmentTag || 'N/A'
+  }
+
+  const getCurrentName = (report: Report) => {
+    const currentEntity = allEntities.find((entity) => entity.id === report.entity)?.name
+    if (currentEntity) return currentEntity
+
+    if (report.name) return report.name
+
+    const currentFromParents = report.parents?.find((entity) => entity.type === 6 || entity.type === 5)?.name
+    return currentFromParents || 'N/A'
+  }
 
   const getConditionName = (conditionCode: number) => {
     switch (conditionCode) {
@@ -145,12 +162,14 @@ const MonconPage = () => {
                       <TableCell>
                         {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
                       </TableCell>
-                      <TableCell>{data?.entity_detail?.equipment?.tag || 'N/A'}</TableCell>
-                      <TableCell>{data?.entity_detail?.current?.name || 'N/A'}</TableCell>
-                      <TableCell>{getTaskTypeName(data.task_type)}</TableCell>
+                      <TableCell>{getEquipmentTag(data)}</TableCell>
+                      <TableCell>{getCurrentName(data)}</TableCell>
+                      <TableCell>{getTaskTypeName(data.work_type)}</TableCell>
                       <TableCell>{getConditionName(data.condition)}</TableCell>
                       <TableCell className="flex flex-row gap-2">
-                        <Button size="sm"
+                        <Button
+                          size="sm"
+                          disabled={!data.attachment}
                           onClick={() => { setOpenPDF(true); setRegisterSelected(data) }}>
                           <FaFilePdf />
                         </Button>
@@ -213,12 +232,14 @@ const MonconPage = () => {
                       <TableCell>
                         {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
                       </TableCell>
-                      <TableCell>{data?.entity_detail?.equipment?.tag || 'N/A'}</TableCell>
-                      <TableCell>{data?.entity_detail?.current?.name || 'N/A'}</TableCell>
-                      <TableCell>{getTaskTypeName(data.task_type)}</TableCell>
+                      <TableCell>{getEquipmentTag(data)}</TableCell>
+                      <TableCell>{getCurrentName(data)}</TableCell>
+                      <TableCell>{getTaskTypeName(data.work_type)}</TableCell>
                       <TableCell>{getConditionName(data.condition)}</TableCell>
                       <TableCell className="flex flex-row gap-2">
-                        <Button size="sm"
+                        <Button
+                          size="sm"
+                          disabled={!data.attachment}
                           onClick={() => { setOpenPDF(true); setRegisterSelected(data) }}>
                           <FaFilePdf />
                         </Button>
@@ -257,12 +278,12 @@ const MonconPage = () => {
           openNewRegister={openNewRegister}
           setOpenNewRegister={setOpenNewRegister}
           getAllReport={getAllReport}
-          entities={equipmentsandComponents}
+          entities={allEntities}
         />
       }
 
       {openEditRegister &&
-        <ReportDialogEdit
+        <EditReportDialog
           openEditRegister={openEditRegister}
           setOpenEditRegister={setOpenEditRegister}
           registerSelected={registerSelected}
@@ -272,7 +293,7 @@ const MonconPage = () => {
       }
 
       {openViewRegister &&
-        <ReportDialogView
+        <ViewReportDialog
           openViewRegister={openViewRegister}
           setOpenViewRegister={setOpenViewRegister}
           registerSelected={registerSelected}

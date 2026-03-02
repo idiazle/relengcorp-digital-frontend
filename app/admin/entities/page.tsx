@@ -5,7 +5,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { FaEye, FaTrash } from "react-icons/fa6"
 import { FaEdit } from "react-icons/fa"
-import { Area, Plant } from "../utils/types"
 import HeaderForm from "../components/HeaderForm"
 import { Entity } from "./models/entity.model"
 import CreateEntityModal from "./components/CreateEntityModal"
@@ -18,7 +17,7 @@ const EntitiesPage = () => {
     getEntities()
       .then((response) => {
         const resp = response.data.results
-        const filtered = resp.filter((ent: Plant | Area) => ent.type === 1 || ent.type === 2)
+        const filtered = resp.filter((ent: Entity) => ent.type === 1 || ent.type === 2)
         const ordered = filtered.sort((a: Entity, b: Entity) => a.type - b.type)
         setEntities(ordered)
       })

@@ -10,10 +10,14 @@ export interface Entity {
   name: string,
   type: number,
   tag: string,
-  attachment: string,
+  attachment?: string,
   parent: number,
-  extra_info: null,
-  deleted: boolean,
+  extra_info?: {
+    name_en?: string,
+    description?: string,
+    properties: { name: string, value: string }[]
+  },
+  deleted?: boolean,
   created_at?: string
   updated_at?: string
   deleted_at?: string

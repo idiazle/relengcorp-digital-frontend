@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Calendar as CalendarIcon } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { format } from 'date-fns'
@@ -10,11 +10,12 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Notices, Report, services, works } from '../models/moncon.models'
 import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { createNotice, deleteNotice, getNoticesByReportId, updateReport } from '@/app/services/monconServices'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { FaTrash } from 'react-icons/fa6'
-import { Equipment } from '../../utils/types'
 import { getEntities } from '@/app/services/entitiesServices'
+import { Entity } from '../../entities/models/entity.model'
 
 
 interface ReportDialogEditProps {
@@ -25,29 +26,42 @@ interface ReportDialogEditProps {
   getAllReport: () => void
 }
 
-const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSelected, registerSelected, getAllReport }: ReportDialogEditProps) => {
-  console.log("registerSelected", registerSelected)
-  const [equipments, setEquipments] = useState<Equipment[]>([]);
+const EditReportDialog = ({ openEditRegister, setOpenEditRegister, setRegisterSelected, registerSelected, getAllReport }: ReportDialogEditProps) => {
+  const [entities, setEntities] = useState<Entity[]>([]);
   const [loading, setLoading] = useState(false);
   const [noticesData, setNoticesData] = useState<Notices[]>([]);
-  const [date, setDate] = useState<Date | undefined>(registerSelected?.execution_date ? new Date(registerSelected.execution_date) : undefined)
   const [date_status, setDateStatus] = useState<Date | undefined>(new Date())
   const [date_ot, setDateOt] = useState<Date | undefined>(new Date())
   const [file, setFile] = useState<File | null>(null);
 
-  const entityDetail = registerSelected?.entity_detail
-  const plantLabel = entityDetail?.plant ? `${entityDetail.plant.name} (${entityDetail.plant.tag})` : ""
-  const areaLabel = entityDetail?.area ? `${entityDetail.area.name} (${entityDetail.area.tag})` : ""
-  const equipmentLabel = entityDetail?.equipment ? `${entityDetail.equipment.name} (${entityDetail.equipment.tag})` : ""
-  const componentLabel = entityDetail?.current ? `${entityDetail.current.name} (${entityDetail.current.tag})` : ""
+  const { register, control, handleSubmit, reset } = useForm<Report>({
+    defaultValues: {
+      name: '',
+      execution_date: undefined,
+      program: 2,
+      work_type: 0,
+      service_type: 0,
+      execution_status: 2,
+      observations: '',
+      condition: 1,
+      diagnostic: '',
+      recomendations: '',
+    }
+  })
 
-  console.log("noticesData", plantLabel, areaLabel, equipmentLabel, componentLabel)
+  const plant = registerSelected?.parents?.find((entity) => entity.type === 1)
+  const area = registerSelected?.parents?.find((entity) => entity.type === 2)
+  const routeOrEquipment = registerSelected?.parents?.find((entity) => entity.type === 4 || entity.type === 3)
+  const currentEntity = entities.find((entity) => entity.id === registerSelected?.entity)
+
+  const plantLabel = plant ? `${plant.name} (${plant.tag})` : ''
+  const areaLabel = area ? `${area.name} (${area.tag})` : ''
+  const equipmentLabel = routeOrEquipment ? `${routeOrEquipment.name} (${routeOrEquipment.tag})` : ''
+  const componentLabel = currentEntity ? `${currentEntity.name} (${currentEntity.tag})` : ''
 
   const editReport = (reportId: number, updatedData: Report) => {
     setLoading(true);
-    // Aquí puedes hacer la llamada a la API para editar el reporte
-    if (!updatedData) return;
-    console.log('Editing report:', reportId, updatedData);
+
     const formData = new FormData()
     formData.append("condition", String(updatedData.condition ?? ""))
     formData.append("diagnostic", String(updatedData.diagnostic ?? ""))
@@ -56,10 +70,19 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
     formData.append("observations", String(updatedData.observations ?? ""))
     formData.append("program", String(updatedData.program ?? ""))
     formData.append("recomendations", String(updatedData.recomendations ?? ""))
-    formData.append("task_type", String(updatedData.task_type ?? ""))
-    if (date) {
-      formData.append("execution_date", date.toISOString().slice(0, 10))
+    formData.append("work_type", String(updatedData.work_type ?? ""))
+    formData.append("service_type", String(updatedData.service_type ?? ""))
+
+    if (updatedData.execution_date) {
+      let dateString: string;
+      if (typeof updatedData.execution_date === 'object' && updatedData.execution_date !== null) {
+        dateString = (updatedData.execution_date as Date).toISOString().slice(0, 10);
+      } else {
+        dateString = String(updatedData.execution_date);
+      }
+      formData.append("execution_date", dateString)
     }
+
     if (file) {
       formData.append("attachment", file)
     }
@@ -71,33 +94,38 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
       setOpenEditRegister(false);
       getAllReport();
       setRegisterSelected(null)
-      // Aquí puedes manejar la respuesta después de la actualización
     }).catch((error) => {
       console.error("Error updating report:", error);
+      setLoading(false)
     });
   };
 
   useEffect(() => {
-    getEntities().then(response => {
-      setEquipments(response.data.filter((entity: Equipment) => entity.type === 3 || entity.type === 4))
+    getEntities().then((response) => {
+      setEntities(response.data.results || response.data)
     }).catch(error => {
-      console.error('Error al obtener los equipos y componentes:', error)
+      console.error('Error al obtener entidades:', error)
     })
   }, []);
 
-  const searchInfoComponent = () => {
-    const component = equipments.find(item => item.id === registerSelected?.entity);
-    console.log("component", component)
-  }
-
   useEffect(() => {
     if (registerSelected) {
-      searchInfoComponent();
+      reset({
+        name: registerSelected.name ?? '',
+        execution_date: registerSelected.execution_date ? registerSelected.execution_date : undefined,
+        program: registerSelected.program,
+        work_type: registerSelected.work_type,
+        service_type: registerSelected.service_type,
+        execution_status: registerSelected.execution_status,
+        observations: registerSelected.observations ?? '',
+        condition: registerSelected.condition,
+        diagnostic: registerSelected.diagnostic ?? '',
+        recomendations: registerSelected.recomendations ?? '',
+      })
     }
-  }, [equipments]);
+  }, [registerSelected, reset]);
 
   const handleAddNotice = () => {
-    // Lógica para añadir un nuevo aviso
     const newNotice: Notices = {
       name: '',
       date: '',
@@ -115,12 +143,10 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
 
   const noticesByReport = (idReport: number) => {
     getNoticesByReportId(idReport).then((response) => {
-      console.log("Notices fetched successfully:", response);
       setNoticesData(response.data);
     }).catch((error) => {
       console.error("Error fetching notices:", error);
     });
-    // Lógica para obtener los avisos relacionados con un reporte
   }
   useEffect(() => {
     if (registerSelected && registerSelected.id) {
@@ -160,13 +186,25 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
     }
   }
 
+  const handleClose = () => {
+    setOpenEditRegister(false)
+    setRegisterSelected(null)
+    reset()
+  }
+
+  const onSubmit = (formData: Report) => {
+    if (registerSelected?.id) {
+      editReport(registerSelected.id, formData)
+    }
+  }
+
   return (
-    <Dialog open={openEditRegister} onOpenChange={() => { setOpenEditRegister(false); setRegisterSelected(null) }}>
+    <Dialog open={openEditRegister} onOpenChange={handleClose}>
       <DialogContent className='min-w-5xl bg-slate-200'>
         <DialogHeader>
           <DialogTitle>Editar Registro</DialogTitle>
         </DialogHeader>
-        <div className='w-full p-2 rounded-md gap-4 flex flex-col mt-4'>
+        <form id="report-form" onSubmit={handleSubmit(onSubmit)} className='w-full p-2 rounded-md gap-4 flex flex-col mt-4'>
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label>Fecha de programación:</Label>
@@ -177,27 +215,36 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
             </div>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Fecha de ejecución:</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    data-empty={!date}
-                    className="data-[empty=true]:text-muted-foreground justify-start text-left font-normal w-full"
-                  >
-                    <CalendarIcon />
-                    {date ? format(date, "dd/MM/yyyy", { locale: es }) : <span>Selecciona una fecha</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar mode="single" selected={date} onSelect={setDate} locale={es} />
-                </PopoverContent>
-              </Popover>
+              <Controller
+                name="execution_date"
+                control={control}
+                render={({ field }) => {
+                  const dateValue = typeof field.value === 'object' && field.value ? field.value : field.value ? new Date(field.value as string) : undefined;
+                  return (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          data-empty={!field.value}
+                          className="data-[empty=true]:text-muted-foreground justify-start text-left font-normal w-full"
+                        >
+                          <CalendarIcon />
+                          {field.value ? format(dateValue || new Date(), "dd/MM/yyyy", { locale: es }) : <span>Selecciona una fecha</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar mode="single" selected={dateValue} onSelect={(date) => field.onChange(date)} locale={es} />
+                      </PopoverContent>
+                    </Popover>
+                  )
+                }}
+              />
             </div>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>Programación:</Label>
               <Select
                 disabled
-                value={registerSelected ? registerSelected.program.toString() : ""} >
+                value={registerSelected ? registerSelected.program.toString() : ""}>
                 <SelectTrigger className='w-full bg-white'>
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
@@ -229,144 +276,115 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/4'>
               <Label className='font-semibold'>Servicio:</Label>
-              <Select
-                disabled
-                value={registerSelected ? registerSelected.work_type.toString() : ""}
-              >
-                <SelectTrigger className='bg-white w-full'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {
-                    works.map((work) => (
-                      <SelectItem key={work.id} value={String(work.id)}>{work.name}</SelectItem>
-                    ))
-                  }
-                </SelectContent>
-              </Select>
+              <Controller
+                name="work_type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                  >
+                    <SelectTrigger className='bg-white w-full'>
+                      <SelectValue placeholder="Seleccionar..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {
+                        works.map((work) => (
+                          <SelectItem key={work.id} value={String(work.id)}>{work.name}</SelectItem>
+                        ))
+                      }
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className='flex flex-col gap-2 w-1/4'>
               <Label className='font-semibold'>Tarea:</Label>
-              <Select
-                disabled
-                value={registerSelected ? registerSelected.service_type.toString() : ""}
-                onValueChange={(value) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    service_type: parseInt(value)
-                  })
-                }}
-              >
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {
-                    services.map((service) => (
-                      <SelectItem key={service.id} value={String(service.id)}>{service.name}</SelectItem>
-                    ))
-                  }
-                </SelectContent>
-              </Select>
+              <Controller
+                name="service_type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                  >
+                    <SelectTrigger className='w-full bg-white'>
+                      <SelectValue placeholder="Seleccionar..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {
+                        services.map((service) => (
+                          <SelectItem key={service.id} value={String(service.id)}>{service.name}</SelectItem>
+                        ))
+                      }
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className='flex flex-col gap-2 w-1/4'>
               <Label className='font-semibold'>Status de ejecución:</Label>
-              <Select
-                value={registerSelected ? String(registerSelected.execution_status) : ""}
-                onValueChange={(value) => {
-                  console.log("execuion", value)
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    execution_status: parseInt(value)
-                  })
-                }}
-              >
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Ejecutado</SelectItem>
-                  <SelectItem value="2">No ejecutado</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="execution_status"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                  >
+                    <SelectTrigger className='w-full bg-white'>
+                      <SelectValue placeholder="Seleccionar..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Ejecutado</SelectItem>
+                      <SelectItem value="2">No ejecutado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className='flex flex-col gap-2 w-2/4'>
               <Label className='font-semibold'>Observación:</Label>
-              <Input
-                className='bg-white'
-                value={registerSelected ? registerSelected.observations : ""}
-                onChange={(e) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    observations: e.target.value
-                  })
-                }}
-              />
+              <Input className='bg-white' {...register('observations')} />
             </div>
           </div>
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/5'>
               <Label className='font-semibold'>Condición:</Label>
-              <Select
-                value={registerSelected ? registerSelected.condition.toString() : ""}
-                onValueChange={(value) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    condition: parseInt(value)
-                  })
-                }}
-              >
-                <SelectTrigger className='w-full bg-white'>
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Normal</SelectItem>
-                  <SelectItem value="2">Tolerable</SelectItem>
-                  <SelectItem value="3">Precaución</SelectItem>
-                  <SelectItem value="4">Crítico</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="condition"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                  >
+                    <SelectTrigger className='w-full bg-white'>
+                      <SelectValue placeholder="Seleccionar..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Normal</SelectItem>
+                      <SelectItem value="2">Tolerable</SelectItem>
+                      <SelectItem value="3">Precaución</SelectItem>
+                      <SelectItem value="4">Crítico</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className='flex flex-col gap-2 w-2/5'>
               <Label className='font-semibold'>Diagnóstico:</Label>
-              <Input
-                className='bg-white'
-                value={registerSelected?.diagnostic ?? ""}
-                onChange={(e) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    diagnostic: e.target.value
-                  })
-                }}
-              />
+              <Input className='bg-white' {...register('diagnostic')} />
             </div>
             <div className='flex flex-col gap-2 w-2/5'>
               <Label className='font-semibold'>Recomendación:</Label>
-              <Input
-                className='bg-white'
-                value={registerSelected?.recomendations ?? ""}
-                onChange={(e) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    recomendations: e.target.value
-                  })
-                }}
-              />
+              <Input className='bg-white' {...register('recomendations')} />
             </div>
           </div>
           <div className='w-full flex flex-row gap-2'>
             <div className='flex flex-col gap-2 w-1/3'>
               <Label className='font-semibold'>N° de reporte:</Label>
-              <Input
-                className='bg-white'
-                value={registerSelected?.name ?? ""}
-                onChange={(e) => {
-                  setRegisterSelected({
-                    ...registerSelected!,
-                    name: e.target.value
-                  })
-                }}
-              />
+              <Input className='bg-white' {...register('name')} />
             </div>
             <div className='flex flex-col gap-2 w-2/3'>
               <Label className='font-semibold'>Archivo:</Label>
@@ -387,15 +405,11 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
             <div className='w-full flex flex-row justify-between items-center'>
               <Label className='font-semibold'>Status de avisos relacionados:</Label>
               <div className='flex flex-row gap-1'>
-                <Button asChild onClick={() => handleSubmitNotices()}>
-                  <div className='bg-blue-600'>
-                    Guardar aviso
-                  </div>
+                <Button type='button' onClick={() => handleSubmitNotices()} className='bg-blue-600'>
+                  Guardar aviso
                 </Button>
-                <Button asChild onClick={() => handleAddNotice()}>
-                  <div className='bg-blue-600'>
-                    Añadir aviso
-                  </div>
+                <Button type='button' onClick={() => handleAddNotice()} className='bg-blue-600'>
+                  Añadir aviso
                 </Button>
               </div>
             </div>
@@ -529,6 +543,7 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
                       </TableCell>
                       <TableCell>
                         <button
+                          type='button'
                           onClick={() => {
                             if (noticesData[index].id) {
                               handleDeleteNotice(index);
@@ -550,15 +565,9 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
               </TableBody>
             </Table>
           </div>
-        </div>
+        </form>
         <DialogFooter>
-          <Button
-            onClick={() => {
-              if (registerSelected && registerSelected.id) {
-                editReport(registerSelected.id, registerSelected);
-              }
-            }}
-          >
+          <Button type='submit' form='report-form'>
             {loading ? 'Guardando...' : 'Guardar'}
           </Button>
         </DialogFooter>
@@ -568,4 +577,4 @@ const ReportDialogEdit = ({ openEditRegister, setOpenEditRegister, setRegisterSe
   )
 }
 
-export default ReportDialogEdit
+export default EditReportDialog;

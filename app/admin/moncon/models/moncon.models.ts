@@ -1,11 +1,12 @@
+import { Entity } from "../../entities/models/entity.model";
 import { User } from "../../users/models/user.models";
 
 export interface Report {
     id: number;
     entity: number;
-    entity_detail: string | null;
+    parents?: Entity[];
     name: string | null;
-    execution_date: string | null;
+    execution_date?: string | null;
     program: number;
     service_type: number;
     work_type: number;
@@ -23,17 +24,18 @@ export interface Report {
     updated_at: string;
 }
 
-export interface ReportFormData {
-  entity: number
-  program: number
-  service_type: number
-  task_type: number
-  execution_status: number
-  condition: number
-  observations: string
-  area?: number
-  equipment?: number
-  component?: number
+export interface Notices {
+  id?: number;
+  name: string;
+  date: string;
+  status: number;
+  ot_status?: number;
+  ot_number?: string;
+  ot_date?: string;
+  status_real?: number;
+  comment?: string;
+  report: number;
+  created_by?: string;
 }
 
 export const services = [
@@ -51,19 +53,3 @@ export const works = [
   { id: 1, name: "PDM" },
   { id: 2, name: "NDT" },
 ]
-
-
-
-export interface Notices {
-  id?: number;
-  name: string;
-  date: string;
-  status: number;
-  ot_status?: number;
-  ot_number?: string;
-  ot_date?: string;
-  status_real?: number;
-  comment?: string;
-  report: number;
-  created_by?: string;
-}
