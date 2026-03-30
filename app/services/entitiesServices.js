@@ -13,6 +13,15 @@ export const getEntities = async () => {
     throw error;
   }
 }
+export const getEquipments = async () => {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/equipments`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching equipments:', error);
+    throw error;
+  }
+}
 
 // Fetch a single entity by ID
 export const getEntityById = async (id) => {

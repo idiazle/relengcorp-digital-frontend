@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 import EquipmentCreateModal from "./components/EquipmentCreateModal";
-import { deleteEntity, getEntities } from "@/app/services/entitiesServices";
+import { deleteEntity, getEntities, getEquipments } from "@/app/services/entitiesServices";
 import ComponentCreateModal from "./components/ComponentCreateModal";
 import { Entity } from "../entities/models/entity.model";
 import { Property } from "./models/equipment.model";
@@ -17,10 +17,9 @@ const RotaryEquipmentPage = () => {
   const [openComponentCreateModal, setOpenComponentCreateModal] = useState(false)
 
   const getEquipmentsData = () => {
-    getEntities().then(response => {
+    getEquipments().then(response => {
       console.log('Equipments fetched:', response.status, response)
-      setEquipments(response.data.results.filter((entity: Entity) => entity.type === 3))
-      setAreas(response.data.results.filter((entity: Entity) => entity.type === 2))
+      setEquipments(response.data.results.filter((entity: Entity) => entity.type === 4))
     }).catch(error => {
       console.error('Error al obtener los equipos:', error)
     })
@@ -31,6 +30,8 @@ const RotaryEquipmentPage = () => {
       getEquipmentsData()
     }
   }, [openCreateModal])
+
+  console.log('Equipments state:', equipments)
 
   const handleDeleteEquipment = (id: number) => {
     if (confirm(`¿Estás seguro de que deseas eliminar este equipo?`)) {
@@ -57,11 +58,11 @@ const RotaryEquipmentPage = () => {
         <TableHeader className="bg-gray-300 sticky top-0 z-10">
           <TableRow>
             <TableHead>N°</TableHead>
-            <TableHead>Area</TableHead>
+            <TableHead>Ruta</TableHead>
             <TableHead>TAG</TableHead>
             <TableHead>Nombre Español</TableHead>
             <TableHead>Nombre Inglés</TableHead>
-            <TableHead>Descripción</TableHead>
+            <TableHead>Componentes</TableHead>
             <TableHead>Propiedades</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
@@ -75,11 +76,17 @@ const RotaryEquipmentPage = () => {
             equipments.map((equipment: Entity, index: number) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{areas.find(area => area.id === equipment.parent)?.name || 'Sin área'}</TableCell>
+                <TableCell>{equipment.parent?.name || 'Sin área'}</TableCell>
                 <TableCell>{equipment.tag}</TableCell>
                 <TableCell>{equipment.name}</TableCell>
                 <TableCell>{equipment.extra_info?.name_en}</TableCell>
-                <TableCell>{equipment.extra_info?.description}</TableCell>
+                <TableCell>{
+                  equipment?.children?.map((component: any, compIndex: number) => (
+                    <div key={compIndex}>
+                      <span>{component.name}</span> {component.value}
+                    </div>
+                  ))
+                }</TableCell>
                 <TableCell>
                   {equipment?.extra_info?.properties?.map((property: Property, propIndex: number) => (
                     <div key={propIndex}>
