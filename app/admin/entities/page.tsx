@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { FaEye, FaTrash } from "react-icons/fa6"
 import { FaEdit } from "react-icons/fa"
-import HeaderForm from "../components/HeaderForm"
+import HeaderForm from "@/components/admin/HeaderForm"
 import { Entity } from "./models/entity.model"
 import CreateEntityModal from "./components/CreateEntityModal"
 

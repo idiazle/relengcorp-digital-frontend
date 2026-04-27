@@ -1,5 +1,5 @@
 import { Entity } from "../../entities/models/entity.model";
-import { User } from "../../users/models/user.models";
+import { User } from "../../users/_models/user.models";
 
 export interface Report {
     id: number;

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Notices, Report, services, works } from '../models/moncon.models'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import PDFViewer from '../../components/PDFViewer'
+import PDFViewer from '@/components/admin/PDFViewer'
 import { getNoticesByReportId } from '@/app/services/monconServices'
 import { getEntities } from '@/app/services/entitiesServices'
 import { Entity } from '../../entities/models/entity.model'

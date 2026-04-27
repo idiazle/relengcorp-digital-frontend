@@ -1,0 +1,169 @@
+{
+  "status": 200,
+
+  "data": [
+    {
+      "id": 1,
+      "name": "Gemelo DTR",
+      "iconPath": "#",
+      "link": "",
+      "enabled": false,
+      "submodules": [
+        {
+          "id": 1,
+          "name": "Visor 360",
+          "iconPath": "#",
+          "link": "/user/moncon",
+          "enabled": true
+        },
+        {
+          "id": 2,
+          "name": "DFD Diagrama de Dependencias Funcionales",
+          "iconPath": "#",
+          "link": "/user/moncon",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Aplicaciones",
+      "iconPath": "#",
+      "link": "",
+      "enabled": false,
+      "submodules": [
+        {
+          "id": 1,
+          "name": "Celdas de Flotación",
+          "iconPath": "#",
+          "link": "/user/celdas-flotacion",
+          "enabled": true
+        },
+        {
+          "id": 2,
+          "name": "Fajas Transportadoras",
+          "iconPath": "#",
+          "link": "/user/fajas-transportadoras",
+          "enabled": true
+        },
+        {
+          "id": 3,
+          "name": "Auditoria de Pernos",
+          "iconPath": "#",
+          "link": "/user/auditoria-pernos",
+          "enabled": false
+        },
+        {
+          "id": 4,
+          "name": "Elongación de pernos",
+          "iconPath": "#",
+          "link": "/user/elongacion-pernos",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Software de Analisis de Confiabilidad",
+      "iconPath": "#",
+      "link": "/user/moncon",
+      "enabled": false,
+      "submodules": [
+        {
+          "id": 1,
+          "name": "Taxonomía",
+          "iconPath": "#",
+          "link": "/user/taxonomia",
+          "enabled": true
+        },
+        {
+          "id": 2,
+          "name": "Análisis de Criticidad",
+          "iconPath": "#",
+          "link": "/user/analisis-criticidad",
+          "enabled": true
+        },
+        {
+          "id": 3,
+          "name": "RCA",
+          "iconPath": "#",
+          "link": "/user/rca",
+          "enabled": true
+        },
+        {
+          "id": 4,
+          "name": "RCM/FMEA",
+          "iconPath": "#",
+          "link": "/user/rcm-fmea",
+          "enabled": false
+        },
+        {
+          "id": 5,
+          "name": "LCC",
+          "iconPath": "#",
+          "link": "/user/lcc",
+          "enabled": true
+        },
+        {
+          "id": 6,
+          "name": "Análisis de Repuestos",
+          "iconPath": "#",
+          "link": "/user/analisis-repuestos",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Monitoreo de Condiciones",
+      "iconPath": "#",
+      "link": "",
+      "enabled": true,
+      "submodules": [
+        {
+          "id": 1,
+          "name": "Estatus de Avisos",
+          "iconPath": "#",
+          "link": "/user/moncon",
+          "enabled": true
+        },
+        {
+          "id": 2,
+          "name": "Estatus de Equipos Estaticos",
+          "iconPath": "#",
+          "link": "/user/equipos-estaticos",
+          "enabled": true
+        },
+        {
+          "id": 3,
+          "name": "Estatus de Equipos Rotatorio",
+          "iconPath": "#",
+          "link": "/user/equipos-rotatorios",
+          "enabled": true
+        },
+        {
+          "id": 4,
+          "name": "Estatus de KPI's",
+          "iconPath": "#",
+          "link": "/user/kpis",
+          "enabled": false
+        },
+        {
+          "id": 5,
+          "name": "Reportes de Monitoreo",
+          "iconPath": "#",
+          "link": "/user/reportes-monitoreo",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Analítica Predictiva",
+      "iconPath": "#",
+      "link": "",
+      "enabled": false,
+      "submodules": []
+    }
+  ]
+}

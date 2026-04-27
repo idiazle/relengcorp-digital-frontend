@@ -2,18 +2,40 @@
 import { useEffect, useState } from "react"
 import { getUsers } from "@/app/services/userServices"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
-import CreateUserModal from "./components/CreateUserModal"
-import type { User, PaginatedResponse } from "./models/user.models"
-import HeaderForm from "../components/HeaderForm"
+import CreateUserModal from "./_components/organisms/CreateUserModal"
+import type { User, PaginatedResponse } from "./_models/user.models"
+import HeaderForm from "../../../components/admin/HeaderForm"
+import { Button } from "@/components/ui/button"
+
+type UserModalMode = 'create' | 'edit' | 'view'
 
 const UsersPage = () => {
   const [usersData, setUsersData] = useState<PaginatedResponse<User> | null>(null)
   const [openModal, setOpenModal] = useState<boolean>(false)
+  const [modalMode, setModalMode] = useState<UserModalMode>('create')
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+
+  const openCreateModal = () => {
+    setModalMode('create')
+    setSelectedUser(null)
+    setOpenModal(true)
+  }
+
+  const openEditModal = (user: User) => {
+    setModalMode('edit')
+    setSelectedUser(user)
+    setOpenModal(true)
+  }
+
+  const openViewModal = (user: User) => {
+    setModalMode('view')
+    setSelectedUser(user)
+    setOpenModal(true)
+  }
 
   const loadUsers = () => {
     getUsers()
       .then((response) => {
-        console.log("Fetched users:", response)
         setUsersData(response.data)
       })
       .catch((error) => {
@@ -27,7 +49,7 @@ const UsersPage = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <HeaderForm setOpenModal={setOpenModal} nameModule="Usuarios" />
+      <HeaderForm setOpenModal={openCreateModal} nameModule="Usuarios" />
       <Table className="max-h-[90vh]">
         <TableHeader className="bg-gray-300 sticky top-0">
           <TableRow>
@@ -48,7 +70,14 @@ const UsersPage = () => {
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.position}</TableCell>
               <TableCell>
-                {/* Acciones buttons or links can be added here */}
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => openViewModal(user)}>
+                    Ver
+                  </Button>
+                  <Button size="sm" onClick={() => openEditModal(user)}>
+                    Editar
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -59,6 +88,8 @@ const UsersPage = () => {
           openModal={openModal}
           setOpenModal={setOpenModal}
           onUserCreated={loadUsers}
+          mode={modalMode}
+          selectedUser={selectedUser}
         />
       }
     </div>

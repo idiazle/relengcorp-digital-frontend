@@ -4,10 +4,10 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { FaEdit } from 'react-icons/fa';
 import { FaEye, FaPlus, FaTrash } from 'react-icons/fa6'
-import { Groups } from '../users/models/user.models';
+import { Groups } from '../users/_models/user.models';
 import { useEffect, useState } from 'react';
 import { getUserGroups } from '@/app/services/userServices';
-import HeaderForm from '../components/HeaderForm';
+import HeaderForm from '../../../components/admin/HeaderForm';
 
 
 const PermissionsPage = () => {

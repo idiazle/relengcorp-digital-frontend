@@ -1,5 +1,5 @@
 import { FaUser } from "react-icons/fa6";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "@/components/admin/Sidebar";
 
 const AdminLayout =({ children }: { children: React.ReactNode }) => {
   return (
