@@ -7,18 +7,20 @@ export interface PaginatedResponse<T> {
 
 export interface Entity {
   id?: number
-  name: string,
-  type: number,
-  tag: string,
-  attachment?: string,
-  parent: number,
-  extra_info?: {
-    name_en?: string,
-    description?: string,
-    properties: { name: string, value: string }[]
-  },
-  deleted?: boolean,
+  name: string
+  type: number
+  tag: string
+  attachment?: string
+  parent?: number | null
+  extra_info?: ExtraInfo | null
+  deleted?: boolean
   created_at?: string
   updated_at?: string
   deleted_at?: string
+}
+
+interface ExtraInfo {
+  name_en?: string
+  description?: string
+  properties: { name: string, value: string }[]
 }

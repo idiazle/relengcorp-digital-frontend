@@ -37,7 +37,15 @@ export const getEntityById = async (id) => {
 // Create a new entity
 export const createEntity = async (data) => {
   try {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/entities`, data);
+    const formData = new FormData();
+    
+    Object.keys(data).forEach(key => {
+      if (data[key] !== null && data[key] !== undefined) {
+        formData.append(key, data[key]);
+      }
+    });
+    
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/entities`, formData);
     return response;
   } catch (error) {
     console.error('Error creating entity:', error);

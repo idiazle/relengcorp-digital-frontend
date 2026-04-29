@@ -1,51 +1,59 @@
-'use client'
-import { useEffect, useState } from "react"
-import { getUsers } from "@/app/services/userServices"
+ 'use client'
+import useActionsModal from './_hooks/useActionsModal'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import CreateUserModal from "./_components/organisms/CreateUserModal"
-import type { User, PaginatedResponse } from "./_models/user.models"
+import type { User } from "./_models/user.models"
 import HeaderForm from "../../../components/admin/HeaderForm"
 import { Button } from "@/components/ui/button"
-
-type UserModalMode = 'create' | 'edit' | 'view'
+import { FaSpinner } from "react-icons/fa6"
+import useGetUsers from "./_hooks/useGetUsers.hook"
 
 const UsersPage = () => {
-  const [usersData, setUsersData] = useState<PaginatedResponse<User> | null>(null)
-  const [openModal, setOpenModal] = useState<boolean>(false)
-  const [modalMode, setModalMode] = useState<UserModalMode>('create')
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const { openModal, modalMode, selectedUser, setOpenModal, openCreateModal, openEditModal, openViewModal } = useActionsModal()
+  const { data, isLoading, refetch } = useGetUsers()
 
-  const openCreateModal = () => {
-    setModalMode('create')
-    setSelectedUser(null)
-    setOpenModal(true)
+  const renderRows = () => {
+    if (isLoading) {
+      return (
+        <TableRow>
+          <TableCell colSpan={6} className="text-center py-4">
+            <FaSpinner className="animate-spin mx-auto mb-2" size={24} />
+            Cargando usuarios...
+          </TableCell>
+        </TableRow>
+      )
+    }
+
+    if (!data || data.results.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={6} className="text-center py-4">
+            No se encontraron usuarios
+          </TableCell>
+        </TableRow>
+      )
+    }
+
+    return data.results.map((user: User, index: number) => (
+      <TableRow key={user.id}>
+        <TableCell>{index + 1}</TableCell>
+        <TableCell>{user.name}</TableCell>
+        <TableCell>{user.last_name}</TableCell>
+        <TableCell>{user.username}</TableCell>
+        <TableCell>{user.position}</TableCell>
+        <TableCell>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => openViewModal(user)}>
+              Ver
+            </Button>
+            <Button size="sm" onClick={() => openEditModal(user)}>
+              Editar
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    ))
   }
-
-  const openEditModal = (user: User) => {
-    setModalMode('edit')
-    setSelectedUser(user)
-    setOpenModal(true)
-  }
-
-  const openViewModal = (user: User) => {
-    setModalMode('view')
-    setSelectedUser(user)
-    setOpenModal(true)
-  }
-
-  const loadUsers = () => {
-    getUsers()
-      .then((response) => {
-        setUsersData(response.data)
-      })
-      .catch((error) => {
-        console.error("Error fetching users:", error)
-      })
-  }
-
-  useEffect(() => {
-    loadUsers()
-  }, [])
 
   return (
     <div className="flex flex-col h-full">
@@ -62,36 +70,17 @@ const UsersPage = () => {
           </TableRow>
         </TableHeader>
         <TableBody className="overflow-y-auto">
-          {usersData?.results?.map((user: User) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.last_name}</TableCell>
-              <TableCell>{user.username}</TableCell>
-              <TableCell>{user.position}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => openViewModal(user)}>
-                    Ver
-                  </Button>
-                  <Button size="sm" onClick={() => openEditModal(user)}>
-                    Editar
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {renderRows()}
         </TableBody>
       </Table>
-      {
-        <CreateUserModal
-          openModal={openModal}
-          setOpenModal={setOpenModal}
-          onUserCreated={loadUsers}
-          mode={modalMode}
-          selectedUser={selectedUser}
-        />
-      }
+
+      <CreateUserModal
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        onUserCreated={refetch}
+        mode={modalMode ?? 'create'}
+        selectedUser={selectedUser}
+      />
     </div>
   )
 }

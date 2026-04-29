@@ -53,7 +53,6 @@ const useUserModalLogic = ({
       })
       return
     }
-
     reset(emptyUserForm)
   }, [openModal, isEditMode, isViewMode, selectedUser, reset])
 
