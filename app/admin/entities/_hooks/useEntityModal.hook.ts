@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import useGetPlantsAndAreas from './useGetPlantsAndAreas.hook'
 import { useEntityActions } from './useEntityActions.hook'
 import type { Entity } from '../models/entity.model'
+import { emptyEntityForm } from '../_config/entityFormDefaults'
 
 export type EntityModalMode = 'create' | 'edit' | 'view'
 
@@ -30,16 +31,8 @@ const useEntityModal = ({
 
   const { handleCreate, handleUpdate, isLoading, error } = useEntityActions(onEntitySaved)
 
-  const { register, control, handleSubmit, reset, setValue } = useForm<Omit<Entity, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>>({
-    defaultValues: {
-      name: '',
-      type: 1,
-      tag: '',
-      attachment: '',
-      parent: null,
-      extra_info: null,
-      deleted: false
-    }
+  const { register, control, handleSubmit, reset, setValue } = useForm<Entity>({
+    defaultValues: emptyEntityForm
   })
 
   useEffect(() => {

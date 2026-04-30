@@ -8,14 +8,15 @@ import { es } from 'date-fns/locale'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Notices, Report, services, works } from '../models/moncon.models'
+import type { Notices, Report } from '../../_models/moncon.model'
+import { works, services } from '../../_config/options'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createNotice, deleteNotice, getNoticesByReportId, updateReport } from '@/app/services/monconServices'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { FaTrash } from 'react-icons/fa6'
 import { getEntities } from '@/app/services/entitiesServices'
-import { Entity } from '../../entities/models/entity.model'
+import { Entity } from '../../../entities/models/entity.model'
 
 
 interface ReportDialogEditProps {

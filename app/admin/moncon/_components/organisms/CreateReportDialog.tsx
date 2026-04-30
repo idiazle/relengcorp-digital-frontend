@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { useForm, Controller, useWatch } from 'react-hook-form'
 import { createMonconReport } from '@/app/services/monconServices'
-import { Entity } from '../../entities/models/entity.model'
-import type { Report } from '../models/moncon.models'
-import { works, services } from '../models/moncon.models'
+import { Entity } from '../../../entities/models/entity.model'
+import type { Report } from '../../_models/moncon.model'
+import { works, services } from '../../_config/options'
 
 interface CreateReportDialogProps {
   openNewRegister: boolean

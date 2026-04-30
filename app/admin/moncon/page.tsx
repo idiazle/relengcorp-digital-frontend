@@ -1,21 +1,21 @@
 'use client'
 import { Button } from '@/components/ui/button'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
 import { FaCircle, FaEye, FaFilePdf, FaPlus, FaTrash, FaUpload } from 'react-icons/fa6'
-import { deleteMonconReport, getMonconReports } from '../../services/monconServices'
-import { getEntities } from '@/app/services/entitiesServices'
+import { deleteMonconReport } from '../../services/monconServices'
 import PDFViewer from '../../../components/admin/PDFViewer'
-import CreateReportDialog from './components/CreateReportDialog'
-import UploadReports from './components/UploadReports'
+import CreateReportDialog from './_components/organisms/CreateReportDialog'
+import UploadReports from './_components/organisms/UploadReports'
 import { FaEdit } from 'react-icons/fa'
-import type { Entity } from '../entities/models/entity.model'
-import { works } from './models/moncon.models'
-import type { Report } from './models/moncon.models'
+import { works } from './_config/options'
+import type { Report } from './_models/moncon.model'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import EditReportDialog from './components/EditReportDialog'
-import ViewReportDialog from './components/ViewReportDialog'
+import EditReportDialog from './_components/organisms/EditReportDialog'
+import ViewReportDialog from './_components/organisms/ViewReportDialog'
+import useMonconEntities from './_hooks/useMonconEntities.hook'
+import useMonconReports from './_hooks/useMonconReports.hook'
 
 const MonconPage = () => {
   const [openNewRegister, setOpenNewRegister] = useState<boolean>(false);
@@ -24,26 +24,15 @@ const MonconPage = () => {
   const [registerSelected, setRegisterSelected] = useState<Report | null>(null);
   const [openEditRegister, setOpenEditRegister] = useState<boolean>(false);
   const [openViewRegister, setOpenViewRegister] = useState<boolean>(false);
-  const [programmedReports, setProgrammedReports] = useState<Report[]>([]);
-  const [notProgrammedReports, setNotProgrammedReports] = useState<Report[]>([]);
-  const [allEntities, setAllEntities] = useState<Entity[]>([]);
+  const { data: reports = [], refetch: refetchReports } = useMonconReports()
+  const { data: allEntities = [] } = useMonconEntities()
+
+  const programmedReports = reports.filter((report) => report.program === 1)
+  const notProgrammedReports = reports.filter((report) => report.program === 2)
 
   const getAllReport = () => {
-    getMonconReports()
-      .then((response) => {
-        setProgrammedReports(response.data.results.filter((report: Report) => report.program === 1));
-        setNotProgrammedReports(response.data.results.filter((report: Report) => report.program === 2));
-      });
+    refetchReports()
   }
-
-  useEffect(() => {
-    getAllReport();
-    getEntities().then(response => {
-      setAllEntities(response.data.results)
-    }).catch(error => {
-      console.error('Error al obtener los equipos y componentes:', error)
-    })
-  }, []);
 
   const handleDeleteRegister = (dataId: number) => {
     if (confirm(`¿Estás seguro de que deseas eliminar este registro?`)) {

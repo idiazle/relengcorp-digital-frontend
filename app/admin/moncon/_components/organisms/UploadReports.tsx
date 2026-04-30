@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getEntities } from '@/app/services/entitiesServices'
 import { createMonconReport } from '@/app/services/monconServices'
+import type { Entity } from '@/app/admin/entities/models/entity.model'
 
 type UploadReportsProps = {
   openUploadReports: boolean;
@@ -16,7 +17,7 @@ type UploadReportsProps = {
 
 const UploadReports = ({ openUploadReports, setOpenUploadReports, getAllReport }: UploadReportsProps) => {
   const [routeData, setRouteData] = useState<any[]>([]);
-  const [entities, setEntities] = useState<any[]>([]);
+  const [entities, setEntities] = useState<Entity[]>([]);
 
   // Cargar entidades al montar el componente
   useEffect(() => {

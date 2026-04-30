@@ -6,9 +6,9 @@ import { FaEye, FaTrash } from "react-icons/fa6"
 import { FaEdit } from "react-icons/fa"
 import HeaderForm from "@/components/admin/HeaderForm"
 import { Entity } from "./models/entity.model"
-import CreateEntityModal from "./_components/organisms/CreateEntityModal"
 import useGetPlantsAndAreas from "./_hooks/useGetPlantsAndAreas.hook"
 import { useEntityActions } from "./_hooks/useEntityActions.hook"
+import EntityFormModal from "./_components/organisms/EntityFormModal"
 
 const EntitiesPage = () => {
   const { openModal, modalMode, selectedEntity, setOpenModal, openCreateModal, openEditModal, openViewModal } = useActionsModal()
@@ -49,7 +49,7 @@ const EntitiesPage = () => {
         </TableBody>
       </Table>
       {
-        <CreateEntityModal
+        <EntityFormModal
           openModal={openModal}
           setOpenModal={setOpenModal}
           onEntityCreated={refetch}

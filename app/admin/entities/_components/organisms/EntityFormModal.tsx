@@ -6,7 +6,7 @@ import EntityFieldRow from '../molecules/EntityFieldRow'
 import EntitySelectField from '../molecules/EntitySelectField'
 import { entityFormFieldsConfig } from '../../_config/entityFormFields.config'
 
-interface CreateEntityModalProps {
+interface EntityFormModalProps {
   openModal: boolean
   setOpenModal: (open: boolean) => void
   onEntityCreated?: () => void
@@ -14,13 +14,13 @@ interface CreateEntityModalProps {
   selectedEntity?: Entity | null
 }
 
-const CreateEntityModal = ({
+const EntityFormModal = ({
   openModal,
   setOpenModal,
   onEntityCreated,
   mode = 'create',
   selectedEntity = null
-}: CreateEntityModalProps) => {
+}: EntityFormModalProps) => {
   const {
     register,
     control,
@@ -111,5 +111,4 @@ const CreateEntityModal = ({
   )
 }
 
-export default CreateEntityModal
-
+export default EntityFormModal;
