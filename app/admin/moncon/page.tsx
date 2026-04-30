@@ -4,26 +4,22 @@ import { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
 import { FaCircle, FaEye, FaFilePdf, FaPlus, FaTrash, FaUpload } from 'react-icons/fa6'
-import { deleteMonconReport } from '../../services/monconServices'
-import PDFViewer from '../../../components/admin/PDFViewer'
-import CreateReportDialog from './_components/organisms/CreateReportDialog'
+import { deleteMonconReport, createMonconReport, updateReport } from '../../services/monconServices'
+import ReportFormModal from './_components/organisms/ReportFormModal'
 import UploadReports from './_components/organisms/UploadReports'
 import { FaEdit } from 'react-icons/fa'
 import { works } from './_config/options'
 import type { Report } from './_models/moncon.model'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import EditReportDialog from './_components/organisms/EditReportDialog'
-import ViewReportDialog from './_components/organisms/ViewReportDialog'
 import useMonconEntities from './_hooks/useMonconEntities.hook'
 import useMonconReports from './_hooks/useMonconReports.hook'
+import type { ReportModalMode } from './_hooks/useMonconReportModal'
 
 const MonconPage = () => {
-  const [openNewRegister, setOpenNewRegister] = useState<boolean>(false);
-  const [openPDF, setOpenPDF] = useState<boolean>(false);
+  const [openReportModal, setOpenReportModal] = useState(false)
+  const [modalMode, setModalMode] = useState<ReportModalMode>('create')
   const [openUploadRoute, setOpenUploadRoute] = useState<boolean>(false);
   const [registerSelected, setRegisterSelected] = useState<Report | null>(null);
-  const [openEditRegister, setOpenEditRegister] = useState<boolean>(false);
-  const [openViewRegister, setOpenViewRegister] = useState<boolean>(false);
   const { data: reports = [], refetch: refetchReports } = useMonconReports()
   const { data: allEntities = [] } = useMonconEntities()
 
@@ -32,6 +28,24 @@ const MonconPage = () => {
 
   const getAllReport = () => {
     refetchReports()
+  }
+
+  const openCreateModal = () => {
+    setRegisterSelected(null)
+    setModalMode('create')
+    setOpenReportModal(true)
+  }
+
+  const openEditModal = (report: Report) => {
+    setRegisterSelected(report)
+    setModalMode('edit')
+    setOpenReportModal(true)
+  }
+
+  const openViewModal = (report: Report) => {
+    setRegisterSelected(report)
+    setModalMode('view')
+    setOpenReportModal(true)
   }
 
   const handleDeleteRegister = (dataId: number) => {
@@ -110,7 +124,7 @@ const MonconPage = () => {
         <h1 className='font-bold text-lg'>GESTIÓN DE MONITOREO DE CONDICIONES</h1>
         <div className='flex flex-row items-center gap-2'>
           <Button onClick={() => { console.log('Subiendo archivo', setOpenUploadRoute(true)) }}><FaUpload /> Nueva ruta</Button>
-          <Button onClick={() => { setOpenNewRegister(true) }}><FaPlus /> Nuevo registro</Button>
+          <Button onClick={openCreateModal}><FaPlus /> Nuevo registro</Button>
         </div>
       </div>
       <Separator className='my-2' />
@@ -159,21 +173,13 @@ const MonconPage = () => {
                         <Button
                           size="sm"
                           disabled={!data.attachment}
-                          onClick={() => { setOpenPDF(true); setRegisterSelected(data) }}>
+                          onClick={() => openViewModal(data)}>
                           <FaFilePdf />
                         </Button>
-                        <Button size="sm"
-                          onClick={() => {
-                            setRegisterSelected(data);
-                            setOpenViewRegister(true)
-                          }}>
+                        <Button size="sm" onClick={() => openViewModal(data)}>
                           <FaEye />
                         </Button>
-                        <Button size="sm"
-                          onClick={() => {
-                            setRegisterSelected(data);
-                            setOpenEditRegister(true)
-                          }}>
+                        <Button size="sm" onClick={() => openEditModal(data)}>
                           <FaEdit />
                         </Button>
                         <Button
@@ -229,21 +235,13 @@ const MonconPage = () => {
                         <Button
                           size="sm"
                           disabled={!data.attachment}
-                          onClick={() => { setOpenPDF(true); setRegisterSelected(data) }}>
+                          onClick={() => openViewModal(data)}>
                           <FaFilePdf />
                         </Button>
-                        <Button size="sm"
-                          onClick={() => {
-                            setRegisterSelected(data);
-                            setOpenViewRegister(true)
-                          }}>
+                        <Button size="sm" onClick={() => openViewModal(data)}>
                           <FaEye />
                         </Button>
-                        <Button size="sm"
-                          onClick={() => {
-                            setRegisterSelected(data);
-                            setOpenEditRegister(true)
-                          }}>
+                        <Button size="sm" onClick={() => openEditModal(data)}>
                           <FaEdit />
                         </Button>
                         <Button
@@ -262,47 +260,31 @@ const MonconPage = () => {
 
       </div>
 
-      {openNewRegister &&
-        <CreateReportDialog
-          openNewRegister={openNewRegister}
-          setOpenNewRegister={setOpenNewRegister}
-          getAllReport={getAllReport}
-          entities={allEntities}
-        />
-      }
-
-      {openEditRegister &&
-        <EditReportDialog
-          openEditRegister={openEditRegister}
-          setOpenEditRegister={setOpenEditRegister}
-          registerSelected={registerSelected}
-          setRegisterSelected={setRegisterSelected}
-          getAllReport={getAllReport}
-        />
-      }
-
-      {openViewRegister &&
-        <ViewReportDialog
-          openViewRegister={openViewRegister}
-          setOpenViewRegister={setOpenViewRegister}
-          registerSelected={registerSelected}
-          setRegisterSelected={setRegisterSelected}
-        />
-      }
+      <ReportFormModal
+        open={openReportModal}
+        onOpenChange={setOpenReportModal}
+        mode={modalMode}
+        selectedReport={registerSelected}
+        entities={allEntities}
+        onSubmit={async (data) => {
+          try {
+            if (modalMode === 'create') {
+              await createMonconReport(data)
+            } else if (modalMode === 'edit') {
+              await updateReport(data.id!, data)
+            }
+            getAllReport()
+          } catch (error) {
+            console.error('Error submitting report:', error)
+          }
+        }}
+      />
 
       {/* Añadir ruta de trabajo */}
       {openUploadRoute &&
         <UploadReports openUploadReports={openUploadRoute}
           setOpenUploadReports={setOpenUploadRoute}
           getAllReport={getAllReport}
-        />
-      }
-
-      {openPDF &&
-        <PDFViewer
-          urlPDF={registerSelected?.attachment}
-          openDialog={openPDF}
-          setOpenDialog={setOpenPDF}
         />
       }
     </div >

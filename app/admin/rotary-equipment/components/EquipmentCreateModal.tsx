@@ -8,7 +8,7 @@ import { DialogTitle } from '@radix-ui/react-dialog'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 import { createEntity } from '@/app/services/entitiesServices'
-import { Entity } from '../../entities/models/entity.model'
+import { Entity } from '../../entities/_models/entity.model'
 
 interface EquipmentCreateModalProps {
   openModal: boolean

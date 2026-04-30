@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getEntities } from '@/app/services/entitiesServices'
 import { createMonconReport } from '@/app/services/monconServices'
-import type { Entity } from '@/app/admin/entities/models/entity.model'
+import type { Entity } from '@/app/admin/entities/_models/entity.model'
 
 type UploadReportsProps = {
   openUploadReports: boolean;

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import useGetPlantsAndAreas from './useGetPlantsAndAreas.hook'
 import { useEntityActions } from './useEntityActions.hook'
-import type { Entity } from '../models/entity.model'
+import type { Entity } from '../_models/entity.model'
 import { emptyEntityForm } from '../_config/entityFormDefaults'
 
 export type EntityModalMode = 'create' | 'edit' | 'view'

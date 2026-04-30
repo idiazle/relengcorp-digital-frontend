@@ -1,4 +1,2 @@
-export { default as CreateReportDialog } from '../_components/organisms/CreateReportDialog'
-export { default as EditReportDialog } from '../_components/organisms/EditReportDialog'
-export { default as UploadReports } from '../_components/organisms/UploadReports'
-export { default as ViewReportDialog } from '../_components/organisms/ViewReportDialog'
+export { default as ReportFormModal } from './organisms/ReportFormModal'
+export { default as UploadReports } from './organisms/UploadReports'

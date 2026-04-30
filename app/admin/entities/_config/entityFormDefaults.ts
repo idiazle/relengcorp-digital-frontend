@@ -1,4 +1,4 @@
-import { Entity } from "../models/entity.model";
+import { Entity } from "../_models/entity.model";
 
 export const emptyEntityForm: Entity = {
   name: '',

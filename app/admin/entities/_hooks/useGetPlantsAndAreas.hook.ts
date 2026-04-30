@@ -1,6 +1,6 @@
 import { getEntities } from "@/app/services/entitiesServices";
 import { useQuery } from "@tanstack/react-query";
-import { Entity } from "../models/entity.model";
+import { Entity } from "../_models/entity.model";
 
 const useGetPlantsAndAreas = () => {
   const fetchPlantsAndAreas = async () => {

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import type { Entity } from '../../models/entity.model'
+import type { Entity } from '../../_models/entity.model'
 import useEntityModal from '../../_hooks/useEntityModal.hook'
 import EntityFieldRow from '../molecules/EntityFieldRow'
 import EntitySelectField from '../molecules/EntitySelectField'

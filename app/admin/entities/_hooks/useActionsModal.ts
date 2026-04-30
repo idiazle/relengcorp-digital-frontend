@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { Entity } from '../models/entity.model'
+import type { Entity } from '../_models/entity.model'
 
 export type ModalMode = 'create' | 'edit' | 'view' | null
 

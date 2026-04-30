@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { createEntity, deleteEntity, updateEntity } from '@/app/services/entitiesServices'
-import type { Entity } from '../models/entity.model'
+import type { Entity } from '../_models/entity.model'
 
 export const useEntityActions = (onSuccess?: () => void) => {
   const [isLoading, setIsLoading] = useState(false)

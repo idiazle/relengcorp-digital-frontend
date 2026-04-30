@@ -8,14 +8,14 @@ import { es } from 'date-fns/locale'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { Notices, Report } from '../../_models/moncon.model'
-import { works, services } from '../../_config/options'
+import { Notices, Report } from '../_models/moncon.model'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import PDFViewer from '@/components/admin/PDFViewer'
 import { getNoticesByReportId } from '@/app/services/monconServices'
 import { getEntities } from '@/app/services/entitiesServices'
-import { Entity } from '../../../entities/models/entity.model'
+import { Entity } from '../../entities/_models/entity.model'
+import { works, services } from '../_config/options'
 
 interface ReportViewFormData {
   name: string
