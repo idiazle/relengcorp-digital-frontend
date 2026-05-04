@@ -11,7 +11,7 @@ export interface Entity {
   type: number
   tag: string
   attachment?: string
-  parent?: number | null
+  parent?: number  | null
   extra_info?: ExtraInfo | null
   deleted?: boolean
   created_at?: string

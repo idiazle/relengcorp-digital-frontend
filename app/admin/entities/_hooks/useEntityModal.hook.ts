@@ -25,7 +25,7 @@ const useEntityModal = ({
   const isViewMode = mode === 'view'
   const isEditMode = mode === 'edit'
   const isCreateMode = mode === 'create'
-
+  
   const { data: plantsAndAreas } = useGetPlantsAndAreas()
   const parents: Entity[] = plantsAndAreas ?? []
 
@@ -34,6 +34,14 @@ const useEntityModal = ({
   const { register, control, handleSubmit, reset, setValue } = useForm<Entity>({
     defaultValues: emptyEntityForm
   })
+
+  const getParentId = (parent: Entity['parent'] | { id?: number } | null | undefined) => {
+    if (parent && typeof parent === 'object') {
+      return parent.id ?? null
+    }
+
+    return parent ?? null
+  }
 
   useEffect(() => {
     if (!openModal) return
@@ -44,7 +52,7 @@ const useEntityModal = ({
       setValue('type', selectedEntity.type ?? 1)
       setValue('tag', selectedEntity.tag ?? '')
       setValue('attachment', selectedEntity.attachment ?? '')
-      setValue('parent', selectedEntity.parent ?? null)
+      setValue('parent', getParentId(selectedEntity.parent as Entity['parent'] | { id?: number } | null | undefined))
       setValue('extra_info', selectedEntity.extra_info ?? null)
       setValue('deleted', selectedEntity.deleted ?? false)
       return
@@ -58,11 +66,12 @@ const useEntityModal = ({
     setOpenModal(false)
   }
 
-  const saveEntity = async (data: Omit<Entity, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>) => {
+  const saveEntity = async (data: Entity) => {
     try {
       if (isEditMode && selectedEntity?.id) {
         await handleUpdate(selectedEntity.id, data as unknown as Entity)
       } else if (isCreateMode) {
+        console.log("Creating entity with data:", data)
         await handleCreate(data as unknown as Entity)
       }
     } catch (err) {

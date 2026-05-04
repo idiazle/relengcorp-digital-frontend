@@ -29,6 +29,8 @@ const EntitySelectField = <T extends FieldValues>({
   required = false,
   onValueChange
 }: EntitySelectFieldProps<T>) => {
+  console.log('options:', options)
+  console.log('control:', control._formValues)
   return (
     <div className="flex flex-col gap-1">
       <Label>{label}{required && '(*)'}</Label>
@@ -44,7 +46,7 @@ const EntitySelectField = <T extends FieldValues>({
             }}
             disabled={disabled}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>

@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getEntities } from '@/app/services/entitiesServices'
 import { createMonconReport } from '@/app/services/monconServices'
 import type { Entity } from '@/app/admin/entities/_models/entity.model'
+import { typeServiceOptions, tareaTypeOptions } from '../../_config/options'
 
 type UploadReportsProps = {
   openUploadReports: boolean;
@@ -15,16 +16,26 @@ type UploadReportsProps = {
   getAllReport: () => void;
 }
 
+type RouteRow = Record<string, string | number | null | undefined>
+
 const UploadReports = ({ openUploadReports, setOpenUploadReports, getAllReport }: UploadReportsProps) => {
-  const [routeData, setRouteData] = useState<any[]>([]);
+  const [routeData, setRouteData] = useState<RouteRow[]>([]);
   const [entities, setEntities] = useState<Entity[]>([]);
+
+  type EntityWithChildren = Entity & { children?: number[] }
 
   // Cargar entidades al montar el componente
   useEffect(() => {
     getEntities()
       .then((response) => {
-        const resp = response.data.filter(entity => entity.type === 3); // Solo componentes
+        const entitiesData = response.data?.results ?? response.data ?? [];
+        const resp = Array.isArray(entitiesData)
+          ? entitiesData.filter((entity: Entity) => entity.type === 3)
+          : [];
         setEntities(resp);
+      })
+      .catch((error) => {
+        console.error('Error al obtener entidades:', error);
       });
   }, []);
 
@@ -43,7 +54,7 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports, getAllReport }
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       // 🔄 Convertir a JSON
-      const json: any[] = XLSX.utils.sheet_to_json(ws);
+      const json = XLSX.utils.sheet_to_json(ws) as RouteRow[];
       console.log(json);
       setRouteData(json);
     };
@@ -51,9 +62,18 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports, getAllReport }
     reader.readAsArrayBuffer(file);
   };
 
-  function excelDateToString(serial) {
+  function excelDateToString(serial: string | number | null | undefined) {
+    if (serial === null || serial === undefined || serial === '') {
+      return '';
+    }
+
+    const numericSerial = typeof serial === 'number' ? serial : Number(serial);
+    if (Number.isNaN(numericSerial)) {
+      return '';
+    }
+
     const excelEpoch = new Date(Date.UTC(1899, 11, 30));
-    const date = new Date(excelEpoch.getTime() + serial * 24 * 60 * 60 * 1000);
+    const date = new Date(excelEpoch.getTime() + numericSerial * 24 * 60 * 60 * 1000);
 
     const day = String(date.getUTCDate()).padStart(2, "0");
     const month = String(date.getUTCMonth() + 1).padStart(2, "0");
@@ -61,47 +81,12 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports, getAllReport }
 
     return `${day}/${month}/${year}`;
   }
-  const typeServiceOptions = [
-    {
-      id: 1, name: 'PDM PTAE'
-    },
-    {
-      id: 2, name: 'PDM Antapaccay'
-    },
-    {
-      id: 3, name: 'NDT PTAE'
-    },
-    {
-      id: 4, name: 'NDT Antapaccay'
-    },
-    {
-      id: 5, name: 'NDT Tintaya'
-    },
-  ];
-
 
   const searchTypeService = (typeServiceName: string) => {
     const found = typeServiceOptions.find(option => option.name === typeServiceName);
     return found ? found.id : null;
   }
 
-  const tareaTypeOptions = [
-    { id: 1, name: 'Vibraciones y Temperatura' },
-    { id: 2, name: 'Alineamiento de ejes' },
-    { id: 3, name: 'Alineamiento de poleas' },
-    { id: 4, name: 'Ultrasonido acústico' },
-    { id: 5, name: 'Termografía infrarroja' },
-    { id: 6, name: 'Fuga de corriente' },
-    { id: 7, name: 'Vibraciones fases' },
-    { id: 8, name: 'Vibraciones ODS' },
-    { id: 9, name: 'Vibraciones Pump Test' },
-    { id: 10, name: 'Ultrasonido convencional' },
-    { id: 11, name: 'Tintes penetrantes' },
-    { id: 12, name: 'Partículas magnéticas' },
-    { id: 13, name: 'Ultrasonido avanzado' },
-    { id: 14, name: 'Metrología' },
-    { id: 15, name: 'Inspección visual' },
-  ]
 
   const searchTaskType = (taskTypeName: string) => {
     const found = tareaTypeOptions.find(option => option.name === taskTypeName);
@@ -111,17 +96,15 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports, getAllReport }
   const getComponentsByTag = (tag: string) => {
     // 1. Encontrar el equipo por tag
 
-    const equipment = entities.find(
-      e => e.extra_info?.tag === tag
-    );
+    const equipment = entities.find((entity) => entity.tag === tag) as EntityWithChildren | undefined;
 
     if (!equipment) return null;
 
     // 2. Traer los ids de los componentes (children)
-    const componentIds = equipment.children;
+    const componentIds = equipment.children ?? [];
 
     // 3. Buscar los objetos completos
-    const components = entities.filter(e => componentIds.includes(e.id));
+    const components = entities.filter((entity): entity is Entity => entity.id != null && componentIds.includes(entity.id));
 
     return components;
   }
@@ -154,11 +137,11 @@ const UploadReports = ({ openUploadReports, setOpenUploadReports, getAllReport }
 
   const uploadRouteData = () => {
     const tempData = routeData.map((data) => ({
-      entity: searchComponnentByEquipment(data["TAG"], data["COMPONENTE"]),
-      service_type: searchTypeService(data["TIPO SERVICIO"]),
-      program: data["TIPO ACTIVIDAD"] === "Programado" ? 1 : 2,
-      task_type: searchTaskType(data["TIPO TAREA"]),
-      condition: searchCondition(data["CONDICION"]),
+      entity: searchComponnentByEquipment(String(data["TAG"] ?? ''), String(data["COMPONENTE"] ?? '')),
+      service_type: searchTypeService(String(data["TIPO SERVICIO"] ?? '')),
+      program: String(data["TIPO ACTIVIDAD"] ?? '') === "Programado" ? 1 : 2,
+      task_type: searchTaskType(String(data["TIPO TAREA"] ?? '')),
+      condition: searchCondition(String(data["CONDICION"] ?? '')),
       execution_status: 2,
     }));
     console.log("Datos de la ruta a subir:", tempData);

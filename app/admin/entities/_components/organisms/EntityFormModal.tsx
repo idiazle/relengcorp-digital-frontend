@@ -42,7 +42,8 @@ const EntityFormModal = ({
 
   const typeOptions = [
     { id: 1, label: 'Planta' },
-    { id: 2, label: 'Área' }
+    { id: 2, label: 'Área' },
+    { id: 3, label: 'Ruta' }
   ]
 
   const parentOptions = parents
@@ -54,7 +55,7 @@ const EntityFormModal = ({
 
   return (
     <Dialog open={openModal} onOpenChange={setOpenModal}>
-      <DialogContent className="min-w-[500px]">
+      <DialogContent className="min-w-[500px] bg-slate-200">
         <DialogHeader>
           <DialogTitle className="font-bold">{modalTitle}</DialogTitle>
           <DialogDescription>

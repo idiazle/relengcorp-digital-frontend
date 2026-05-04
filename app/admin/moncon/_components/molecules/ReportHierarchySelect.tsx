@@ -1,12 +1,18 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { Controller } from 'react-hook-form'
+import { Controller, useWatch, type Control, type UseFormSetValue } from 'react-hook-form'
 import type { Entity } from '../../../entities/_models/entity.model'
+import type { Report } from '../../_models/moncon.model'
 import { works, services } from '../../_config/options'
 
+interface TreeEntity extends Omit<Entity, 'parent'> {
+  parent_id?: number | null
+  children?: TreeEntity[]
+}
+
 interface ReportHierarchySelectProps {
-  control: any
-  setValue: (name: string, value: any) => void
+  control: Control<Report>
+  setValue: UseFormSetValue<Report>
   entities: Entity[]
   selectedPlant: number | undefined
   setSelectedPlant: (id: number | undefined) => void
@@ -35,29 +41,115 @@ const ReportHierarchySelect = ({
   selectedItem,
   setSelectedItem,
 }: ReportHierarchySelectProps) => {
-  const plants = entities.filter((e) => e.type === 1)
-  const areas = entities.filter((e) => e.type === 2)
-  const routes = entities.filter((e) => e.type === 3)
-  const equipments = entities.filter((e) => e.type === 4)
-  const items = entities.filter((e) => e.type === 5)
-  const components = entities.filter((e) => e.type === 6)
+  const treeEntities = entities as TreeEntity[]
 
-  const filteredAreas = selectedPlant ? areas.filter((e) => e.parent === selectedPlant) : []
-  const filteredRoutes = selectedArea ? routes.filter((e) => e.parent === selectedArea) : []
-  const filteredEquipments = selectedRoute ? equipments.filter((e) => e.parent === selectedRoute) : []
-  const filteredItems = selectedRoute ? items.filter((e) => e.parent === selectedRoute) : []
+  const findNodeById = (nodes: TreeEntity[], id?: number): TreeEntity | undefined => {
+    if (!id) return undefined
 
-  const filteredComponents =
-    selectedEquipment || selectedItem
-      ? components.filter((e) => e.parent === selectedEquipment || e.parent === selectedItem)
-      : []
+    for (const node of nodes) {
+      if (node.id === id) return node
 
-  const selectedWorkType = control._formValues?.work_type || 0
+      const childMatch = node.children ? findNodeById(node.children, id) : undefined
+      if (childMatch) return childMatch
+    }
+
+    return undefined
+  }
+
+  const childrenOf = (parentId?: number, type?: number) => {
+    const parentNode = findNodeById(treeEntities, parentId)
+    const children = parentNode?.children ?? []
+    return type ? children.filter((child) => child.type === type) : children
+  }
+
+  const plants = treeEntities.filter((e) => e.type === 1)
+  const areas = childrenOf(selectedPlant, 2)
+  const routes = childrenOf(selectedArea, 3)
+  const equipments = childrenOf(selectedRoute, 4)
+  const items = childrenOf(selectedRoute, 4)
+  const components = selectedEquipment || selectedItem ? childrenOf(selectedEquipment || selectedItem, 6) : []
+
+  const selectedWorkType = Number(useWatch({ control, name: 'work_type' })) || 0
   const useEquipmentFlow = selectedWorkType === 1
   const useItemFlow = selectedWorkType === 2
+  const changeType = useEquipmentFlow ? 1 : useItemFlow ? 2 : 0
 
   return (
     <div className="w-full flex flex-col gap-4">
+      <div className="w-full flex flex-row gap-2">
+        <div className="flex flex-col gap-2 w-1/5">
+          <Label className="font-semibold">Tipo de Trabajo:</Label>
+          <Controller
+            name="work_type"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={String(field.value)}
+                onValueChange={(v) => {
+                  field.onChange(parseInt(v))
+                  setSelectedEquipment(undefined)
+                  setSelectedItem(undefined)
+                  setValue('entity', 0)
+                }}
+              >
+                <SelectTrigger className="w-full bg-white">
+                  <SelectValue placeholder="Seleccionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {works.map((w) => (
+                    <SelectItem key={w.id} value={String(w.id)}>{w.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 w-1/4">
+          <Label className="font-semibold">Tipo de servicio:</Label>
+          <Controller
+            name="service_type"
+            control={control}
+            render={({ field }) => (
+              <Select value={String(field.value)} onValueChange={(v) => field.onChange(parseInt(v))}>
+                <SelectTrigger className="w-full bg-white">
+                  <SelectValue placeholder="Seleccionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                 {
+                    services.filter((s) => selectedWorkType === 0 || works.find((w) => w.id === selectedWorkType)?.service_types.includes(s.id))
+                    .map((s) => (
+                      <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
+                    ))
+                 }
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+       {/*  <div className="flex flex-col gap-2 w-1/5">
+          <Label className="font-semibold">Condición:</Label>
+          <Controller
+            name="condition"
+            control={control}
+            render={({ field }) => (
+              <Select value={String(field.value)} onValueChange={(v) => field.onChange(parseInt(v))}>
+                <SelectTrigger className="w-full bg-white">
+                  <SelectValue placeholder="Seleccionar..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Normal</SelectItem>
+                  <SelectItem value="2">Tolerable</SelectItem>
+                  <SelectItem value="3">Precaución</SelectItem>
+                  <SelectItem value="4">Crítico</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div> */}
+      </div>
+
       <div className="w-full flex flex-row gap-2">
         <div className="flex flex-col gap-2 w-1/5">
           <Label className="font-semibold">Planta:</Label>
@@ -93,7 +185,7 @@ const ReportHierarchySelect = ({
               <SelectValue placeholder={!selectedPlant ? 'Selecciona planta' : 'Seleccionar...'} />
             </SelectTrigger>
             <SelectContent>
-              {filteredAreas.map((a) => (
+              {areas.map((a) => (
                 <SelectItem key={a.id} value={String(a.id)}>{a.name}</SelectItem>
               ))}
             </SelectContent>
@@ -112,14 +204,14 @@ const ReportHierarchySelect = ({
               <SelectValue placeholder={!selectedArea ? 'Selecciona área' : 'Seleccionar...'} />
             </SelectTrigger>
             <SelectContent>
-              {filteredRoutes.map((r) => (
+              {routes.map((r) => (
                 <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        {useEquipmentFlow && (
+        {changeType === 1 && (
           <div className="flex flex-col gap-2 w-1/5">
             <Label className="font-semibold">Equipo:</Label>
             <Select disabled={!selectedRoute} value={selectedEquipment ? String(selectedEquipment) : ''} onValueChange={(v) => {
@@ -131,7 +223,7 @@ const ReportHierarchySelect = ({
                 <SelectValue placeholder={!selectedRoute ? 'Selecciona ruta' : 'Seleccionar...'} />
               </SelectTrigger>
               <SelectContent>
-                {filteredEquipments.map((e) => (
+                {equipments.map((e) => (
                   <SelectItem key={e.id} value={String(e.id)}>{e.tag}/{e.name}</SelectItem>
                 ))}
               </SelectContent>
@@ -139,7 +231,7 @@ const ReportHierarchySelect = ({
           </div>
         )}
 
-        {useItemFlow && (
+        {changeType === 2 && (
           <div className="flex flex-col gap-2 w-1/5">
             <Label className="font-semibold">Ítem:</Label>
             <Select disabled={!selectedRoute} value={selectedItem ? String(selectedItem) : ''} onValueChange={(v) => {
@@ -151,16 +243,13 @@ const ReportHierarchySelect = ({
                 <SelectValue placeholder={!selectedRoute ? 'Selecciona ruta' : 'Seleccionar...'} />
               </SelectTrigger>
               <SelectContent>
-                {filteredItems.map((i) => (
-                  <SelectItem key={i.id} value={String(i.id)}>{i.name}</SelectItem>
+                {items.map((i) => (
+                  <SelectItem key={i.id} value={String(i.id)}>{i.tag}/{i.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
         )}
-      </div>
-
-      <div className="w-full flex flex-row gap-2">
         <div className="flex flex-col gap-2 w-1/5">
           <Label className="font-semibold">Componente:</Label>
           <Controller
@@ -188,77 +277,8 @@ const ReportHierarchySelect = ({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {filteredComponents.map((c) => (
+                  {components.map((c) => (
                     <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2 w-1/5">
-          <Label className="font-semibold">Tipo de Trabajo:</Label>
-          <Controller
-            name="work_type"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={String(field.value)}
-                onValueChange={(v) => {
-                  field.onChange(parseInt(v))
-                  setSelectedEquipment(undefined)
-                  setSelectedItem(undefined)
-                  setValue('entity', 0)
-                }}
-              >
-                <SelectTrigger className="w-full bg-white">
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {works.map((w) => (
-                    <SelectItem key={w.id} value={String(w.id)}>{w.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2 w-1/5">
-          <Label className="font-semibold">Condición:</Label>
-          <Controller
-            name="condition"
-            control={control}
-            render={({ field }) => (
-              <Select value={String(field.value)} onValueChange={(v) => field.onChange(parseInt(v))}>
-                <SelectTrigger className="w-full bg-white">
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Normal</SelectItem>
-                  <SelectItem value="2">Tolerable</SelectItem>
-                  <SelectItem value="3">Precaución</SelectItem>
-                  <SelectItem value="4">Crítico</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2 w-1/5">
-          <Label className="font-semibold">Tipo de servicio:</Label>
-          <Controller
-            name="service_type"
-            control={control}
-            render={({ field }) => (
-              <Select value={String(field.value)} onValueChange={(v) => field.onChange(parseInt(v))}>
-                <SelectTrigger className="w-full bg-white">
-                  <SelectValue placeholder="Seleccionar..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {services.map((s) => (
-                    <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

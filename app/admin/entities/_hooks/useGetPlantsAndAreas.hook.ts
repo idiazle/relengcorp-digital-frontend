@@ -6,7 +6,7 @@ const useGetPlantsAndAreas = () => {
   const fetchPlantsAndAreas = async () => {
     const response = await getEntities();
     const resp = response.data.results
-    const filtered = resp.filter((ent: Entity) => ent.type === 1 || ent.type === 2)
+    const filtered = resp.filter((ent: Entity) => ent.type === 1 || ent.type === 2 || ent.type === 3)
     const ordered = filtered.sort((a: Entity, b: Entity) => a.type - b.type)
     return ordered;
   };

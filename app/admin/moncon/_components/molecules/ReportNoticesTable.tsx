@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Calendar, Calendar as CalendarIcon } from 'lucide-react'
+import { Calendar as CalendarIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
@@ -7,7 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { FaTrash } from 'react-icons/fa6'
+import { Calendar } from '@/components/ui/calendar'
 import type { Notices } from '../../_models/moncon.model'
+
+type EditableNoticeField = 'name' | 'date' | 'status' | 'ot_number' | 'ot_date' | 'ot_status' | 'status_real' | 'comment'
 
 interface ReportNoticesTableProps {
   noticesData: Notices[]
@@ -32,7 +35,7 @@ const ReportNoticesTable = ({
   onSubmitNotices,
   onDeleteNotice,
 }: ReportNoticesTableProps) => {
-  const handleNoticeChange = (index: number, field: keyof Notices, value: any) => {
+  const handleNoticeChange = (index: number, field: EditableNoticeField, value: Notices[EditableNoticeField]) => {
     const updated = [...noticesData]
     updated[index] = { ...updated[index], [field]: value }
     setNoticesData(updated)

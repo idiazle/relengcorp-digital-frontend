@@ -14,7 +14,6 @@ import PDFViewer from '@/components/admin/PDFViewer'
 import { useState } from 'react'
 import type { Entity } from '../../../entities/_models/entity.model'
 import type { Report, Notices } from '../../_models/moncon.model'
-import { works, services } from '../../_config/options'
 import useMonconReportModal, { type ReportModalMode } from '../../_hooks/useMonconReportModal'
 import ReportHierarchySelect from '../molecules/ReportHierarchySelect'
 import ReportNoticesTable from '../molecules/ReportNoticesTable'
@@ -27,9 +26,7 @@ interface ReportFormModalProps {
   selectedReport?: Report | null
   entities: Entity[]
   onSubmit: (data: Report, file?: File | null, notices?: Notices[]) => Promise<void>
-  onAddNotice?: (notice: Notices) => void
   onSubmitNotices?: () => void
-  onDeleteNotice?: (id: number) => void
 }
 
 const ReportFormModal = ({
@@ -39,17 +36,14 @@ const ReportFormModal = ({
   selectedReport,
   entities,
   onSubmit,
-  onAddNotice,
   onSubmitNotices,
-  onDeleteNotice,
 }: ReportFormModalProps) => {
   const [openPDF, setOpenPDF] = useState(false)
-
+  console.log('Selected report in modal:', selectedReport)
   const {
     register,
     control,
     handleSubmit,
-    reset,
     setValue,
     isCreateMode,
     isEditMode,
@@ -124,7 +118,7 @@ const ReportFormModal = ({
 
           <form onSubmit={handleSubmit(formOnSubmit)} className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
             {/* CREATE MODE - Hierarchy Select */}
-            {isCreateMode && (
+            {(isCreateMode || isEditMode) && (
               <ReportHierarchySelect
                 control={control}
                 setValue={setValue}
@@ -145,6 +139,37 @@ const ReportFormModal = ({
             {/* CREATE & EDIT MODE - Common Fields */}
             {(isCreateMode || isEditMode) && (
               <>
+                <div className="w-full flex flex-row gap-2">
+                  <div className="flex flex-col gap-2 w-1/4">
+                    <Label className="font-semibold">Condición:</Label>
+                    <Controller
+                      name="condition"
+                      control={control}
+                      render={({ field }) => (
+                        <Select value={String(field.value)} onValueChange={(v) => field.onChange(parseInt(v))}>
+                          <SelectTrigger className="w-full bg-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">Normal</SelectItem>
+                            <SelectItem value="2">Tolerable</SelectItem>
+                            <SelectItem value="3">Precaución</SelectItem>
+                            <SelectItem value="4">Crítico</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2 w-2/4">
+                    <Label className="font-semibold">Diagnóstico:</Label>
+                    <Input className="bg-white" {...register('diagnostic')} />
+                  </div>
+                  <div className="flex flex-col gap-2 w-2/4">
+                    <Label className="font-semibold">Recomendación:</Label>
+                    <Input className="bg-white" {...register('recomendations')} />
+                  </div>
+                </div>
+
                 <div className="w-full flex flex-row gap-2">
                   <div className="flex flex-col gap-2 w-1/4">
                     <Label className="font-semibold">Programación:</Label>
@@ -182,37 +207,6 @@ const ReportFormModal = ({
                   </div>
                 </div>
 
-                <div className="w-full flex flex-row gap-2">
-                  <div className="flex flex-col gap-2 w-1/4">
-                    <Label className="font-semibold">Condición:</Label>
-                    <Controller
-                      name="condition"
-                      control={control}
-                      render={({ field }) => (
-                        <Select value={String(field.value)} onValueChange={(v) => field.onChange(parseInt(v))}>
-                          <SelectTrigger className="w-full bg-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">Normal</SelectItem>
-                            <SelectItem value="2">Tolerable</SelectItem>
-                            <SelectItem value="3">Precaución</SelectItem>
-                            <SelectItem value="4">Crítico</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 w-2/4">
-                    <Label className="font-semibold">Diagnóstico:</Label>
-                    <Input className="bg-white" {...register('diagnostic')} />
-                  </div>
-                  <div className="flex flex-col gap-2 w-2/4">
-                    <Label className="font-semibold">Recomendación:</Label>
-                    <Input className="bg-white" {...register('recomendations')} />
-                  </div>
-                </div>
-
                 {isEditMode && (
                   <div className="w-full flex flex-row gap-2">
                     <div className="flex flex-col gap-2 w-1/3">
@@ -225,7 +219,7 @@ const ReportFormModal = ({
                         name="execution_date"
                         control={control}
                         render={({ field }) => {
-                          const dateValue = typeof field.value === 'object' ? field.value : field.value ? new Date(field.value as string) : undefined
+                          const dateValue = field.value ? new Date(field.value as string) : undefined
                           return (
                             <Popover>
                               <PopoverTrigger asChild>
@@ -235,7 +229,7 @@ const ReportFormModal = ({
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-0">
-                                <Calendar mode="single" selected={dateValue} onSelect={(date) => field.onChange(date)} locale={es} />
+                                <Calendar mode="single" selected={dateValue} onSelect={(date) => field.onChange(date ?? null)} locale={es} />
                               </PopoverContent>
                             </Popover>
                           )
@@ -266,7 +260,7 @@ const ReportFormModal = ({
                 date_ot={date_ot}
                 setDateOt={setDateOt}
                 onAddNotice={handleAddNoticeClick}
-                onSubmitNotices={onSubmitNotices || (() => {})}
+                onSubmitNotices={onSubmitNotices || (() => { })}
                 onDeleteNotice={handleDeleteNoticeClick}
               />
             )}
@@ -274,7 +268,7 @@ const ReportFormModal = ({
             {/* VIEW MODE - Summary */}
             {isViewMode && (
               <ReportViewSummary
-                selectedReport={selectedReport}
+                selectedReport={selectedReport ?? null}
                 entities={entities}
                 noticesData={noticesData}
                 onOpenPDF={() => setOpenPDF(true)}

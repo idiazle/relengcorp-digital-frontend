@@ -11,7 +11,7 @@ import { FaEdit } from 'react-icons/fa'
 import { works } from './_config/options'
 import type { Report } from './_models/moncon.model'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import useMonconEntities from './_hooks/useMonconEntities.hook'
+import useGetTreeEntities from './_hooks/useMonconTreeEntities.hook'
 import useMonconReports from './_hooks/useMonconReports.hook'
 import type { ReportModalMode } from './_hooks/useMonconReportModal'
 
@@ -21,11 +21,10 @@ const MonconPage = () => {
   const [openUploadRoute, setOpenUploadRoute] = useState<boolean>(false);
   const [registerSelected, setRegisterSelected] = useState<Report | null>(null);
   const { data: reports = [], refetch: refetchReports } = useMonconReports()
-  const { data: allEntities = [] } = useMonconEntities()
-
+  const { data: treeEntities = [] } = useGetTreeEntities()
   const programmedReports = reports.filter((report) => report.program === 1)
   const notProgrammedReports = reports.filter((report) => report.program === 2)
-
+  
   const getAllReport = () => {
     refetchReports()
   }
@@ -57,8 +56,6 @@ const MonconPage = () => {
     }
   };
 
-  console.log('no programados', notProgrammedReports)
-
   const getTaskTypeName = (taskTypeCode: number) => {
     return works.find((tarea) => tarea.id === taskTypeCode)?.name || 'Desconocido'
   };
@@ -68,14 +65,16 @@ const MonconPage = () => {
     return routeOrEquipmentTag || 'N/A'
   }
 
-  const getCurrentName = (report: Report) => {
-    const currentEntity = allEntities.find((entity) => entity.id === report.entity)?.name
-    if (currentEntity) return currentEntity
+  const getCompItemName = (report: Report) => {
+    if (report.work_type === 1) {
+      return report.parents?.find((entity) => entity.type === 4)?.name || 'N/A'
+    }
 
-    if (report.name) return report.name
+    if (report.work_type === 2) {
+      return report.parents?.find((entity) => entity.type === 5)?.name || 'N/A'
+    }
 
-    const currentFromParents = report.parents?.find((entity) => entity.type === 6 || entity.type === 5)?.name
-    return currentFromParents || 'N/A'
+    return 'N/A'
   }
 
   const getConditionName = (conditionCode: number) => {
@@ -118,6 +117,7 @@ const MonconPage = () => {
     }
   };
 
+
   return (
     <div className="flex flex-col h-full">
       <div className='flex justify-between items-center'>
@@ -143,7 +143,7 @@ const MonconPage = () => {
                   <TableHead>EJECUCIÓN</TableHead>
                   <TableHead>FECHA EJEC.</TableHead>
                   <TableHead>TAG EQUIPO</TableHead>
-                  <TableHead>COMP/ITEM</TableHead>
+                  {/* <TableHead>COMPONET</TableHead> */}
                   <TableHead>TIPO TAREA</TableHead>
                   <TableHead>CONDICIÓN</TableHead>
                   <TableHead>ACCIONES</TableHead>
@@ -166,7 +166,7 @@ const MonconPage = () => {
                         {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
                       </TableCell>
                       <TableCell>{getEquipmentTag(data)}</TableCell>
-                      <TableCell>{getCurrentName(data)}</TableCell>
+                     {/*  <TableCell>{getCompItemName(data)}</TableCell> */}
                       <TableCell>{getTaskTypeName(data.work_type)}</TableCell>
                       <TableCell>{getConditionName(data.condition)}</TableCell>
                       <TableCell className="flex flex-row gap-2">
@@ -204,7 +204,7 @@ const MonconPage = () => {
                   <TableHead>EJECUCIÓN</TableHead>
                   <TableHead>FECHA EJEC.</TableHead>
                   <TableHead>TAG EQUIPO</TableHead>
-                  <TableHead>COMP/ITEM</TableHead>
+                  {/* <TableHead>COMP/ITEM</TableHead> */}
                   <TableHead>TIPO TAREA</TableHead>
                   <TableHead>CONDICIÓN</TableHead>
                   <TableHead>ACCIONES</TableHead>
@@ -228,7 +228,7 @@ const MonconPage = () => {
                         {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
                       </TableCell>
                       <TableCell>{getEquipmentTag(data)}</TableCell>
-                      <TableCell>{getCurrentName(data)}</TableCell>
+                    {/*   <TableCell>{getCompItemName(data)}</TableCell> */}
                       <TableCell>{getTaskTypeName(data.work_type)}</TableCell>
                       <TableCell>{getConditionName(data.condition)}</TableCell>
                       <TableCell className="flex flex-row gap-2">
@@ -265,13 +265,18 @@ const MonconPage = () => {
         onOpenChange={setOpenReportModal}
         mode={modalMode}
         selectedReport={registerSelected}
-        entities={allEntities}
+        entities={treeEntities}
         onSubmit={async (data) => {
           try {
             if (modalMode === 'create') {
               await createMonconReport(data)
             } else if (modalMode === 'edit') {
-              await updateReport(data.id!, data)
+              const reportId = registerSelected?.id
+              if (!reportId) {
+                throw new Error('No se encontró el ID del registro a actualizar')
+              }
+
+              await updateReport(reportId, data)
             }
             getAllReport()
           } catch (error) {
