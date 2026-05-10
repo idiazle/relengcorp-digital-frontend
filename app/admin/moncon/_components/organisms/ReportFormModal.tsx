@@ -18,6 +18,7 @@ import useMonconReportModal, { type ReportModalMode } from '../../_hooks/useMonc
 import ReportHierarchySelect from '../molecules/ReportHierarchySelect'
 import ReportNoticesTable from '../molecules/ReportNoticesTable'
 import ReportViewSummary from '../molecules/ReportViewSummary'
+import { FaCircle } from 'react-icons/fa6'
 
 interface ReportFormModalProps {
   open: boolean
@@ -39,7 +40,7 @@ const ReportFormModal = ({
   onSubmitNotices,
 }: ReportFormModalProps) => {
   const [openPDF, setOpenPDF] = useState(false)
-  console.log('Selected report in modal:', selectedReport)
+
   const {
     register,
     control,
@@ -151,10 +152,11 @@ const ReportFormModal = ({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="1">Normal</SelectItem>
-                            <SelectItem value="2">Tolerable</SelectItem>
-                            <SelectItem value="3">Precaución</SelectItem>
-                            <SelectItem value="4">Crítico</SelectItem>
+                            <SelectItem value="1"><FaCircle className="text-green-500" /> Normal</SelectItem>
+                            <SelectItem value="2"><FaCircle className="text-yellow-500" /> Tolerable</SelectItem>
+                            <SelectItem value="3"><FaCircle className="text-orange-500" /> Precaución</SelectItem>
+                            <SelectItem value="4"><FaCircle className="text-red-500" /> Crítico</SelectItem>
+                            <SelectItem value="5"><FaCircle className="text-gray-500" /> No Monitoreado</SelectItem>
                           </SelectContent>
                         </Select>
                       )}

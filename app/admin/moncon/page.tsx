@@ -7,6 +7,7 @@ import { FaCircle, FaEye, FaFilePdf, FaPlus, FaTrash, FaUpload } from 'react-ico
 import { deleteMonconReport, createMonconReport, updateReport } from '../../services/monconServices'
 import ReportFormModal from './_components/organisms/ReportFormModal'
 import UploadReports from './_components/organisms/UploadReports'
+import { UploadHistoryReports } from './_components'
 import { FaEdit } from 'react-icons/fa'
 import { works } from './_config/options'
 import type { Report } from './_models/moncon.model'
@@ -19,9 +20,15 @@ const MonconPage = () => {
   const [openReportModal, setOpenReportModal] = useState(false)
   const [modalMode, setModalMode] = useState<ReportModalMode>('create')
   const [openUploadRoute, setOpenUploadRoute] = useState<boolean>(false);
+  const [openHistory, setOpenHistory] = useState<boolean>(false);
   const [registerSelected, setRegisterSelected] = useState<Report | null>(null);
-  const { data: reports = [], refetch: refetchReports } = useMonconReports()
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  const { data: paginatedData, refetch: refetchReports } = useMonconReports(page, limit)
   const { data: treeEntities = [] } = useGetTreeEntities()
+  const reports = paginatedData?.results ?? []
+  const total = paginatedData?.total ?? 0
+  const totalPages = Math.ceil(total / limit)
   const programmedReports = reports.filter((report) => report.program === 1)
   const notProgrammedReports = reports.filter((report) => report.program === 2)
   
@@ -60,22 +67,21 @@ const MonconPage = () => {
     return works.find((tarea) => tarea.id === taskTypeCode)?.name || 'Desconocido'
   };
 
+  const getRouteName = (report: Report) => {
+    const routeName = report.parents?.find((entity) => entity.type === 3)?.name
+    return routeName || 'N/A'
+  }
+
+  const getComponentName = (report: Report) => {
+    const componentName = report.parents?.find((entity) => entity.type === 6)?.name
+    return componentName || 'N/A'
+  }
+
   const getEquipmentTag = (report: Report) => {
     const routeOrEquipmentTag = report.parents?.find((entity) => entity.type === 3 || entity.type === 4)?.tag
     return routeOrEquipmentTag || 'N/A'
   }
 
-  const getCompItemName = (report: Report) => {
-    if (report.work_type === 1) {
-      return report.parents?.find((entity) => entity.type === 4)?.name || 'N/A'
-    }
-
-    if (report.work_type === 2) {
-      return report.parents?.find((entity) => entity.type === 5)?.name || 'N/A'
-    }
-
-    return 'N/A'
-  }
 
   const getConditionName = (conditionCode: number) => {
     switch (conditionCode) {
@@ -107,10 +113,17 @@ const MonconPage = () => {
             <h1>Crítico</h1>
           </div>
         );
-      default:
+      case 5:
         return (
           <div className='flex flex-row gap-1 items-center'>
             <FaCircle className='text-gray-500' />
+            <h1>No Monitoreado</h1>
+          </div>
+        );
+      default:
+        return (
+          <div className='flex flex-row gap-1 items-center'>
+            <FaCircle className='text-black' />
             <h1>Desconocido</h1>
           </div>
         );
@@ -124,6 +137,7 @@ const MonconPage = () => {
         <h1 className='font-bold text-lg'>GESTIÓN DE MONITOREO DE CONDICIONES</h1>
         <div className='flex flex-row items-center gap-2'>
           <Button onClick={() => { console.log('Subiendo archivo', setOpenUploadRoute(true)) }}><FaUpload /> Nueva ruta</Button>
+          <Button onClick={() => setOpenHistory(true)}><FaUpload /> Historial</Button>
           <Button onClick={openCreateModal}><FaPlus /> Nuevo registro</Button>
         </div>
       </div>
@@ -143,7 +157,8 @@ const MonconPage = () => {
                   <TableHead>EJECUCIÓN</TableHead>
                   <TableHead>FECHA EJEC.</TableHead>
                   <TableHead>TAG EQUIPO</TableHead>
-                  {/* <TableHead>COMPONET</TableHead> */}
+                  <TableHead>RUTA</TableHead>
+                  <TableHead>COMPONENTE</TableHead>
                   <TableHead>TIPO TAREA</TableHead>
                   <TableHead>CONDICIÓN</TableHead>
                   <TableHead>ACCIONES</TableHead>
@@ -159,14 +174,15 @@ const MonconPage = () => {
                 ) :
                   programmedReports.map((data, index) => (
                     <TableRow key={index}>
-                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{(page - 1) * limit + index + 1}</TableCell>
                       <TableCell>{data.created_at ? data.created_at.slice(0, 10) : 'N/A'}</TableCell>
                       <TableCell>{data.execution_status === 1 ? 'Ejecutado' : 'No Ejecutado'}</TableCell>
                       <TableCell>
                         {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
                       </TableCell>
                       <TableCell>{getEquipmentTag(data)}</TableCell>
-                     {/*  <TableCell>{getCompItemName(data)}</TableCell> */}
+                      <TableCell>{getRouteName(data)}</TableCell>
+                      <TableCell>{getComponentName(data)}</TableCell>
                       <TableCell>{getTaskTypeName(data.work_type)}</TableCell>
                       <TableCell>{getConditionName(data.condition)}</TableCell>
                       <TableCell className="flex flex-row gap-2">
@@ -199,12 +215,12 @@ const MonconPage = () => {
               <TableHeader className="bg-gray-300 sticky top-0 z-10">
                 <TableRow>
                   <TableHead className="w-[50px]">N°</TableHead>
-                  {/* <TableHead>PROGRAMA</TableHead> */}
                   <TableHead>FECHA PROGR.</TableHead>
                   <TableHead>EJECUCIÓN</TableHead>
                   <TableHead>FECHA EJEC.</TableHead>
                   <TableHead>TAG EQUIPO</TableHead>
-                  {/* <TableHead>COMP/ITEM</TableHead> */}
+                  <TableHead>RUTA</TableHead>
+                  <TableHead>COMPONENTE</TableHead>
                   <TableHead>TIPO TAREA</TableHead>
                   <TableHead>CONDICIÓN</TableHead>
                   <TableHead>ACCIONES</TableHead>
@@ -220,7 +236,7 @@ const MonconPage = () => {
                 ) :
                   notProgrammedReports.map((data, index) => (
                     <TableRow key={index}>
-                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{(page - 1) * limit + index + 1}</TableCell>
                       {/* <TableCell>{data.program == 1 ? 'Programado' : 'No Programado'}</TableCell> */}
                       <TableCell>{data.created_at ? data.created_at.slice(0, 10) : 'N/A'}</TableCell>
                       <TableCell>{data.execution_status === 1 ? 'Ejecutado' : 'No Ejecutado'}</TableCell>
@@ -228,7 +244,8 @@ const MonconPage = () => {
                         {data.execution_date ? data.execution_date.slice(0, 10) : 'N/A'}
                       </TableCell>
                       <TableCell>{getEquipmentTag(data)}</TableCell>
-                    {/*   <TableCell>{getCompItemName(data)}</TableCell> */}
+                      <TableCell>{getRouteName(data)}</TableCell>
+                      <TableCell>{getComponentName(data)}</TableCell>
                       <TableCell>{getTaskTypeName(data.work_type)}</TableCell>
                       <TableCell>{getConditionName(data.condition)}</TableCell>
                       <TableCell className="flex flex-row gap-2">
@@ -258,6 +275,47 @@ const MonconPage = () => {
           </TabsContent>
         </Tabs>
 
+        {/* Controles de paginación */}
+        <div className='flex justify-between items-center mt-4 px-4 py-3 bg-gray-100 rounded'>
+          <div className='text-sm text-gray-600'>
+            Mostrando {reports.length === 0 ? 0 : (page - 1) * limit + 1} a {Math.min(page * limit, total)} de {total} registros
+          </div>
+          <div className='flex gap-2 items-center'>
+            <select 
+              value={limit} 
+              onChange={(e) => {
+                setLimit(Number(e.target.value))
+                setPage(1)
+              }}
+              className='px-2 py-1 border rounded text-sm'
+            >
+              <option value={5}>5 por página</option>
+              <option value={10}>10 por página</option>
+              <option value={20}>20 por página</option>
+              <option value={50}>50 por página</option>
+            </select>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page === 1}
+            >
+              Anterior
+            </Button>
+            <span className='text-sm text-gray-600'>
+              Página {page} de {totalPages}
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              disabled={page === totalPages || totalPages === 0}
+            >
+              Siguiente
+            </Button>
+          </div>
+        </div>
+
       </div>
 
       <ReportFormModal
@@ -286,12 +344,16 @@ const MonconPage = () => {
       />
 
       {/* Añadir ruta de trabajo */}
-      {openUploadRoute &&
+    {/*   {openUploadRoute &&
         <UploadReports openUploadReports={openUploadRoute}
           setOpenUploadReports={setOpenUploadRoute}
-          getAllReport={getAllReport}
         />
-      }
+      } */}
+
+      {/* Modal de previsualización de historial Excel */}
+      {openHistory && (
+        <UploadHistoryReports open={openHistory} setOpen={setOpenHistory} />
+      )}
     </div >
 
   )

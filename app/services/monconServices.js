@@ -53,9 +53,14 @@ export const deleteNotice = async (id) => {
 
 
 //REPORTS
-export const getMonconReports = async () => {
+export const getMonconReports = async (page = 1, limit = 10) => {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/reports`);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/reports`, {
+      params: {
+        page,
+        page_size: limit
+      }
+    });
     return response;
   } catch (error) {
     console.error('Error fetching Moncon reports:', error);
