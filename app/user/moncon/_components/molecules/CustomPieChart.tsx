@@ -24,7 +24,7 @@ const CustomPieChart = ({ data }: { data: PieItem[] }) => {
 
   return (
     <>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
         <PieChart>
           <Tooltip formatter={(value) => `${value}`} />
           <Legend verticalAlign="bottom" />

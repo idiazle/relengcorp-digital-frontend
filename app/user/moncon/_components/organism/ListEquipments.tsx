@@ -1,5 +1,3 @@
-
-
 import equipmentList from '../../_mocks/EquipmentList.json'
 
 type EquipmentItem = {
@@ -10,24 +8,35 @@ type EquipmentItem = {
   nextMaintenance: string
 }
 
+const ItemList = ({ equipment }: { equipment: EquipmentItem }) => {
+  return (
+    <li className='border border-gray-300 p-2 rounded bg-white flex flex-row justify-between items-start'>
+      <div>
+        <h2 className='text-md font-semibold'>{equipment.name}</h2>
+        <p><strong>Último mantenimiento:</strong> {equipment.lastMaintenance}</p>
+        <p><strong>Próximo mantenimiento:</strong> {equipment.nextMaintenance}</p>
+      </div>
+      <div>
+        <span className={`px-2 py-1 rounded text-sm ${equipment.status === 'Activo' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+          {equipment.status === 'Activo' ? 'Activo' : 'Inactivo'}
+        </span>
+      </div>
+    </li>
+  )
+}
+
 const ListEquipments = () => {
   const equipments = equipmentList.data as EquipmentItem[]
 
   return (
-    <div className='w-full h-full border border-gray-300 bg-green-100'>
+    <div className='w-full border border-gray-300 bg-gray-100 h-2/3'>
       <h1 className='bg-gray-200 text-center w-full text-lg'>Lista de equipos</h1>
-      <div className='p-2'>
-        <ul className='space-y-2'>
-          {equipments.map((equipment) => (
-            <li key={equipment.id} className='rounded border border-gray-300 bg-white p-2'>
-              <p className='font-semibold'>{equipment.name}</p>
-              <p className='text-sm'>Estado: {equipment.status}</p>
-              <p className='text-sm'>Ultimo mantenimiento: {equipment.lastMaintenance}</p>
-              <p className='text-sm'>Proximo mantenimiento: {equipment.nextMaintenance}</p>
-            </li>
+        <ul className='gap-1 flex-col flex overflow-y-auto'>
+          {equipments.map(equipment => (
+            <ItemList key={equipment.id} equipment={equipment} />
           ))}
         </ul>
-      </div>
+      
     </div>
   )
 }
