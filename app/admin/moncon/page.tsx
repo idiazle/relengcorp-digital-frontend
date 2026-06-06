@@ -147,6 +147,7 @@ const MonconPage = () => {
           <TabsList className="bg-gray-200 justify-start sticky top-0 z-20">
             <TabsTrigger value="programmed">Programados</TabsTrigger>
             <TabsTrigger value="not-programmed">No programados</TabsTrigger>
+            <TabsTrigger value="history">Histórico</TabsTrigger>
           </TabsList>
           <TabsContent value="programmed">
             <Table className="bg-white">
@@ -271,6 +272,24 @@ const MonconPage = () => {
                     </TableRow>
                   ))}
               </TableBody>
+            </Table>
+          </TabsContent>
+          <TabsContent value="history">
+             <Table className="bg-white">
+              <TableHeader className="bg-gray-300 sticky top-0 z-10">
+                <TableRow>
+                  <TableHead className="w-[50px]">N°</TableHead>
+                  <TableHead>FECHA PROGR.</TableHead>
+                  <TableHead>EJECUCIÓN</TableHead>
+                  <TableHead>FECHA EJEC.</TableHead>
+                  <TableHead>TAG EQUIPO</TableHead>
+                  <TableHead>RUTA</TableHead>
+                  <TableHead>COMPONENTE</TableHead>
+                  <TableHead>TIPO TAREA</TableHead>
+                  <TableHead>CONDICIÓN</TableHead>
+                  <TableHead>ACCIONES</TableHead>
+                </TableRow>
+              </TableHeader>
             </Table>
           </TabsContent>
         </Tabs>

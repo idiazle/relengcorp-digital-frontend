@@ -1,0 +1,40 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Equipo 1",
+      "status": "Activo",
+      "lastMaintenance": "2024-05-01",
+      "nextMaintenance": "2024-06-01"
+    },
+    {
+      "id": 2,
+      "name": "Equipo 2",
+      "status": "En Mantenimiento",
+      "lastMaintenance": "2024-04-15",
+      "nextMaintenance": "2024-05-15"
+    },
+    {
+      "id": 3,
+      "name": "Equipo 3",
+      "status": "Activo",
+      "lastMaintenance": "2024-05-10",
+      "nextMaintenance": "2024-06-10"
+    },
+    {
+      "id": 4,
+      "name": "Equipo 4",
+      "status": "Inactivo",
+      "lastMaintenance": "2024-03-20",
+      "nextMaintenance": "2024-04-20"
+    },
+    {
+      "id": 5,
+      "name": "Equipo 5",
+      "status": "Activo",
+      "lastMaintenance": "2024-05-05",
+      "nextMaintenance": "2024-06-05"
+    }
+  ]
+}

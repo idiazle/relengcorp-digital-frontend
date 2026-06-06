@@ -1,471 +1,153 @@
 'use client'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TabsContent } from '@radix-ui/react-tabs'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { FaHouse } from 'react-icons/fa6'
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryGroup,
-  VictoryLabel,
-  VictoryLegend,
-  VictoryLine,
-  VictoryPie
-  , VictoryStack, VictoryTheme
-} from "victory";
-
-import { getConditionsData, getEquipmentConditionByMonth } from '../../services/monconUserServices'
+import { avisos_ot, avisos_ot_cerr_ab, cond_comp_percentage, eq_monitoreo, equip_pie, hh_data, no_program_works } from './_utils/data.constant';
+import { ResponsiveContainer, ComposedChart, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, BarChart, Bar, LabelList } from 'recharts';
+import CustomBarChart from './_components/molecules/CustomBarChart';
+import CustomPieChart from './_components/molecules/CustomPieChart'
+import ListEquipments from './_components/organism/ListEquipments';
 
 const Moncon = () => {
-  const myDataset = [
-    [ // Condicion Normal
-      { x: "a", y: 1 },
-      { x: "b", y: 2 },
-      { x: "c", y: 3 },
-      { x: "d", y: 2 },
-      { x: "e", y: 3 },
-      { x: "f", y: 3 },
-      { x: "g", y: 3 },
-    ],
-    [ // Condicion Tolerable
-      { x: "a", y: 2 },
-      { x: "b", y: 3 },
-      { x: "c", y: 7 },
-      { x: "d", y: 5 },
-      { x: "e", y: 3 },
-      { x: "f", y: 3 },
-      { x: "g", y: 3 },
-    ],
-    [ // Condicion Precaucion
-      { x: "a", y: 5 },
-      { x: "b", y: 2 },
-      { x: "c", y: 3 },
-      { x: "d", y: 4 },
-      { x: "e", y: 4 },
-      { x: "f", y: 4 },
-      { x: "g", y: 4 },
-    ],
-    [ // Condicion Critico
-      { x: "a", y: 5 },
-      { x: "b", y: 2 },
-      { x: "c", y: 3 },
-      { x: "d", y: 4 },
-      { x: "e", y: 4 },
-      { x: "f", y: 4 },
-      { x: "g", y: 4 },
-    ],
-  ];
-
-
-
-  const dataCerrado = [
-    { category: "OTs", value: 12 },
-    { category: "Avisos", value: 18 },
-  ];
-
-  const dataAbierto = [
-    { category: "OTs", value: 25 },
-    { category: "Avisos", value: 21 },
-  ];
-
-  const [conditionData, setConditionData] = useState(
-    [
-      { x: "Normal", y: 0 },
-      { x: "Tolerable", y: 0 },
-      { x: "Precaucion", y: 0 },
-      { x: "Critico", y: 0 },
-    ]
-  );
-  const [EquipCondBYMonth, setEquipCondBYMonth] = useState([
-    [ // Condicion Normal
-      { x: "a", y: 1 },
-      { x: "b", y: 2 },
-      { x: "c", y: 3 },
-      { x: "d", y: 2 },
-      { x: "e", y: 3 },
-      { x: "f", y: 3 },
-      { x: "g", y: 3 },
-    ],
-    [ // Condicion Tolerable
-      { x: "a", y: 2 },
-      { x: "b", y: 3 },
-      { x: "c", y: 7 },
-      { x: "d", y: 5 },
-      { x: "e", y: 3 },
-      { x: "f", y: 3 },
-      { x: "g", y: 3 },
-    ],
-    [ // Condicion Precaucion
-      { x: "a", y: 5 },
-      { x: "b", y: 2 },
-      { x: "c", y: 3 },
-      { x: "d", y: 4 },
-      { x: "e", y: 4 },
-      { x: "f", y: 4 },
-      { x: "g", y: 4 },
-    ],
-    [ // Condicion Critico
-      { x: "a", y: 5 },
-      { x: "b", y: 2 },
-      { x: "c", y: 3 },
-      { x: "d", y: 4 },
-      { x: "e", y: 4 },
-      { x: "f", y: 4 },
-      { x: "g", y: 4 },
-    ],
-  ]);
-
-
-  useEffect(() => {
-    getConditionsData().then((response) => {
-      setConditionData(
-        [
-          { x: "Normal", y: response.data.c1 },
-          { x: "Tolerable", y: response.data.c2 },
-          { x: "Precaucion", y: response.data.c3 },
-          { x: "Critico", y: response.data.c4 },
-        ]
-      );
-    });
-    getEquipmentConditionByMonth().then((response) => {
-      setEquipCondBYMonth(response.data);
-    });
-  }, []);
-
-  const transformDataForVictory = (data: any) => {
-    const condition1: any[] = [];
-    const condition2: any[] = [];
-    const condition3: any[] = [];
-    const condition4: any[] = [];
-
-    Object.entries(data).forEach(([month, values]: any) => {
-      console.log("VALUESSSS ", values, month.toString());
-      condition1.push({ x: month, y: values.c1 });
-      condition2.push({ x: month, y: values.c2 });
-      condition3.push({ x: month, y: values.c3 });
-      condition4.push({ x: month, y: values.c4 });
-    });
-
-    return [condition1, condition2, condition3, condition4];
-  };
-  const [chartData, setChartData] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (!EquipCondBYMonth) return;
-
-    const formatted = transformDataForVictory(EquipCondBYMonth);
-    setChartData(formatted);
-
-  }, [EquipCondBYMonth]);
-
-  function transformData(dataset) {
-    const totals = dataset[0].map(
-      (data, i) => {
-        return dataset.reduce(
-          (memo, curr) => {
-            return memo + curr[i].y;
-          },
-          0,
-        );
-      },
-    );
-    return dataset.map((data) => {
-      return data.map((datum, i) => {
-        return {
-          x: datum.x,
-          y:
-            (datum.y / totals[i]) * 100,
-        };
-      });
-    });
-  }
-
-  const dataset =
-    transformData(myDataset);
-
-  const getColor = (condition: string) => {
-    switch (condition) {
-      case "Normal":
-        return "#4CAF50";
-      case "Tolerable":
-        return "#FFC107";
-      case "Precaucion":
-        return "#FF9800";
-      case "Critico":
-        return "#F44336";
-      default:
-        return "#BDBDBD";
-    }
-  };
-
-  const COLORS = [
-    "#4CAF50", // Normal
-    "#FFC107", // Tolerable
-    "#FF9800", // Precaución
-    "#F44336", // Crítico
-  ];
-
   return (
     <div className='w-full h-[88vh]'>
-      <Tabs defaultValue='pdmp' className='w-full h-full flex flex-col'>
+      <Tabs defaultValue='pdma' className='w-full h-full flex flex-col'>
         <TabsList className='w-full flex flex-row bg-gray-300 '>
           <TabsTrigger value='pdmp' className='cursor-pointer hover:bg-gray-400'>PDM PTAE</TabsTrigger>
-          <TabsTrigger value='pdma' className='cursor-pointer hover:bg-gray-400'>PDM ANTAPACCAY</TabsTrigger>
-          <TabsTrigger value='ndtp' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS PTAE</TabsTrigger>
-          <TabsTrigger value='ndta' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS ANTAPACCAY</TabsTrigger>
-          <TabsTrigger value='ndtt' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS TINTAYA</TabsTrigger>
+          <TabsTrigger disabled value='pdma' className='cursor-pointer hover:bg-gray-400'>PDM ANTAPACCAY</TabsTrigger>
+          <TabsTrigger disabled value='ndtp' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS PTAE</TabsTrigger>
+          <TabsTrigger disabled value='ndta' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS ANTAPACCAY</TabsTrigger>
+          <TabsTrigger disabled value='ndtt' className='cursor-pointer hover:bg-gray-400'>NDT TUBERIAS TINTAYA</TabsTrigger>
         </TabsList>
         <TabsContent value='pdmp' className='flex flex-row w-full h-full gap-2'>
-          <div className=' flex flex-col w-1/2 h-full gap-2'>
-            <div className='flex flex-col w-full h-1/3 bg-white rounded-md border border-gray-300'>
-              <div className='w-full flex justify-center bg-gray-200 font-bold p-1 rounded-t-md'><h1>CONDICION DE EQUIPOS/COMPONENTES</h1></div>
-              <div className='flex flex-col'>
-                <div className='flex flex-row gap-1'>
-                  <div className='flex w-1/2 h-48'>
-                    <VictoryPie
-                      labels={({ datum }) =>
-                        datum.y > 0 ? `${datum.x}: ${datum.y}%` : ''}
-                      data={conditionData}
-                      theme={VictoryTheme.clean}
-                      style={{
-                        labels: { fontSize: 14, fill: "#333" },
-                        data: {
-                          fill: ({ datum }) => getColor(datum.x),
-                        }
-                      }}
-                    />
-                  </div>
-                  <div className='flex w-1/2 h-48'>
-                    <VictoryChart
-                      domainPadding={{ x: 30, y: 20 }}
-                      theme={VictoryTheme.clean}
-                    >
-                      <VictoryStack>
-                        {chartData?.map((data, i) => {
-                          return (
-                            <VictoryBar
-                              data={data}
-                              key={i}
-                              style={{
-                                data: {
-                                  fill: COLORS[i]
-                                }
-                              }}
-                            />
-                          );
-                        })}
-                      </VictoryStack>
-                      <VictoryAxis
-                        tickValues={chartData[0]?.map(d => d.x)}
-                        style={{
-                          tickLabels: {
-                            angle: -45,
-                            textAnchor: "end",
-                            fontSize: 10
-                          }
-                        }}
-                      />
 
-                    </VictoryChart>
-
-                  </div>
-                </div>
-                <div className='h-64 flex justify-center'>
-                  <VictoryLegend x={10} y={10}
-                    orientation="horizontal"
-                    gutter={20}
-                    data={[
-                      { name: "Normal", symbol: { fill: "#4CAF50" } },
-                      { name: "Tolerable", symbol: { fill: "#FFC107" } },
-                      { name: "Precaucion", symbol: { fill: "#FF9800" } },
-                      { name: "Critico", symbol: { fill: "#F44336" } },
-                    ]}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className='flex flex-col w-full h-2/3 bg-white rounded-md'>
-              <div className='flex flex-row gap-1'>
-                <div className='flex flex-col w-1/2 border border-gray-300 h-full rounded-md'>
-                  <div className='w-full flex justify-center bg-gray-200 font-bold p-1 rounded-t-md'><h1>CUMPLIMIENTO</h1></div>
-                  <div className='w-full flex justify-center font-bold p-1 rounded-t-md gap-2 flex-row'>
-                    <button className='w-1/3 border border-black bg-gray-100 hover:bg-gray-200 cursor-pointer'>Dia</button>
-                    <button className='w-1/3 border border-black bg-gray-100 hover:bg-gray-200 cursor-pointer'>Semana</button>
-                    <button className='w-1/3 border border-black bg-gray-100 hover:bg-gray-200 cursor-pointer'>Mes</button>
-                  </div>
-                  <div className='flex flex-row'>
-                   {/*  <VictoryChart
-                      domain={{ x: [0.5, 5.5], y: [0, 100] }}
-                      theme={VictoryTheme.clean}
-                    >
-                      <VictoryBar data={
-                        [
-                          { x: '10 nov', y: 80 },
-                          { x: '11 nov', y: 90 },
-                          { x: '12 nov', y: 75 },
-                          { x: '13 nov', y: 95 },
-                          { x: '14 nov', y: 85 },
-                          { x: '15 nov', y: 85 },
-                          { x: '16 nov', y: 85 },
-                        ]
-                      } />
-                    </VictoryChart> */}
-
-                  </div>
-                  <div className='flex flex-row'>
-                    <VictoryChart
-                      domainPadding={{ x: 30, y: 20 }}
-                      theme={VictoryTheme.clean}
-                    >
-                      <VictoryStack>
-                        {dataset.map((data, i) => {
-                          return (
-                            <VictoryBar
-                              data={data}
-                              key={i}
-                            />
-                          );
-                        })}
-                      </VictoryStack>
-                      <VictoryAxis
-                        dependentAxis
-                        tickFormat={(tick) =>
-                          `${tick}%`
-                        }
-                      />
-                      <VictoryAxis
-                        tickFormat={[
-                          "a",
-                          "b",
-                          "c",
-                          "d",
-                          "e",
-                          "f",
-                          "g",
-                        ]}
-                      />
-                    </VictoryChart>
-
-                  </div>
-                </div>
-                <div className='flex flex-col w-1/2 border border-gray-300 h-full rounded-md'>
-                  <div className='w-full flex justify-center bg-gray-200 font-bold p-1 rounded-t-md'><h1>TAREAS NO PROGRAMADAS</h1></div>
-                  <div className='w-full flex justify-center font-bold p-1 rounded-t-md gap-2 flex-row'>
-                    <button className='w-1/3 border border-black bg-gray-100 hover:bg-gray-200 cursor-pointer'>Semana</button>
-                    <button className='w-1/3 border border-black bg-gray-100 hover:bg-gray-200 cursor-pointer'>Mes</button>
-                  </div>
-                  <div>
-                    <VictoryChart
-                      theme={VictoryTheme.clean}
-                    >
-                      <VictoryLine
-                        domain={{ y: [0, 50] }}
-                        data={[
-                          { x: "Sem 35", y: 22 },
-                          { x: "Sem 36", y: 34 },
-                          { x: "Sem 37", y: 18 },
-                          { x: "Sem 38", y: 30 },
-                          { x: "Sem 39", y: 26 },
-                          { x: "Sem 40", y: 22 },
-                          { x: "Sem 41", y: 24 },
-                        ]}
-                      />
-                    </VictoryChart>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className='flex flex-col w-1/2 h-full gap-2 overflow-hidden'>
-            <div className='flex flex-col w-full h-2/3 bg-white rounded-md border border-gray-300 overflow-hidden'>
-
-            </div>
-            <div className='flex flex-col w-full h-1/3 bg-white rounded-md border border-gray-300 overflow-hidden'>
-              <div className='w-full flex justify-center bg-gray-200 font-bold p-1 rounded-t-md'><h1>AVISOS & OT</h1></div>
-              <div className='flex flex-row gap-2 flex-1 overflow-hidden p-2'>
-                <div className='flex w-1/2 items-center justify-center'>
-                  <h1>Grafica Circular</h1>
-                </div>
-                <div className='flex w-1/2 flex-col min-h-0 gap-2'>
-                  <div className='flex flex-col flex-1 border border-gray-300 rounded-md p-2 overflow-auto'>
-                    <VictoryChart
-                      horizontal
-                      domain={{ y: [0, 30] }}
-                      padding={{ top: 20, bottom: 50,  }}
-                      domainPadding={{ x: 60 }}
-                    >
-                      {/* Categorías */}
-                      <VictoryAxis
-                        style={{
-                          axis: { stroke: "#333" },
-                          tickLabels: { fontSize: 20, padding: 10 },
-                        }}
-                      />
-
-                      {/* Eje numérico */}
-                      <VictoryAxis
-                        dependentAxis
-                        tickValues={[0, 10, 20, 30]}
-                        tickFormat={(t) => t}
-                        style={{
-                          grid: { stroke: "#e0e0e0", strokeDasharray: "3,3" },
-                          tickLabels: { fontSize: 20 },
-                          axis: { stroke: "#333" },
-                        }}
-                      />
-
-                      {/* GRUPOS DE BARRAS */}
-                      <VictoryGroup
-                        horizontal
-                        offset={30}
-                        colorScale={["#1f4bd8", "#ff5722"]}
-                      >
-                        {/* Cerrado */}
-                        <VictoryBar
-                          data={dataCerrado}
-                          x="category"
-                          y="value"
-                          barWidth={25}
-                          labels={({ datum }) => datum.value}
-                          labelComponent={<VictoryLabel dx={15} style={{ fontSize: 20 }} />}
-                        />
-
-                        {/* Abierto */}
-                        <VictoryBar
-                          data={dataAbierto}
-                          x="category"
-                          y="value"
-                          barWidth={25}
-                          labels={({ datum }) => datum.value}
-                          labelComponent={<VictoryLabel dx={15} style={{ fontSize: 20 }} />}
-                        />
-                      </VictoryGroup>
-                    </VictoryChart>
-                  </div>
-
-                  {/* LEYENDA ABAJO */}
-                  <div className='flex justify-center gap-6 pb-2'>
-                    <div className='flex items-center gap-1.5'>
-                      <div className='w-3 h-3' style={{ background: "#1f4bd8" }}></div>
-                      <span className='text-xs'>Cerrado</span>
-                    </div>
-
-                    <div className='flex items-center gap-1.5'>
-                      <div className='w-3 h-3' style={{ background: "#ff5722" }}></div>
-                      <span className='text-xs'>Abierto</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </TabsContent>
         <TabsContent value='pdma'>
-          <h1>PDM ANTAPACCAY</h1>
+          <div className='flex flex-row w-full h-full gap-2'>
+            <div className='flex flex-col w-1/2 gap-2'>
+              <div>
+                <h1 className='bg-gray-200 text-center w-full text-lg'>Condición de equipos/componentes</h1>
+                <div className='flex flex-row'>
+                  <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+                    <CustomPieChart data={equip_pie} />
+                  </div>
+                  <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={cond_comp_percentage} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
+                        <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
+                        <Tooltip formatter={(value) => `${(Number(value) * 100).toFixed(0)}%`} />
+                        <Bar dataKey="normal" fill="green" stackId="eq_monitoreo" />
+                        <Bar dataKey="tolerable" fill="yellow" stackId="eq_monitoreo" />
+                        <Bar dataKey="precaucion" fill="orange" stackId="eq_monitoreo" />
+                        <Bar dataKey="critico" fill="red" stackId="eq_monitoreo" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+              </div>
+
+              <div className='flex w-full flex-row'>
+                <div className='flex w-full flex-col'>
+                  <h1 className='bg-gray-200 text-center w-full text-lg'>Cumplimiento</h1>
+                  <CustomBarChart />
+                  <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={eq_monitoreo} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="mon" fill="blue" stackId="eq_monitoreo">
+                          <LabelList dataKey="mon" position="center" fill='#fff' />
+                        </Bar>
+                        <Bar dataKey="no_mon" fill="red" stackId="eq_monitoreo">
+                          <LabelList dataKey="no_mon" position="center" fill='#fff' />
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className='flex w-full flex-col'>
+                  <h1 className='bg-gray-200 text-center w-full text-lg'>Tareas no programadas</h1>
+                  <div className="w-full max-w-[700px] max-h-[20vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={no_program_works}>
+                        <CartesianGrid strokeDasharray="3" />
+                        <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
+                        <YAxis />
+                        <Tooltip />
+                        <Line dataKey="value" stroke="blue" strokeWidth={3} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={hh_data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line dataKey="hh_programado" stroke="blue" strokeWidth={3} />
+                        <Line dataKey="hh_ejecutado" stroke="green" strokeWidth={3} />
+                        <Bar dataKey="hh_fuera_ruta" fill="red" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div className='flex flex-col w-1/2 h-full gap-2'>
+              <div>
+                <h1 className='bg-gray-200 text-center w-full text-lg'>{`Avisos & OT's`}</h1>
+                <div className='flex w-full flex-row'>
+                  <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={avisos_ot} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="avisos" fill="blue">
+                          <LabelList dataKey="avisos" position="top" fill='black' />
+                        </Bar>
+                        <Bar dataKey="ot" fill="red" >
+                          <LabelList dataKey="ot" position="top" fill='black' />
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart layout="vertical" data={avisos_ot_cerr_ab} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="abierto" fill="red">
+                          <LabelList dataKey="abierto" position="right" />
+                        </Bar>
+                        <Bar dataKey="cerrado" fill="blue">
+                          <LabelList dataKey="cerrado" position="right" />
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+              <ListEquipments />
+            </div>
+
+          </div>
+
         </TabsContent>
         <TabsContent value='ndtp'>
           <h1>NDT TUBERIAS PTAE</h1>
@@ -477,7 +159,7 @@ const Moncon = () => {
           <h1>NDT TUBERIAS TINTAYA</h1>
         </TabsContent>
       </Tabs>
-    </div>
+    </div >
   )
 }
 

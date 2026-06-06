@@ -12,7 +12,7 @@ export default function RootLayout({
           <h1 className="italic">Hola User 01</h1>
           <FaUser className="bg-white rounded-full p-4" color="blue" />
         </div>
-        <div className="h-[96%] p-4">
+        <div className="h-[96%]">
           {children}
         </div>
       </div>
