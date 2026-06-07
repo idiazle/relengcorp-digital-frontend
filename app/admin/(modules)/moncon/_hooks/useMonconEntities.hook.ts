@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getEntities } from '@/app/services/entitiesServices'
-import type { Entity } from '../../entities/_models/entity.model'
+import type { Entity } from '../../(modules)/entities/_models/entity.model'
 
 const useMonconEntities = () => {
   return useQuery({

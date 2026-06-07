@@ -7,7 +7,7 @@ import { FaEye, FaPlus, FaTrash } from 'react-icons/fa6'
 import { Groups } from '../users/_models/user.models';
 import { useEffect, useState } from 'react';
 import { getUserGroups } from '@/app/services/userServices';
-import HeaderForm from '../../../components/admin/HeaderForm';
+import HeaderForm from '@/components/admin/HeaderForm';
 
 
 const PermissionsPage = () => {

@@ -1,7 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Controller, useWatch, type Control, type UseFormSetValue } from 'react-hook-form'
-import type { Entity } from '../../../entities/_models/entity.model'
+import type { Entity } from '../../../(modules)/entities/_models/entity.model'
 import type { Report } from '../../_models/moncon.model'
 import { works, services } from '../../_config/options'
 

@@ -14,7 +14,7 @@ import { Controller, useForm } from 'react-hook-form'
 import PDFViewer from '@/components/admin/PDFViewer'
 import { getNoticesByReportId } from '@/app/services/monconServices'
 import { getEntities } from '@/app/services/entitiesServices'
-import { Entity } from '../../entities/_models/entity.model'
+import { Entity } from '../../(modules)/entities/_models/entity.model'
 import { works, services } from '../_config/options'
 
 interface ReportViewFormData {

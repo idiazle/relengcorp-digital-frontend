@@ -7,7 +7,7 @@ import { FaPlus } from "react-icons/fa6";
 import EquipmentCreateModal from "./components/EquipmentCreateModal";
 import { deleteEntity, getEntities, getEquipments } from "@/app/services/entitiesServices";
 import ComponentCreateModal from "./components/ComponentCreateModal";
-import { Entity } from "../entities/_models/entity.model";
+import { Entity } from "../(modules)/entities/_models/entity.model";
 import { Property } from "./models/equipment.model";
 
 const RotaryEquipmentPage = () => {

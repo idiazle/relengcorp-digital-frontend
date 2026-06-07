@@ -62,7 +62,7 @@ export default function Login() {
   const [showPass, setShowPass] = useState<boolean>(false)
 
   return (
-    <div className="w-full h-[100vh] bg-[url('/images/login-background.png')] bg-cover bg-center bg-no-repeat">
+    <div className="w-full h-[100vh] bg-[url('/images/login-background.webp')] bg-cover bg-center bg-no-repeat">
       <div className='h-full w-full flex flex-col justify-center items-center gap-5'>
         <div className='bg-black/60 p-10 rounded-2xl flex flex-col justify-center items-center gap-5'>
           <div className='flex flex-col justify-center items-center w-36'>

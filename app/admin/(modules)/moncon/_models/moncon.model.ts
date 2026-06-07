@@ -1,4 +1,4 @@
-import { Entity } from "../../entities/_models/entity.model";
+import { Entity } from "../../(modules)/entities/_models/entity.model";
 import { User } from "../../users/_models/user.models";
 
 export interface Report {

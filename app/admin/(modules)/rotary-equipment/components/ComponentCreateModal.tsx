@@ -8,15 +8,15 @@ import { DialogTitle } from '@radix-ui/react-dialog'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 import { createEntity } from '@/app/services/entitiesServices'
-import { Entity } from '../../entities/_models/entity.model'
+import { Entity } from '../../(modules)/entities/_models/entity.model'
 
-interface EquipmentCreateModalProps {
+interface ComponentCreateModalProps {
   openModal: boolean
   setOpenModal: (open: boolean) => void
-  entities: Entity[]
+  equipments: Entity[]
 }
 
-const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCreateModalProps) => {
+const ComponentCreateModal = ({ openModal, setOpenModal, equipments }: ComponentCreateModalProps) => {
   const { register, control, handleSubmit, reset, setValue } = useForm<Entity>({
     defaultValues: {
       name: '',
@@ -35,29 +35,29 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
     name: 'extra_info.properties'
   })
 
-  const handleSelectArea = (areaName: string) => {
-    const selectedArea = entities.find(entity => entity.name === areaName)
-    if (selectedArea) {
-      setValue('parent', selectedArea.id || 0)
+  const handleSelectEquipment = (equipmentName: string) => {
+    const equipmentSelected = equipments.find(equipment => equipment.name === equipmentName)
+    if (equipmentSelected) {
+      setValue('parent', equipmentSelected.id || 0)
     }
   }
 
   const onSubmit = async (formData: Entity) => {
     try {
-      const equipmentData = {
+      const componentData = {
         ...formData,
-        type: 3,
+        type: 4,
         extra_info: {
           ...formData.extra_info,
           properties: formData.extra_info?.properties || []
         }
       }
-      const response = await createEntity(equipmentData)
-      console.log('Equipo creado:', response)
+      const response = await createEntity(componentData)
+      console.log('Componente creado:', response)
       reset()
       setOpenModal(false)
     } catch (error) {
-      console.error('Error al crear el equipo:', error)
+      console.error('Error al crear el componente:', error)
     }
   }
 
@@ -65,7 +65,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogContent className='bg-slate-200'>
         <DialogHeader>
-          <DialogTitle className='font-bold'>CREAR EQUIPO</DialogTitle>
+          <DialogTitle className='font-bold'>CREAR COMPONENTE</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
           <div className='flex flex-col gap-2'>
@@ -75,7 +75,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
               <Input
                 {...register('name')}
                 className='bg-white'
-                placeholder='Nombre del equipo'
+                placeholder='Nombre del componente'
               />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
@@ -83,7 +83,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
               <Input
                 {...register('extra_info.name_en')}
                 className='bg-white'
-                placeholder='Equipment name'
+                placeholder='Component name'
               />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
@@ -91,26 +91,26 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
               <Input
                 {...register('tag')}
                 className='bg-white'
-                placeholder='TAG del equipo'
+                placeholder='TAG del componente'
               />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
-              <Label className='font-bold'>Área:</Label>
+              <Label className='font-bold'>Equipo:</Label>
               <Controller
                 name="parent"
                 control={control}
                 render={({ field }) => (
                   <Select
-                    onValueChange={(value) => handleSelectArea(value)}
-                    value={entities.find(entity => entity.id === field.value)?.name || ''}
+                    onValueChange={(value) => handleSelectEquipment(value)}
+                    value={equipments.find(equipment => equipment.id === field.value)?.name || ''}
                   >
                     <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Seleccione un área" />
+                      <SelectValue placeholder="Seleccione equipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {entities.map((entity) => (
-                        <SelectItem key={entity.id} value={entity.id?.toString() || ''}>
-                          {entity?.tag ? "[" + entity?.tag + "] - " + entity.name : "[S/T] - " + entity.name}
+                      {equipments.map((equipment: Entity) => (
+                        <SelectItem key={equipment.id} value={equipment.id?.toString() || ''}>
+                          {equipment?.tag ? "[" + equipment?.tag + "] - " + equipment.name : "[S/T] - " + equipment.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -126,7 +126,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
                 render={({ field }) => (
                   <Textarea
                     {...field}
-                    placeholder='Descripción del equipo'
+                    placeholder='Descripción del componente'
                     className='bg-white resize-none'
                   />
                 )}
@@ -136,7 +136,12 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
           <div className='flex flex-col gap-2'>
             <div className='flex flex-row items-center gap-2'>
               <h1 className='font-bold'>Propiedades</h1>
-              <button type='button' onClick={() => append({ name: '', value: '' })} className='bg-blue-700 p-1 rounded-sm'><FaPlus color='white' /></button>
+              <button
+                type='button'
+                onClick={() => append({ name: '', value: '' })}
+                className='bg-blue-700 p-1 rounded-sm'>
+                <FaPlus color='white' />
+              </button>
             </div>
             <div>
               {
@@ -155,10 +160,14 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
                         placeholder='Valor'
                         className='bg-white'
                       />
-                      <button type='button' onClick={() => remove(index)} className='bg-red-700 p-1 rounded-sm'><FaMinus color='white' /></button>
+                      <button
+                        type='button'
+                        onClick={() => remove(index)}
+                        className='bg-red-700 p-1 rounded-sm'>
+                        <FaMinus color='white' />
+                      </button>
                     </div>
-                  ))
-              }
+                  ))}
             </div>
           </div>
           <DialogFooter>
@@ -179,4 +188,4 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, entities }: EquipmentCr
   )
 }
 
-export default EquipmentCreateModal
+export default ComponentCreateModal;
