@@ -1,7 +1,7 @@
 export const ADMIN_ROUTES = [
   {
     key: 1,
-    name: 'Dashboard',
+    name: 'Inicio',
     path: '/admin/dashboard',
     role: ['1', '2'],
     enabled: true
