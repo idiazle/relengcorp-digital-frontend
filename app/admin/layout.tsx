@@ -7,7 +7,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <AdminNavbar />
       <div className="flex flex-row flex-1 overflow-hidden">
         <Sidebar />
-        <div className="flex-1 p-2 overflow-auto">
+        <div className="flex-1 px-4 py-2 overflow-auto">
           {children}
         </div>
       </div>
