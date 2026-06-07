@@ -1,0 +1,71 @@
+{
+  "status": "success",
+  "message": "Dashboard data for Quebrada Blanca retrieved successfully",
+  "timestamp": "2024-05-20T10:00:00Z",
+  "data": {
+    "equipPie": [
+      { "name": "normal", "value": 45, "fill": "#4CAF50" },
+      { "name": "tolerable", "value": 60, "fill": "#FFC107" },
+      { "name": "precaucion", "value": 40, "fill": "#FF9800" },
+      { "name": "critico", "value": 65, "fill": "#F44336" }
+    ],
+    "condCompPercentage": [
+      { "name": "10-nov", "normal": 0.4, "tolerable": 0.3, "precaucion": 0.2, "critico": 0.1 },
+      { "name": "11-nov", "normal": 0.42, "tolerable": 0.28, "precaucion": 0.15, "critico": 0.15 },
+      { "name": "12-nov", "normal": 0.45, "tolerable": 0.25, "precaucion": 0.2, "critico": 0.1 },
+      { "name": "13-nov", "normal": 0.44, "tolerable": 0.26, "precaucion": 0.2, "critico": 0.1 },
+      { "name": "14-nov", "normal": 0.4, "tolerable": 0.3, "precaucion": 0.2, "critico": 0.1 },
+      { "name": "15-nov", "normal": 0.38, "tolerable": 0.32, "precaucion": 0.2, "critico": 0.1 },
+      { "name": "16-nov", "normal": 0.42, "tolerable": 0.28, "precaucion": 0.2, "critico": 0.1 }
+    ],
+    "cumplimiento": [
+      { "name": "10-nov", "value": 0.88 },
+      { "name": "11-nov", "value": 0.85 },
+      { "name": "12-nov", "value": 0.92 },
+      { "name": "13-nov", "value": 0.89 },
+      { "name": "14-nov", "value": 0.84 },
+      { "name": "15-nov", "value": 0.82 },
+      { "name": "16-nov", "value": 0.9 }
+    ],
+    "eqMonitoreo": [
+      { "name": "10-nov", "mon": 40, "no_mon": 24 },
+      { "name": "11-nov", "mon": 42, "no_mon": 22 },
+      { "name": "12-nov", "mon": 45, "no_mon": 19 },
+      { "name": "13-nov", "mon": 44, "no_mon": 20 },
+      { "name": "14-nov", "mon": 40, "no_mon": 24 },
+      { "name": "15-nov", "mon": 38, "no_mon": 26 },
+      { "name": "16-nov", "mon": 42, "no_mon": 22 }
+    ],
+    "noProgramWorks": [
+      { "name": "Sem. 1", "value": 45 },
+      { "name": "Sem. 2", "value": 52 },
+      { "name": "Sem. 3", "value": 38 },
+      { "name": "Sem. 4", "value": 41 },
+      { "name": "Sem. 5", "value": 49 },
+      { "name": "Sem. 6", "value": 33 },
+      { "name": "Sem. 7", "value": 37 }
+    ],
+    "hhData": [
+      { "name": "11-nov", "hh_programado": 4000, "hh_ejecutado": 3500, "hh_fuera_ruta": 200 },
+      { "name": "12-nov", "hh_programado": 4100, "hh_ejecutado": 3600, "hh_fuera_ruta": 250 },
+      { "name": "13-nov", "hh_programado": 4000, "hh_ejecutado": 3550, "hh_fuera_ruta": 180 },
+      { "name": "14-nov", "hh_programado": 4000, "hh_ejecutado": 3400, "hh_fuera_ruta": 300 },
+      { "name": "15-nov", "hh_programado": 4100, "hh_ejecutado": 3300, "hh_fuera_ruta": 400 },
+      { "name": "16-nov", "hh_programado": 4000, "hh_ejecutado": 3700, "hh_fuera_ruta": 150 },
+      { "name": "Sem. 7", "hh_programado": 4100, "hh_ejecutado": 3500, "hh_fuera_ruta": 220 }
+    ],
+    "avisosOt": [
+      { "name": "10-nov", "avisos": 40, "ot": 24 },
+      { "name": "11-nov", "avisos": 42, "ot": 22 },
+      { "name": "12-nov", "avisos": 45, "ot": 19 },
+      { "name": "13-nov", "avisos": 44, "ot": 20 },
+      { "name": "14-nov", "avisos": 40, "ot": 24 },
+      { "name": "15-nov", "avisos": 38, "ot": 26 },
+      { "name": "16-nov", "avisos": 42, "ot": 22 }
+    ],
+    "avisosOtCerrAb": [
+      { "name": "OTs", "abierto": 24, "cerrado": 40 },
+      { "name": "Avisos", "abierto": 42, "cerrado": 22 }
+    ]
+  }
+}

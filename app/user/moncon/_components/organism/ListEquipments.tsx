@@ -29,7 +29,7 @@ const ListEquipments = () => {
   const equipments = equipmentList.data as EquipmentItem[]
 
   return (
-    <div className='w-full border border-gray-300 bg-gray-100 h-2/3'>
+    <div className='w-full border border-gray-300 bg-gray-100'>
       <h1 className='bg-gray-200 text-center w-full text-lg'>Lista de equipos</h1>
         <ul className='gap-1 flex-col flex overflow-y-auto'>
           {equipments.map(equipment => (

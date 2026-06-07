@@ -3,24 +3,24 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ResponsiveContainer, PieChart, Pie, Tooltip, Legend } from 'recharts';
-type PieItem = {
-  name: string;
-  value: number;
-  fill?: string;
-};
+import { PieItem } from '../../_models/dashboard.model';
 
-const CustomPieChart = ({ data }: { data: PieItem[] }) => {
+interface CustomPieChartProps {
+  data: PieItem[] | undefined;
+}
+
+const CustomPieChart = ({ data }: CustomPieChartProps) => {
   const [pieModalOpen, setPieModalOpen] = useState(false);
-  const [selectedPieItem, setSelectedPieItem] = useState<PieItem | null>(null);
+  /* const [selectedPieItem, setSelectedPieItem] = useState<PieItem | null>(null); */
 
-  const handlePieClick = (_: unknown, index: number) => {
-    const item = data[index];
+  /*   const handlePieClick = (_: unknown, index: number) => {
+      const item = data[index];
 
-    if (!item) return;
+      if (!item) return;
 
-    setSelectedPieItem(item);
-    setPieModalOpen(true);
-  };
+      setSelectedPieItem(item);
+      setPieModalOpen(true);
+    }; */
 
   return (
     <>
@@ -35,7 +35,7 @@ const CustomPieChart = ({ data }: { data: PieItem[] }) => {
             cx="50%"
             cy="50%"
             outerRadius="90%"
-            onClick={handlePieClick}
+            //onClick={handlePieClick}
             cursor="pointer"
           />
         </PieChart>
@@ -50,12 +50,12 @@ const CustomPieChart = ({ data }: { data: PieItem[] }) => {
             </DialogDescription>
           </DialogHeader>
 
-          {selectedPieItem && (
+         {/*  {selectedPieItem && (
             <div className="space-y-2 text-sm">
               <div><strong>Nombre:</strong> {selectedPieItem.name}</div>
               <div><strong>Valor:</strong> {selectedPieItem.value}</div>
             </div>
-          )}
+          )} */}
         </DialogContent>
       </Dialog>
     </>

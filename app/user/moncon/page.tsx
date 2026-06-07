@@ -2,19 +2,12 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TabsContent } from '@radix-ui/react-tabs'
 import Dashboard from './_components/organism/Dashboard';
-
-const sections = [
-  { id: 1, name: 'PDM PTAE', value: 'pdmp' },
-  { id: 2, name: 'PDM ANTAPACCAY', value: 'pdma' },
-  { id: 3, name: 'NDT TUBERIAS PTAE', value: 'ndtp' },
-  { id: 4, name: 'NDT TUBERIAS ANTAPACCAY', value: 'ndta' },
-  { id: 5, name: 'NDT TUBERIAS TINTAYA', value: 'ndtt' },
-]
+import { sections } from './_utils/moncon.constant';
 
 const Moncon = () => {
   return (
     <div className='w-full h-full p-2'>
-      <Tabs defaultValue='pdma' className='w-full h-full flex flex-col'>
+      <Tabs defaultValue={sections[0].value} className='w-full flex flex-col'>
         <TabsList className='w-full flex flex-row bg-gray-300 '>
           {
             sections.map(section => (
@@ -25,7 +18,7 @@ const Moncon = () => {
         {
           sections.map(section => (
             <TabsContent key={section.id} value={section.value} className='w-full h-full'>
-              <Dashboard area={section.value} />
+              <Dashboard codeArea={section.value} />
             </TabsContent>
           ))
         }
@@ -34,4 +27,4 @@ const Moncon = () => {
   )
 }
 
-export default Moncon
+export default Moncon;
