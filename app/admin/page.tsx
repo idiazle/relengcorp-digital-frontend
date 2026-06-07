@@ -2,8 +2,8 @@
 
 const AdminDashboardPage = () => {
   return (
-    <div className="flex flex-col h-full bg-gray-400">
-
+    <div className="flex flex-col h-full">
+      Dashboard Admin
     </div>
   )
 }
