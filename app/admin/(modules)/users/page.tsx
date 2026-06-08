@@ -3,7 +3,7 @@ import useActionsModal from './_hooks/useActionsModal'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import CreateUserModal from "./_components/organisms/CreateUserModal"
 import type { User } from "./_models/user.models"
-import HeaderForm from "@/components/admin/HeaderForm"
+import HeaderForm from "@/app/admin/_components/molecules/HeaderForm"
 import { Button } from "@/components/ui/button"
 import { FaSpinner } from "react-icons/fa6"
 import useGetUsers from "./_hooks/useGetUsers.hook"

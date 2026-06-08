@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { FaEye, FaTrash } from "react-icons/fa6"
 import { FaEdit } from "react-icons/fa"
-import HeaderForm from "@/components/admin/HeaderForm"
+import HeaderForm from "@/app/admin/_components/molecules/HeaderForm"
 import { Entity } from "./_models/entity.model"
 import useGetPlantsAndAreas from "./_hooks/useGetPlantsAndAreas.hook"
 import { useEntityActions } from "./_hooks/useEntityActions.hook"

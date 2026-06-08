@@ -1,10 +1,10 @@
 'use client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useEffect } from 'react';
-import packageJson from '../../package.json'
+
+import packageJson from '../../../../package.json'
 const pdfjsVersion = packageJson.dependencies['pdfjs-dist']
 import '@react-pdf-viewer/zoom/lib/styles/index.css';
-import { Viewer, Worker, SpecialZoomLevel, type LoadError } from '@react-pdf-viewer/core'
+import { Viewer, Worker, type LoadError } from '@react-pdf-viewer/core'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import es_ES from '@react-pdf-viewer/locales/lib/es_ES.json'

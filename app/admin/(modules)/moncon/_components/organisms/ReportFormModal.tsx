@@ -10,15 +10,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import PDFViewer from '@/components/admin/PDFViewer'
 import { useState } from 'react'
-import type { Entity } from '../../../(modules)/entities/_models/entity.model'
+import type { Entity } from '../../../../(modules)/entities/_models/entity.model'
 import type { Report, Notices } from '../../_models/moncon.model'
 import useMonconReportModal, { type ReportModalMode } from '../../_hooks/useMonconReportModal'
 import ReportHierarchySelect from '../molecules/ReportHierarchySelect'
 import ReportNoticesTable from '../molecules/ReportNoticesTable'
 import ReportViewSummary from '../molecules/ReportViewSummary'
 import { FaCircle } from 'react-icons/fa6'
+import PDFViewer from '@/app/admin/_components/molecules/PDFViewer'
 
 interface ReportFormModalProps {
   open: boolean
