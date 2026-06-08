@@ -3,18 +3,46 @@ import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
-import { FaCircle, FaEye, FaFilePdf, FaPlus, FaTrash, FaUpload } from 'react-icons/fa6'
+import { FaEye, FaFilePdf, FaTrash } from 'react-icons/fa6'
 import { deleteMonconReport, createMonconReport, updateReport } from '@/app/_services/monconServices'
 import ReportFormModal from './_components/organisms/ReportFormModal'
 import UploadReports from './_components/organisms/UploadReports'
 import { UploadHistoryReports } from './_components'
 import { FaEdit } from 'react-icons/fa'
-import { works } from './_config/options'
 import type { Report } from './_models/moncon.model'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import useGetTreeEntities from './_hooks/useMonconTreeEntities.hook'
 import useMonconReports from './_hooks/useMonconReports.hook'
 import type { ReportModalMode } from './_hooks/useMonconReportModal'
+import { getComponentName, getConditionName, getEquipmentTag, getRouteName, getTaskTypeName } from './_utils/monconRenders.utils'
+import PaginationControl from './_components/molecules/PaginationControl'
+import TitleSection from '../../_components/molecules/TitleSection'
+
+const MONCON_UI = {
+  SECTION: {
+    title: 'Gestión de Monitoreo de Condiciones',
+    firstButton: 'Nueva ruta',
+    secondButton: 'Historial',
+    thirdButton: 'Nuevo registro',
+  },
+  OPTIONS: {
+    programmed: 'Programados',
+    notProgrammed: 'No programados',
+    history: 'Histórico',
+  },
+  CABECERAS: {
+    number: 'N°',
+    programmedDate: 'FECHA PROGR.',
+    executionStatus: 'EJECUCIÓN',
+    executionDate: 'FECHA EJEC.',
+    equipmentTag: 'TAG EQUIPO',
+    route: 'RUTA',
+    component: 'COMPONENTE',
+    taskType: 'TIPO TAREA',
+    condition: 'CONDICIÓN',
+    actions: 'ACCIONES',
+  }
+}
 
 const MonconPage = () => {
   const [openReportModal, setOpenReportModal] = useState(false)
@@ -24,17 +52,13 @@ const MonconPage = () => {
   const [registerSelected, setRegisterSelected] = useState<Report | null>(null);
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
-  const { data: paginatedData, refetch: refetchReports } = useMonconReports(page, limit)
+  const { data: paginatedData, refetch } = useMonconReports(page, limit)
   const { data: treeEntities = [] } = useGetTreeEntities()
   const reports = paginatedData?.results ?? []
   const total = paginatedData?.total ?? 0
   const totalPages = Math.ceil(total / limit)
   const programmedReports = reports.filter((report) => report.program === 1)
   const notProgrammedReports = reports.filter((report) => report.program === 2)
-  
-  const getAllReport = () => {
-    refetchReports()
-  }
 
   const openCreateModal = () => {
     setRegisterSelected(null)
@@ -58,111 +82,40 @@ const MonconPage = () => {
     if (confirm(`¿Estás seguro de que deseas eliminar este registro?`)) {
       deleteMonconReport(dataId).then((response) => {
         console.log("eliminado", response)
-        getAllReport()
+        refetch()
       })
     }
   };
 
-  const getTaskTypeName = (taskTypeCode: number) => {
-    return works.find((tarea) => tarea.id === taskTypeCode)?.name || 'Desconocido'
-  };
-
-  const getRouteName = (report: Report) => {
-    const routeName = report.parents?.find((entity) => entity.type === 3)?.name
-    return routeName || 'N/A'
-  }
-
-  const getComponentName = (report: Report) => {
-    const componentName = report.parents?.find((entity) => entity.type === 6)?.name
-    return componentName || 'N/A'
-  }
-
-  const getEquipmentTag = (report: Report) => {
-    const routeOrEquipmentTag = report.parents?.find((entity) => entity.type === 3 || entity.type === 4)?.tag
-    return routeOrEquipmentTag || 'N/A'
-  }
-
-
-  const getConditionName = (conditionCode: number) => {
-    switch (conditionCode) {
-      case 1:
-        return (
-          <div className='flex flex-row gap-1 items-center'>
-            <FaCircle className='text-green-500' />
-            <h1>Normal</h1>
-          </div>
-        );
-      case 2:
-        return (
-          <div className='flex flex-row gap-1 items-center'>
-            <FaCircle className='text-yellow-500' />
-            <h1>Tolerable</h1>
-          </div>
-        );
-      case 3:
-        return (
-          <div className='flex flex-row gap-1 items-center'>
-            <FaCircle className='text-orange-500' />
-            <h1>Precaución</h1>
-          </div>
-        );
-      case 4:
-        return (
-          <div className='flex flex-row gap-1 items-center'>
-            <FaCircle className='text-red-500' />
-            <h1>Crítico</h1>
-          </div>
-        );
-      case 5:
-        return (
-          <div className='flex flex-row gap-1 items-center'>
-            <FaCircle className='text-gray-500' />
-            <h1>No Monitoreado</h1>
-          </div>
-        );
-      default:
-        return (
-          <div className='flex flex-row gap-1 items-center'>
-            <FaCircle className='text-black' />
-            <h1>Desconocido</h1>
-          </div>
-        );
-    }
-  };
-
-
   return (
     <div className="flex flex-col h-full">
-      <div className='flex justify-between items-center'>
-        <h1 className='font-bold text-lg'>GESTIÓN DE MONITOREO DE CONDICIONES</h1>
-        <div className='flex flex-row items-center gap-2'>
-          <Button onClick={() => { console.log('Subiendo archivo', setOpenUploadRoute(true)) }}><FaUpload /> Nueva ruta</Button>
-          <Button onClick={() => setOpenHistory(true)}><FaUpload /> Historial</Button>
-          <Button onClick={openCreateModal}><FaPlus /> Nuevo registro</Button>
-        </div>
-      </div>
+      <TitleSection
+        title={MONCON_UI.SECTION.title}
+        labelFirstButton={MONCON_UI.SECTION.firstButton}
+        labelSecondButton={MONCON_UI.SECTION.secondButton}
+        labelThirdButton={MONCON_UI.SECTION.thirdButton}
+        firstButton={() => setOpenUploadRoute(true)}
+        secondButton={() => setOpenHistory(true)}
+        thirdButton={openCreateModal}
+      />
       <Separator className='my-2' />
       <div className="flex-1 overflow-auto">
         <Tabs defaultValue="programmed" className="w-full">
           <TabsList className="bg-gray-200 justify-start sticky top-0 z-20">
-            <TabsTrigger value="programmed">Programados</TabsTrigger>
-            <TabsTrigger value="not-programmed">No programados</TabsTrigger>
-            <TabsTrigger value="history">Histórico</TabsTrigger>
+            <TabsTrigger value="programmed">{MONCON_UI.OPTIONS.programmed}</TabsTrigger>
+            <TabsTrigger value="not-programmed">{MONCON_UI.OPTIONS.notProgrammed}</TabsTrigger>
+            <TabsTrigger value="history">{MONCON_UI.OPTIONS.history}</TabsTrigger>
           </TabsList>
           <TabsContent value="programmed">
             <Table className="bg-white">
               <TableHeader className="bg-gray-300 sticky top-0 z-10">
                 <TableRow>
-                  <TableHead className="w-[50px]">N°</TableHead>
-                  <TableHead>FECHA PROGR.</TableHead>
-                  <TableHead>EJECUCIÓN</TableHead>
-                  <TableHead>FECHA EJEC.</TableHead>
-                  <TableHead>TAG EQUIPO</TableHead>
-                  <TableHead>RUTA</TableHead>
-                  <TableHead>COMPONENTE</TableHead>
-                  <TableHead>TIPO TAREA</TableHead>
-                  <TableHead>CONDICIÓN</TableHead>
-                  <TableHead>ACCIONES</TableHead>
+                  {
+                    Object.values(MONCON_UI.CABECERAS).map((header, index) => (
+                      console.log(header),
+                      <TableHead key={index} className={index === 0 ? "w-[50px]" : ""}>{header}</TableHead>
+                    ))
+                  }
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -215,16 +168,11 @@ const MonconPage = () => {
             <Table className="bg-white">
               <TableHeader className="bg-gray-300 sticky top-0 z-10">
                 <TableRow>
-                  <TableHead className="w-[50px]">N°</TableHead>
-                  <TableHead>FECHA PROGR.</TableHead>
-                  <TableHead>EJECUCIÓN</TableHead>
-                  <TableHead>FECHA EJEC.</TableHead>
-                  <TableHead>TAG EQUIPO</TableHead>
-                  <TableHead>RUTA</TableHead>
-                  <TableHead>COMPONENTE</TableHead>
-                  <TableHead>TIPO TAREA</TableHead>
-                  <TableHead>CONDICIÓN</TableHead>
-                  <TableHead>ACCIONES</TableHead>
+                  {
+                    Object.values(MONCON_UI.CABECERAS).map((header, index) => (
+                      <TableHead key={index} className={index === 0 ? "w-[50px]" : ""}>{header}</TableHead>
+                    ))
+                  }
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -275,19 +223,14 @@ const MonconPage = () => {
             </Table>
           </TabsContent>
           <TabsContent value="history">
-             <Table className="bg-white">
+            <Table className="bg-white">
               <TableHeader className="bg-gray-300 sticky top-0 z-10">
                 <TableRow>
-                  <TableHead className="w-[50px]">N°</TableHead>
-                  <TableHead>FECHA PROGR.</TableHead>
-                  <TableHead>EJECUCIÓN</TableHead>
-                  <TableHead>FECHA EJEC.</TableHead>
-                  <TableHead>TAG EQUIPO</TableHead>
-                  <TableHead>RUTA</TableHead>
-                  <TableHead>COMPONENTE</TableHead>
-                  <TableHead>TIPO TAREA</TableHead>
-                  <TableHead>CONDICIÓN</TableHead>
-                  <TableHead>ACCIONES</TableHead>
+                  {
+                    Object.values(MONCON_UI.CABECERAS).map((header, index) => (
+                      <TableHead key={index} className={index === 0 ? "w-[50px]" : ""}>{header}</TableHead>
+                    ))
+                  }
                 </TableRow>
               </TableHeader>
             </Table>
@@ -295,13 +238,15 @@ const MonconPage = () => {
         </Tabs>
 
         {/* Controles de paginación */}
-        <div className='flex justify-between items-center mt-4 px-4 py-3 bg-gray-100 rounded'>
+        <PaginationControl reports={reports} paginatedData={paginatedData} />
+
+        {/*    <div className='flex justify-between items-center mt-4 px-4 py-3 bg-gray-100 rounded'>
           <div className='text-sm text-gray-600'>
             Mostrando {reports.length === 0 ? 0 : (page - 1) * limit + 1} a {Math.min(page * limit, total)} de {total} registros
           </div>
           <div className='flex gap-2 items-center'>
-            <select 
-              value={limit} 
+            <select
+              value={limit}
               onChange={(e) => {
                 setLimit(Number(e.target.value))
                 setPage(1)
@@ -313,8 +258,8 @@ const MonconPage = () => {
               <option value={20}>20 por página</option>
               <option value={50}>50 por página</option>
             </select>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
@@ -324,8 +269,8 @@ const MonconPage = () => {
             <span className='text-sm text-gray-600'>
               Página {page} de {totalPages}
             </span>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages || totalPages === 0}
@@ -333,8 +278,7 @@ const MonconPage = () => {
               Siguiente
             </Button>
           </div>
-        </div>
-
+        </div> */}
       </div>
 
       <ReportFormModal
@@ -363,7 +307,7 @@ const MonconPage = () => {
       />
 
       {/* Añadir ruta de trabajo */}
-    {/*   {openUploadRoute &&
+      {/*   {openUploadRoute &&
         <UploadReports openUploadReports={openUploadRoute}
           setOpenUploadReports={setOpenUploadRoute}
         />
