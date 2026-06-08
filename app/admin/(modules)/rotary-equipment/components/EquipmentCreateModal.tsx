@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { DialogTitle } from '@radix-ui/react-dialog'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
-import { createEntity } from '@/app/services/entitiesServices'
+import { createEntity } from '@/app/_services/entitiesServices'
 import { Entity } from '../../(modules)/entities/_models/entity.model'
 
 interface EquipmentCreateModalProps {

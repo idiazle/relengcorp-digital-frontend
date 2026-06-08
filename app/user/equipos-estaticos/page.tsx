@@ -14,7 +14,7 @@ import {
   , VictoryStack, VictoryTheme
 } from "victory";
 
-import { getConditionsData, getEquipmentConditionByMonth } from '../../services/monconUserServices'
+import { getConditionsData, getEquipmentConditionByMonth } from '../../_services/monconUserServices'
 
 const EquiposEstaticos = () => {
   const myDataset = [

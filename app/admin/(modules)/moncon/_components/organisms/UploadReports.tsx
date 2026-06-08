@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/input'
 import * as XLSX from 'xlsx'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
-import { getTreeEntities } from '@/app/services/entitiesServices'
-import { createMonconReport } from '@/app/services/monconServices'
+import { getTreeEntities } from '@/app/_services/entitiesServices'
+import { createMonconReport } from '@/app/_services/monconServices'
 
 type Props = {
   openUploadReports: boolean

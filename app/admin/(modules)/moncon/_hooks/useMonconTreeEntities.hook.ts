@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getTreeEntities } from '@/app/services/entitiesServices'
+import { getTreeEntities } from '@/app/_services/entitiesServices'
 import type { Entity } from '../../(modules)/entities/_models/entity.model'
 
 const useGetTreeEntities = () => {

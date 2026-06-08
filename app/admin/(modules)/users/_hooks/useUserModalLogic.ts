@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { createUser, getUserGroups, updateUser } from '@/app/services/userServices'
+import { createUser, getUserGroups, updateUser } from '@/app/_services/userServices'
 import { generateRandomPassword } from '../_utils/utils'
 import type { Groups, User } from '../_models/user.models'
 import { emptyUserForm } from '../_config/userFormDefaults'

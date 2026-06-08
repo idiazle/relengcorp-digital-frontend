@@ -1,4 +1,4 @@
-import { getUsers } from '@/app/services/userServices'
+import { getUsers } from '@/app/_services/userServices'
 import { useQuery } from '@tanstack/react-query'
 import { PaginatedResponse, User,  } from '../_models/user.models'
 

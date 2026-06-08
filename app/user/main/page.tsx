@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import React, { useState } from 'react'
-import modulesMock from './mock/modules_mock.json'
+import modulesMock from './_mock/modules_mock.json'
 
 const Main = () => {
   const [activeModule, setActiveModule] = useState<number | null>(null)

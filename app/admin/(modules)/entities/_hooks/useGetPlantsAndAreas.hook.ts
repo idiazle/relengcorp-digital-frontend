@@ -1,4 +1,4 @@
-import { getEntities } from "@/app/services/entitiesServices";
+import { getEntities } from "@/app/_services/entitiesServices";
 import { useQuery } from "@tanstack/react-query";
 import { Entity } from "../_models/entity.model";
 
