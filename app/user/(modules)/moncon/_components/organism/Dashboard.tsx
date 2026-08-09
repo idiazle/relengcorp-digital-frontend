@@ -9,14 +9,14 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ codeArea }: DashboardProps) => {
-  const { data, isLoading, error } = useGetDashboard(130,1)
-  console.log('Dashboard data:', codeArea, data)
+  const numericCodeArea = Number(codeArea) || 0
+  const { data, isLoading, error } = useGetDashboard(numericCodeArea, 1)
 
   if (isLoading) {
     return <div>Cargando datos...</div>
   }
 
-  if (error) {
+  if (error || !data?.data) {
     return <div>Error al cargar los datos del dashboard</div>
   }
 
@@ -27,12 +27,12 @@ const Dashboard = ({ codeArea }: DashboardProps) => {
           <div>
             <h1 className='bg-gray-200 text-center w-full text-lg'>Condición de equipos/componentes</h1>
             <div className='flex flex-row'>
-              <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
-                <CustomPieChart data={data?.data.equipPie} />
+              <div className="w-full max-w-[700px] h-[30vh] border border-gray-300 p-4 bg-gray-100">
+                <CustomPieChart data={data.data.equipPie} />
               </div>
-              <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+              <div className="w-full max-w-[700px] h-[30vh] border border-gray-300 p-4 bg-gray-100">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data?.data.condCompPercentage} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <BarChart data={data.data.condCompPercentage} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
                     <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
@@ -51,10 +51,10 @@ const Dashboard = ({ codeArea }: DashboardProps) => {
           <div className='flex w-full flex-row'>
             <div className='flex w-full flex-col'>
               <h1 className='bg-gray-200 text-center w-full text-lg'>Cumplimiento</h1>
-              <CustomBarChart data={data?.data.cumplimiento} />
-              <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+              <CustomBarChart data={data.data.cumplimiento} />
+              <div className="w-full max-w-[700px] h-[30vh] border border-gray-300 p-4 bg-gray-100">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data?.data.eqMonitoreo} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <BarChart data={data.data.eqMonitoreo} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
                     <YAxis />
@@ -73,9 +73,9 @@ const Dashboard = ({ codeArea }: DashboardProps) => {
 
             <div className='flex w-full flex-col'>
               <h1 className='bg-gray-200 text-center w-full text-lg'>Tareas no programadas</h1>
-              <div className="w-full max-w-[700px] max-h-[20vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+              <div className="w-full max-w-[700px] h-[20vh] border border-gray-300 p-4 bg-gray-100">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data?.data.noProgramWorks}>
+                  <LineChart data={data.data.noProgramWorks}>
                     <CartesianGrid strokeDasharray="3" />
                     <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
                     <YAxis />
@@ -84,9 +84,9 @@ const Dashboard = ({ codeArea }: DashboardProps) => {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+              <div className="w-full max-w-[700px] h-[30vh] border border-gray-300 p-4 bg-gray-100">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={data?.data.hhData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <ComposedChart data={data.data.hhData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
                     <YAxis />
@@ -107,9 +107,9 @@ const Dashboard = ({ codeArea }: DashboardProps) => {
           <div>
             <h1 className='bg-gray-200 text-center w-full text-lg'>{`Avisos & OT's`}</h1>
             <div className='flex w-full flex-row'>
-              <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+              <div className="w-full max-w-[700px] h-[30vh] border border-gray-300 p-4 bg-gray-100">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data?.data.avisosOt} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <BarChart data={data.data.avisosOt} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" height={60} tick={{ angle: -45, textAnchor: 'end' }} interval={0} />
                     <YAxis />
@@ -124,9 +124,9 @@ const Dashboard = ({ codeArea }: DashboardProps) => {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="w-full max-w-[700px] max-h-[30vh] aspect-square border border-gray-300 p-4 bg-gray-100">
+              <div className="w-full max-w-[700px] h-[30vh] border border-gray-300 p-4 bg-gray-100">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart layout="vertical" data={data?.data.avisosOtCerrAb} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <BarChart layout="vertical" data={data.data.avisosOtCerrAb} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" />
                     <YAxis dataKey="name" type="category" />
@@ -147,7 +147,7 @@ const Dashboard = ({ codeArea }: DashboardProps) => {
         </div>
       </div>
       <div className='w-full flex flex-row justify-end'>
-        <h1>{data?.timestamp && new Date(data?.timestamp).toLocaleString(
+        <h1>{data.timestamp && new Date(data.timestamp).toLocaleString(
           'es-ES',
           {
             day: '2-digit',
