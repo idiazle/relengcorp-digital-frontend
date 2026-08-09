@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboard } from '../_services/getDashboard.service'
 
-export const useGetDashboard = (codeArea: string) => {
+export const useGetDashboard = (codeArea: number, workType: number) => {
   const query = useQuery({
-    queryKey: ['dashboard', codeArea],
-    queryFn: () => getDashboard(codeArea),
+    queryKey: ['dashboard'],
+    queryFn: () => getDashboard({ codeArea, workType }),
     // enabled: false, // Se comenta o elimina para que la carga sea automática
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

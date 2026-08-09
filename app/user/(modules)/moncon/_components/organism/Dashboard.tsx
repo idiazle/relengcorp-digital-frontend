@@ -9,7 +9,7 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ codeArea }: DashboardProps) => {
-  const { data, isLoading, error } = useGetDashboard(codeArea)
+  const { data, isLoading, error } = useGetDashboard(130,1)
   console.log('Dashboard data:', codeArea, data)
 
   if (isLoading) {

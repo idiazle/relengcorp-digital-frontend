@@ -8,15 +8,15 @@ import { DialogTitle } from '@radix-ui/react-dialog'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 import { createEntity } from '@/app/_services/entitiesServices'
-import { Entity } from '../../entities/_models/entity.model'
+import { Entity } from '../entities/_models/entity.model'
 
-interface EquipmentCreateModalProps {
+interface ItemCreateModalProps {
   openModal: boolean
   setOpenModal: (open: boolean) => void
-  areas: Entity[]
+  routes: Entity[]
 }
 
-const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreateModalProps) => {
+const ItemCreateModal = ({ openModal, setOpenModal, routes }: ItemCreateModalProps) => {
   const { register, control, handleSubmit, reset, setValue } = useForm<Entity>({
     defaultValues: {
       name: '',
@@ -35,30 +35,30 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
     name: 'extra_info.properties'
   })
 
-  const handleSelectArea = (areaName: string) => {
-    const selectedArea = areas.find(entity => entity.name === areaName)
-    if (selectedArea) {
-      setValue('parent', selectedArea.id || 0)
+  const handleSelectRoute = (routeName: string) => {
+    const selectedRoute = routes.find(entity => entity.name === routeName)
+    if (selectedRoute) {
+      setValue('parent', selectedRoute.id || 0)
     }
   }
 
   const onSubmit = async (formData: Entity) => {
     console.log('Form data to submit:', formData)
     try {
-      const equipmentData = {
+      const itemData = {
         ...formData,
-        type: 4, // Tipo 4 para equipos rotatorios
+        type: 5, // Tipo 5 para items genéricos
         extra_info: {
           ...formData.extra_info,
           properties: formData.extra_info?.properties || []
         }
       }
-      const response = await createEntity(equipmentData)
-      console.log('Equipo creado:', response)
+      const response = await createEntity(itemData)
+      console.log('Item creado:', response)
       reset()
       setOpenModal(false)
     } catch (error) {
-      console.error('Error al crear el equipo:', error)
+      console.error('Error al crear el item:', error)
     }
   }
 
@@ -66,7 +66,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
     <Dialog open={openModal} onOpenChange={setOpenModal}>
       <DialogContent className='bg-slate-200'>
         <DialogHeader>
-          <DialogTitle className='font-bold'>CREAR EQUIPO</DialogTitle>
+          <DialogTitle className='font-bold'>CREAR ITEM</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
           <div className='flex flex-col gap-2'>
@@ -76,7 +76,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
               <Input
                 {...register('name')}
                 className='bg-white'
-                placeholder='Nombre del equipo'
+                placeholder='Nombre del item'
               />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
@@ -84,7 +84,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
               <Input
                 {...register('extra_info.name_en')}
                 className='bg-white'
-                placeholder='Equipment name'
+                placeholder='Item name'
               />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
@@ -92,24 +92,24 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
               <Input
                 {...register('tag')}
                 className='bg-white'
-                placeholder='TAG del equipo'
+                placeholder='TAG del item'
               />
             </div>
             <div className='flex flex-row justify-center items-center gap-2'>
-              <Label className='font-bold'>Área:</Label>
+              <Label className='font-bold'>Ruta:</Label>
               <Controller
                 name="parent"
                 control={control}
                 render={({ field }) => (
                   <Select
-                    onValueChange={(value) => handleSelectArea(value)}
-                    value={areas.find(entity => entity.id === field.value)?.name || ''}
+                    onValueChange={(value) => handleSelectRoute(value)}
+                    value={routes.find(entity => entity.id === field.value)?.name || ''}
                   >
                     <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Seleccione un área" />
+                      <SelectValue placeholder="Seleccione una ruta" />
                     </SelectTrigger>
                     <SelectContent>
-                      {areas.map((entity) => (
+                      {routes.map((entity) => (
                         <SelectItem key={entity.id} value={entity.name || ''}>
                           {entity?.tag ? "[" + entity?.tag + "] - " + entity.name : "[S/T] - " + entity.name}
                         </SelectItem>
@@ -127,7 +127,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
                 render={({ field }) => (
                   <Textarea
                     {...field}
-                    placeholder='Descripción del equipo'
+                    placeholder='Descripción del item'
                     className='bg-white resize-none'
                   />
                 )}
@@ -180,4 +180,4 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
   )
 }
 
-export default EquipmentCreateModal
+export default ItemCreateModal;

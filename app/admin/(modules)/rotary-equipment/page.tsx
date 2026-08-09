@@ -7,7 +7,7 @@ import { FaPlus } from "react-icons/fa6";
 import EquipmentCreateModal from "./components/EquipmentCreateModal";
 import { deleteEntity, getEntities, getEquipments } from "@/app/_services/entitiesServices";
 import ComponentCreateModal from "./components/ComponentCreateModal";
-import { Entity } from "../(modules)/entities/_models/entity.model";
+import { Entity } from "../entities/_models/entity.model";
 import { Property } from "./models/equipment.model";
 
 const RotaryEquipmentPage = () => {
@@ -17,9 +17,15 @@ const RotaryEquipmentPage = () => {
   const [openComponentCreateModal, setOpenComponentCreateModal] = useState(false)
 
   const getEquipmentsData = () => {
+    getEntities().then(response => {
+      console.log('Entities fetched:', response.status, response)
+      setAreas(response.data.filter((entity: Entity) => entity.type === 2))
+    }).catch(error => {
+      console.error('Error al obtener las áreas:', error)
+    })
     getEquipments().then(response => {
       console.log('Equipments fetched:', response.status, response)
-      setEquipments(response.data.results.filter((entity: Entity) => entity.type === 4))
+      setEquipments(response.data.filter((entity: Entity) => entity.type === 4))
     }).catch(error => {
       console.error('Error al obtener los equipos:', error)
     })
@@ -113,12 +119,16 @@ const RotaryEquipmentPage = () => {
           }
         </TableBody>
       </Table>
-      {
-        <EquipmentCreateModal openModal={openCreateModal} setOpenModal={setOpenCreateModal} entities={areas} />
-      }
-      {
-        <ComponentCreateModal openModal={openComponentCreateModal} setOpenModal={setOpenComponentCreateModal} equipments={equipments} />
-      }
+      <EquipmentCreateModal
+        areas={areas}
+        openModal={openCreateModal}
+        setOpenModal={setOpenCreateModal}
+      />
+      <ComponentCreateModal
+        equipments={equipments}
+        openModal={openComponentCreateModal}
+        setOpenModal={setOpenComponentCreateModal}
+      />
     </div>
 
   )

@@ -24,7 +24,7 @@ const UsersPage = () => {
       )
     }
 
-    if (!data || data.results.length === 0) {
+    if (!data || data.length === 0) {
       return (
         <TableRow>
           <TableCell colSpan={6} className="text-center py-4">
@@ -34,7 +34,7 @@ const UsersPage = () => {
       )
     }
 
-    return data.results.map((user: User, index: number) => (
+    return data.map((user: User, index: number) => (
       <TableRow key={user.id}>
         <TableCell>{index + 1}</TableCell>
         <TableCell>{user.name}</TableCell>

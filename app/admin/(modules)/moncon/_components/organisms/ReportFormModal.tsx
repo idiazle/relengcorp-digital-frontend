@@ -79,6 +79,7 @@ const ReportFormModal = ({
 
   const formOnSubmit = async (formData: Report) => {
     try {
+      console.log('Form data to submit:', formData)
       await onSubmit(formData, file, noticesData)
       handleClose()
     } catch (error) {

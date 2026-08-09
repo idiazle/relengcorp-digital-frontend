@@ -7,7 +7,7 @@ const useGetUsers = () => {
     const response = await getUsers()
     return response.data
   }
-  return useQuery<PaginatedResponse<User>>({
+  return useQuery<User[]>({
     queryKey: ['users'],
     queryFn: fetchUsers,
     refetchOnWindowFocus: false

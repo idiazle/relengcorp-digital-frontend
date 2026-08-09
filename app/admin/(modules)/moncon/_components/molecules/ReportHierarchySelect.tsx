@@ -116,19 +116,19 @@ const ReportHierarchySelect = ({
                   <SelectValue placeholder="Seleccionar..." />
                 </SelectTrigger>
                 <SelectContent>
-                 {
+                  {
                     services.filter((s) => selectedWorkType === 0 || works.find((w) => w.id === selectedWorkType)?.service_types.includes(s.id))
-                    .map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
-                    ))
-                 }
+                      .map((s) => (
+                        <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
+                      ))
+                  }
                 </SelectContent>
               </Select>
             )}
           />
         </div>
 
-       {/*  <div className="flex flex-col gap-2 w-1/5">
+        {/*  <div className="flex flex-col gap-2 w-1/5">
           <Label className="font-semibold">Condición:</Label>
           <Controller
             name="condition"
@@ -191,7 +191,6 @@ const ReportHierarchySelect = ({
             </SelectContent>
           </Select>
         </div>
-
         <div className="flex flex-col gap-2 w-1/5">
           <Label className="font-semibold">Ruta:</Label>
           <Select disabled={!selectedArea} value={selectedRoute ? String(selectedRoute) : ''} onValueChange={(v) => {
@@ -210,7 +209,6 @@ const ReportHierarchySelect = ({
             </SelectContent>
           </Select>
         </div>
-
         {changeType === 1 && (
           <div className="flex flex-col gap-2 w-1/5">
             <Label className="font-semibold">Equipo:</Label>

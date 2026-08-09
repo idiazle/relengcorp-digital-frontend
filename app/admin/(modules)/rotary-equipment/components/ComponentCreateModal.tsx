@@ -8,7 +8,7 @@ import { DialogTitle } from '@radix-ui/react-dialog'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 import { createEntity } from '@/app/_services/entitiesServices'
-import { Entity } from '../../(modules)/entities/_models/entity.model'
+import { Entity } from '../../entities/_models/entity.model'
 
 interface ComponentCreateModalProps {
   openModal: boolean
@@ -46,7 +46,7 @@ const ComponentCreateModal = ({ openModal, setOpenModal, equipments }: Component
     try {
       const componentData = {
         ...formData,
-        type: 4,
+        type: 6, // Tipo 6 para componentes de equipos rotatorios
         extra_info: {
           ...formData.extra_info,
           properties: formData.extra_info?.properties || []
@@ -109,7 +109,7 @@ const ComponentCreateModal = ({ openModal, setOpenModal, equipments }: Component
                     </SelectTrigger>
                     <SelectContent>
                       {equipments.map((equipment: Entity) => (
-                        <SelectItem key={equipment.id} value={equipment.id?.toString() || ''}>
+                        <SelectItem key={equipment.id} value={equipment.name || ''}>
                           {equipment?.tag ? "[" + equipment?.tag + "] - " + equipment.name : "[S/T] - " + equipment.name}
                         </SelectItem>
                       ))}

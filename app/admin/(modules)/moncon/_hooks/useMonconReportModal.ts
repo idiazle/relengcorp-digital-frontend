@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import type { Report, Notices } from '../_models/moncon.model'
-import type { Entity } from '../../(modules)/entities/_models/entity.model'
+import type { Entity } from '../../entities/_models/entity.model'
 
 export type ReportModalMode = 'create' | 'edit' | 'view'
 
