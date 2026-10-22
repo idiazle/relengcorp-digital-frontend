@@ -1,4 +1,5 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator";
 import { FaUser } from "react-icons/fa6";
 
 const userName = "User 01";
@@ -16,6 +17,7 @@ const UserMenu = () => {
         <DropdownMenuItem>Perfil</DropdownMenuItem>
         <DropdownMenuItem>Configuración</DropdownMenuItem>
         <DropdownMenuItem>Soporte</DropdownMenuItem>
+        <Separator/>
         <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -23,3 +25,4 @@ const UserMenu = () => {
 }
 
 export default UserMenu;
+ 

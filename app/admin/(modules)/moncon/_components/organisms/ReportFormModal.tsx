@@ -292,9 +292,9 @@ const ReportFormModal = ({
         </DialogContent>
       </Dialog>
 
-      {openPDF && selectedReport?.attachment && (
+      {/*openPDF && selectedReport?.attachment && (
         <PDFViewer urlPDF={selectedReport.attachment} openDialog={openPDF} setOpenDialog={setOpenPDF} />
-      )}
+      )*/}
     </>
   )
 }

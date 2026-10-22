@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { DialogTitle } from '@radix-ui/react-dialog'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
-import { FaMinus, FaPlus } from 'react-icons/fa6'
+import { FaPlus, FaTrash } from 'react-icons/fa6'
 import { createEntity } from '@/app/_services/entitiesServices'
 import { Entity } from '../../entities/_models/entity.model'
 
@@ -145,7 +145,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
                   <p className='italic'>No hay propiedades agregadas.</p>
                   :
                   fields.map((field, index) => (
-                    <div key={field.id} className='flex flex-row gap-2 mb-2'>
+                    <div key={field.id} className='flex flex-row gap-2 border-b border-gray-800 p-1'>
                       <Input
                         {...register(`extra_info.properties.${index}.name`)}
                         placeholder='Nombre'
@@ -156,7 +156,7 @@ const EquipmentCreateModal = ({ openModal, setOpenModal, areas }: EquipmentCreat
                         placeholder='Valor'
                         className='bg-white'
                       />
-                      <button type='button' onClick={() => remove(index)} className='bg-red-700 p-1 rounded-sm'><FaMinus color='white' /></button>
+                      <button type='button' onClick={() => remove(index)} className='bg-red-500 px-3 py-1 rounded-sm'><FaTrash color='white' /></button>
                     </div>
                   ))
               }

@@ -10,7 +10,7 @@ const Logo = () => {
         height={10}
         className="bg-white p-1"
       />
-      <h1 className="text-lg font-bold">Gemelo Digital</h1>
+      <h1 className="text-lg font-bold">Gemelo Digital Personal</h1>
     </div>
   )
 }
